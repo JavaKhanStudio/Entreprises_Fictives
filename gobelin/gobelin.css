@@ -1,0 +1,180 @@
+/* Gobelin Hurlant: a cave lit by a screen at 3 a.m. Phone first, wider layouts at 720px. */
+
+:root {
+  --nuit: #12160f;
+  --paroi: #1f2719;
+  --trait: #3b4a2e;
+  --morve: #b9f73e;
+  --hurle: #ff6fb5;
+  --os: #f0f5e4;
+  --mousse: #b4c4a6;
+  --titre: ui-monospace, "SF Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+}
+
+html { background: var(--nuit); }
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--nuit);
+  color: var(--os);
+  font: 1rem/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+main { flex: 1; width: 100%; max-width: 68rem; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+
+a { color: var(--morve); }
+a:hover { color: var(--hurle); }
+:focus-visible { outline: 3px solid var(--hurle); outline-offset: 2px; }
+
+h1, h2, h3 { font-family: var(--titre); line-height: 1.2; }
+h1 { margin: 0.5rem 0 1rem; color: var(--morve); font-size: 1.8rem; text-transform: uppercase; }
+h2 { margin: 2.25rem 0 0.75rem; color: var(--morve); font-size: 1.25rem; text-transform: uppercase; }
+h3 { margin: 0; font-size: 1.05rem; }
+
+.chapo { color: var(--mousse); font-size: 1.1rem; }
+
+/* The top of every page */
+.haut { border-bottom: 3px solid var(--morve); background: var(--paroi); }
+.haut-dedans { max-width: 68rem; margin: 0 auto; padding: 0.6rem 1rem; }
+.marque {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  color: var(--os);
+  font: 700 1.15rem var(--titre);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.marque img { width: 44px; height: 44px; }
+.menu { display: flex; flex-wrap: wrap; gap: 0.25rem 0.4rem; margin-top: 0.5rem; }
+.menu a {
+  display: inline-block;
+  padding: 0.4rem 0.55rem;
+  color: var(--os);
+  font: 0.9rem var(--titre);
+  text-decoration: none;
+}
+.menu a:hover { background: var(--trait); color: var(--morve); }
+.menu a[aria-current="page"] { background: var(--morve); color: var(--nuit); }
+
+/* What is pinned on the cave wall */
+.affiche {
+  display: grid;
+  gap: 1.25rem;
+  align-items: center;
+}
+.affiche img { display: block; width: 100%; border: 3px solid var(--morve); box-shadow: 6px 6px 0 var(--hurle); }
+.sticker {
+  display: inline-block;
+  margin: 0.25rem 0;
+  padding: 0.3rem 0.6rem;
+  background: var(--hurle);
+  color: var(--nuit);
+  font: 700 0.9rem var(--titre);
+  transform: rotate(-1.5deg);
+}
+
+.bloc {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 2px solid var(--trait);
+  background: var(--paroi);
+}
+.bloc > :first-child { margin-top: 0; }
+.bloc > :last-child { margin-bottom: 0; }
+
+figure { max-width: 44rem; margin: 1.25rem 0; }
+figure img { display: block; width: 100%; border: 3px solid var(--trait); }
+figure.badge { max-width: 15rem; }
+figcaption { margin-top: 0.4rem; color: var(--mousse); font-size: 0.9rem; }
+
+/* Posts */
+.post {
+  margin: 0.9rem 0;
+  padding: 0.8rem 0.9rem;
+  border-left: 4px solid var(--morve);
+  background: var(--nuit);
+}
+.bloc .post:last-child { margin-bottom: 0; }
+.post .qui { margin: 0 0 0.35rem; color: var(--mousse); font-size: 0.85rem; }
+.post p { margin: 0 0 0.45rem; }
+.post .tags { color: var(--hurle); font-size: 0.9rem; }
+.post .likes { margin: 0; color: var(--mousse); font-size: 0.85rem; }
+.post figure { margin: 0.5rem 0; }
+
+/* The horde */
+.gobelin-carte { margin: 1.25rem 0; padding: 1rem; border: 2px solid var(--trait); background: var(--paroi); }
+.gobelin-tete { display: flex; gap: 0.9rem; align-items: center; }
+.gobelin-tete img { flex: none; width: 84px; height: 84px; border: 2px solid var(--morve); border-radius: 50%; }
+.gobelin-tete h2 { margin: 0; }
+.titre-absurde { margin: 0.15rem 0 0; color: var(--hurle); font-weight: 600; }
+.poste { margin: 0.1rem 0 0; color: var(--mousse); font-size: 0.9rem; }
+.bio { margin: 0.8rem 0 0; }
+
+/* Tables that stay readable on a phone */
+.mur { width: 100%; border-collapse: collapse; }
+.mur th, .mur td { padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: top; }
+.mur th { color: var(--morve); font: 0.85rem var(--titre); }
+.mur .nb { white-space: nowrap; }
+
+.adresses { padding: 0; list-style: none; }
+.adresses li { padding: 0.5rem 0; border-bottom: 1px solid var(--trait); }
+.adresses code, code { color: var(--morve); font: 0.95em var(--titre); }
+
+/* The org chart: an indented list on a phone, a tree from 720px */
+.org, .org ul { margin: 0; padding: 0; list-style: none; }
+.org ul { margin-left: 0.9rem; padding-left: 0.9rem; border-left: 2px solid var(--morve); }
+.org li { margin: 0.6rem 0; }
+.boite { padding: 0.55rem 0.7rem; border: 2px solid var(--morve); background: var(--paroi); }
+.boite strong { display: block; }
+.boite span { display: block; font-size: 0.88rem; }
+.boite .titre-absurde { margin: 0; }
+.boite .poste { margin: 0; }
+.boite.vide { border-style: dashed; border-color: var(--hurle); background: none; }
+.boite.dehors { border-style: dotted; border-color: var(--mousse); background: none; }
+
+@media (min-width: 720px) {
+  h1 { font-size: 2.4rem; }
+  .haut-dedans { display: flex; gap: 1.5rem; align-items: center; justify-content: space-between; }
+  .menu { justify-content: flex-end; margin-top: 0; }
+  .affiche { grid-template-columns: 1fr 1fr; }
+  .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .deux .post { margin: 0; }
+  .gobelin-tete img { width: 110px; height: 110px; }
+
+  .org { display: flex; justify-content: center; }
+  .org ul { display: flex; gap: 0.9rem; justify-content: center; margin: 0; padding: 1rem 0 0; border: 0; position: relative; }
+  .org li { position: relative; flex: 1 1 0; margin: 0; min-width: 0; }
+  .org ul > li { padding-top: 1rem; }
+  /* The rungs: a stub above each box, and a bar joining the stubs of one level. */
+  .org ul > li::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 1rem;
+    border-left: 2px solid var(--morve);
+  }
+  .org ul > li::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -0.5rem;
+    right: -0.5rem;
+    border-top: 2px solid var(--morve);
+  }
+  .org ul > li:first-child::after { left: 50%; }
+  .org ul > li:last-child::after { right: 50%; }
+  .org ul > li:only-child::after { display: none; }
+  .org li > ul::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 1rem;
+    border-left: 2px solid var(--morve);
+  }
+  .boite { text-align: center; }
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300" font-family="ui-monospace,DejaVu Sans Mono,Menlo,Consolas,monospace" font-weight="700">
+<rect width="240" height="300" fill="#12160f"/>
+<rect x="104" y="0" width="32" height="70" fill="#ff6fb5"/>
+<rect x="36" y="56" width="168" height="224" rx="6" fill="#c9a877" stroke="#7b5e33" stroke-width="4"/>
+<rect x="96" y="66" width="48" height="10" rx="5" fill="#12160f"/>
+<text x="120" y="108" text-anchor="middle" font-size="19" fill="#12160f">HÉROS DU</text><text x="120" y="132" text-anchor="middle" font-size="26" fill="#c01f4c">CRUNCH</text>
+<circle cx="120" cy="184" r="34" fill="#b9f73e" stroke="#12160f" stroke-width="3"/><path d="M104 176h10M126 176h10" stroke="#12160f" stroke-width="5"/><ellipse cx="120" cy="198" rx="10" ry="8" fill="#12160f"/>
+<text x="120" y="246" text-anchor="middle" font-size="13" fill="#12160f">72 H SANS DORMIR</text><text x="120" y="266" text-anchor="middle" font-size="12" fill="#12160f">(carton, non cessible)</text>
+</svg>
