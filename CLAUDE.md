@@ -49,10 +49,13 @@ fine, it is for the ones who think. Say the fact and stop:
   temps l'est aussi`). Nobody at that company would write it. What they would write straight
   can stay, however absurd (`Il ne sera pas joignable, n'ayant pas de téléphone`).
 - A joke is an exaggeration of something relatable. It is funny once: `👏 1 (lui-même)` on every
-  post is not a joke any more, and neither is an absurd title on every employee.
+  post is not a joke any more. How many absurd titles a company keeps is Simon's call per site
+  (all seven at Courtepaille, four at Merlin).
 - Likes and hashtags belong to a social network. Use them only on a site that could have them
   (a notary's own site does not). Where they exist they follow real life: a woman gets more
-  likes than a man, the young secretary too many. Subtle, dark, never explained.
+  likes than a man, the young secretary too many. Subtle, dark, never explained. That bias is in
+  the numbers and nowhere else: never spare the women the silliness (Simon, r4: "Women can be
+  silly too").
 - A clue goes where the company would put it for its own reasons. A table called "Qui signe
   quoi" is on the nose; the same fact in the org chart's boxes is not.
 - A joke the reader cannot decode is not subtle, it is a miss (`goût des cartons`).
