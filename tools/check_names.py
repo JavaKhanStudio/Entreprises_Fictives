@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Is an invented name already someone's? Search it, and prove each search can answer.
 
-    python3 tools/check_names.py "Prénom Nom" "Nom de produit" ...
+    python3 tools/check_names.py [--no-web] [--domains] "Prénom Nom" "Nom de produit" ...
 
 Three sources for the exact string. French and English Wikipedia and Wikidata give the verdict
 on "is this notable": their APIs answer a script. The open web (Brave) refuses scripts when it
@@ -14,6 +14,16 @@ the known name is a modest one, because fame hides a fuzzy engine: on 2026-11-02
 Pesquet 15 mentions and Odile Decq 0, answering a script with pages on the first name Odile, its
 quotes ignored. A zero from it means nothing, so it is not here, nor DuckDuckGo. Brave answered
 this client 429 at 20 s and at 120 s between requests, so a slower pace does not cure it.
+On 2026-11-02 DuckDuckGo's HTML page gave one curl real results, then 202 and its bot challenge on
+every query, so it is out too. Getting past a challenge or a filter is not this tool's job.
+
+So --no-web skips the web and says so, and PUBLIC holds what is open to scripts and can name a
+real company, game, band or book: Steam, GLEIF, MusicBrainz, Open Library, GitHub. Each returned
+name must hold the exact string, because some of them search loosely, and each source is run on a
+known name and on nonsense first; one that fails is reported and counts as unchecked. --domains
+adds RDAP for the name's .com and .fr, for companies and products: a registered domain is a hit to
+read by eye. None of this is the open web: a small firm with a site and none of these still goes
+unseen, which is why --no-web can never exit 0.
 Exit 1 when a name has a hit, to read by eye; 2 when the APIs fail their control; 3 when no name
 has a hit but one went unchecked on the web, which is not a pass.
 Python stdlib. Needs the network. A student never runs this.
@@ -24,6 +34,7 @@ import json
 import re
 import sys
 import time
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -46,10 +57,14 @@ def fetch(url, headers):
             with urllib.request.urlopen(request, timeout=20) as answer:
                 return answer.read().decode("utf-8", "replace")
         except urllib.error.HTTPError as error:
-            if error.code != 429 or attempt == 3:
+            if error.code not in (429, 503) or attempt == 3:
                 raise
             wait = error.headers.get("Retry-After", "")
             time.sleep(int(wait) if wait.isdigit() else 30 * (attempt + 1))
+        except urllib.error.URLError:  # a reset connection: HTTPError, a real answer, came first
+            if attempt == 3:
+                raise
+            time.sleep(10 * (attempt + 1))
     raise AssertionError("unreachable")
 
 
@@ -83,6 +98,100 @@ def wikidata_hits(name):
             for item in answer["search"] if item.get("label", "").lower() == name.lower()]
 
 
+def flat(text):
+    """Lower case, no accents, single spaces: how two spellings of a name are compared."""
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    return " ".join(text.casefold().split())
+
+
+def holding(name, labels):
+    """The labels with the exact name in them as whole words, not merely near it."""
+    wanted = re.compile(rf"(?<!\w){re.escape(flat(name))}(?!\w)")
+    return [label for label in labels if label and wanted.search(flat(label))]
+
+
+def steam(name):
+    query = urllib.parse.urlencode({"term": name, "l": "french", "cc": "FR"})
+    answer = api(f"https://store.steampowered.com/api/storesearch/?{query}", "items")
+    return [item["name"] for item in answer["items"]]
+
+
+def gleif(name):
+    query = urllib.parse.urlencode({"filter[fulltext]": name, "page[size]": 20})
+    answer = api(f"https://api.gleif.org/api/v1/lei-records?{query}", "data")
+    return [item["attributes"]["entity"]["legalName"]["name"] for item in answer["data"]]
+
+
+def musicbrainz(kind, key, label, name):
+    time.sleep(2)  # MusicBrainz answers 503 above one request a second
+    query = urllib.parse.urlencode({"query": f'"{name}"', "limit": 25, "fmt": "json"})
+    answer = api(f"https://musicbrainz.org/ws/2/{kind}?{query}", key)
+    return [item[label] for item in answer[key]]
+
+
+def open_library(name):
+    query = urllib.parse.urlencode({"q": f'"{name}"', "limit": 25, "fields": "title,author_name"})
+    answer = api(f"https://openlibrary.org/search.json?{query}", "docs")
+    return [text for doc in answer["docs"] for text in [doc.get("title"), *doc.get("author_name", [])]]
+
+
+def github(name):
+    query = urllib.parse.urlencode({"q": f'"{name}"', "per_page": 30})
+    answer = api(f"https://api.github.com/search/repositories?{query}", "items")
+    return [f"{item['name'].replace('-', ' ')}: {item['description']}" for item in answer["items"]]
+
+
+PUBLIC = {"steam": ("Dead Cells", steam),
+          "gleif": ("Ubisoft", gleif),
+          "musicbrainz artist": ("Daft Punk", lambda n: musicbrainz("artist", "artists", "name", n)),
+          "musicbrainz album": ("Random Access Memories",
+                                lambda n: musicbrainz("release-group", "release-groups", "title", n)),
+          "open library": ("Odile Decq", open_library),
+          "github": ("Dead Cells", github)}
+
+
+def public_control():
+    """The sources that find their known name and not the nonsense."""
+    usable = {}
+    for source, (known, search) in PUBLIC.items():
+        try:
+            good, bad = holding(known, search(known)), holding(NONSENSE, search(NONSENSE))
+        except (OSError, RuntimeError, KeyError, ValueError) as error:
+            print(f"{source}: failed at the control ({error})")
+            continue
+        time.sleep(PAUSE)
+        if good and not bad:
+            print(f"{source} control: {known} {len(good)}, {NONSENSE} 0")
+            usable[source] = search
+        else:
+            print(f"{source}: not answering ({known} {len(good)}, {NONSENSE} {len(bad)})")
+    return usable
+
+
+def registered(domain):
+    """Whether RDAP knows the domain. Only 200 and 404 are answers."""
+    tld = domain.rsplit(".", 1)[1]
+    base = {"com": "https://rdap.verisign.com/com/v1", "fr": "https://rdap.nic.fr"}[tld]
+    try:
+        fetch(f"{base}/domain/{domain}", API)
+        return True
+    except urllib.error.HTTPError as error:
+        if error.code == 404:
+            return False
+        raise
+
+
+def domains_of(name):
+    words = flat(name).replace("-", " ").split()
+    return [f"{joined}.{tld}" for joined in dict.fromkeys(("".join(words), "-".join(words)))
+            for tld in ("com", "fr")]
+
+
+def domain_control():
+    return (registered("ubisoft.com") and registered("ubisoft.fr")
+            and not registered("zorglaxevrumpfeldt.com") and not registered("zorglaxevrumpfeldt.fr"))
+
+
 def web_mentions(name):
     """Bits of visible Brave result text holding the exact name, the page's own echo included."""
     query = urllib.parse.quote(f'"{name}"')
@@ -111,19 +220,34 @@ def web_control():
 
 
 def main():
-    if len(sys.argv) < 2:
+    names = [arg for arg in sys.argv[1:] if arg not in ("--no-web", "--domains")]
+    no_web, domains = "--no-web" in sys.argv, "--domains" in sys.argv
+    if not names:
         print(__doc__)
         return 2
     if (not wikipedia_hits(KNOWN) or not wikidata_hits(KNOWN)
             or wikipedia_hits(NONSENSE) or wikidata_hits(NONSENSE)):
         print("Wikipedia or Wikidata failed the control, stopping")
         return 2
-    echo = web_control()
+    echo = None if no_web else web_control()
+    usable = public_control()
+    if domains and not domain_control():
+        print("RDAP failed the control, stopping")
+        return 2
     taken = unchecked = 0
-    for name in sys.argv[1:]:
+    for name in names:
         time.sleep(PAUSE)
         hits = wikipedia_hits(name) + wikidata_hits(name)
-        web = "web: skipped, control failed"
+        missed = [source for source in PUBLIC if source not in usable]
+        for source, search in usable.items():
+            try:
+                hits += [f"{source} {label[:100]}" for label in holding(name, search(name))]
+            except (OSError, RuntimeError, KeyError, ValueError):
+                missed.append(source)
+        if domains:
+            hits += [f"rdap {domain} is registered" for domain in domains_of(name)
+                     if registered(domain)]
+        web = "web: skipped by --no-web" if no_web else "web: skipped, control failed"
         if echo is not None:
             time.sleep(WEB_PAUSE)
             try:
@@ -132,7 +256,8 @@ def main():
                 web = f"web: {len(extra)} mentions"
             except urllib.error.URLError as error:
                 web = f"web: refused ({error})"
-        unchecked += not web.endswith("mentions")
+        unchecked += not web.endswith("mentions") or bool(missed)
+        web += f", unchecked on {', '.join(missed)}" if missed else ""
         print(f"{name}: {len(hits)} hits, {web}", flush=True)
         for line in hits[:6]:
             print(f"    {line}", flush=True)
