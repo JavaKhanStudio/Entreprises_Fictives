@@ -20,6 +20,8 @@ python3 tools/render_pages.py OUT index.html   # both file:// and http, 1280 and
 python3 tools/check_trombone.py [OUT]   # Merlin's moving parts, which the renders freeze
 python3 tools/check_trombone_browsers.py OUT   # the clip in Firefox and headed Chrome, real card, no window on screen
 python3 tools/check_badge.py [OUT]      # Gobelin's 3D badge: its sway, turn and flip, also frozen
+python3 tools/check_badge_browsers.py OUT [--control flat|gold]   # the badge's pixels in Firefox against Chrome, no window on screen
+python3 tools/check_badge_safari.py --extract LOG OUT   # read a Safari run; the run itself is in its docstring (macOS runner)
 python3 tests/test_render_pages.py             # two render runs at once each prove their own tree
 ```
 
