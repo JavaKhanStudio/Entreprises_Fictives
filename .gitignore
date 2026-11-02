@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+# Links written by `atelier skills install`: absolute paths, broken for anyone else.
+.claude/
+# Logo drafts; only the chosen one lands, as icon.svg.
+.atelier/logo/
