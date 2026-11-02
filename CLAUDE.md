@@ -19,6 +19,7 @@ python3 tests/test_check_sites.py       # each refusal of the gate, on scratch p
 python3 tools/render_pages.py OUT index.html   # both file:// and http, 1280 and 390, pictures in OUT
 python3 tools/check_trombone.py [OUT]   # Merlin's moving parts, which the renders freeze
 python3 tools/check_trombone_browsers.py OUT   # the clip in Firefox and headed Chrome, real card, no window on screen
+python3 tools/check_trombone_safari.py        # real Safari, run through skill test-windows-mac: its docstring says what it cannot prove
 python3 tools/check_badge.py [OUT]      # Gobelin's 3D badge: its sway, turn and flip, also frozen
 python3 tools/check_badge_browsers.py OUT [--control flat|gold]   # the badge's pixels in Firefox against Chrome, no window on screen
 python3 tools/check_badge_safari.py --extract LOG OUT   # read a Safari run; the run itself is in its docstring (macOS runner)
