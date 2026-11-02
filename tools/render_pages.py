@@ -3,8 +3,8 @@
 
     python3 tools/render_pages.py OUT_DIR index.html [merlin/index.html ...]
 
-Each page is opened over file:// (a double-click) and over http://127.0.0.1:8802 (the port
-CLAUDE.md names, which must be free), at 1280 and 390 wide. It fails on a request that fails or
+Each page is opened over file:// (a double-click) and over http from a server of this run's own,
+on a free port the system picks, at 1280 and 390 wide. It fails on a request that fails or
 a console error, on base.css not applied, on a page wider than its window, and when the two
 ways do not give the same picture. Pictures land in OUT_DIR as <page>-<width>.png.
 
@@ -12,19 +12,23 @@ The gate (tools/check_sites.py) reads the source; this one looks at what a brows
 Needs Playwright and Chrome, which a student never does.
 """
 
+import functools
+import http.server
 import os
-import subprocess
 import sys
-import time
-import urllib.request
+import threading
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
 REPO = Path(__file__).resolve().parent.parent
-PORT = 8802
 WIDTHS = (1280, 390)
 FOOTER_BACKGROUND = "rgb(36, 38, 43)"  # .site-fictif in shared/base.css
+
+
+class QuietHandler(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
 
 
 def open_page(browser, url, width):
@@ -58,26 +62,18 @@ def main():
         return 2
     out = Path(sys.argv[1])
     out.mkdir(parents=True, exist_ok=True)
-    server = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT),
-                               "--bind", "127.0.0.1", "--directory", str(REPO)],
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    handler = functools.partial(QuietHandler, directory=str(REPO))
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    port = server.server_address[1]
     failed = 0
     try:
-        for _ in range(50):
-            try:
-                urllib.request.urlopen(f"http://127.0.0.1:{PORT}/", timeout=1)
-                break
-            except OSError:
-                time.sleep(0.1)
-        if server.poll() is not None:
-            print(f"port {PORT} is taken: free it first")
-            return 2
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(channel="chrome")
             for name in sys.argv[2:]:
                 for width in WIDTHS:
                     by_file, problems = open_page(browser, (REPO / name).as_uri(), width)
-                    by_http, more = open_page(browser, f"http://127.0.0.1:{PORT}/{name}", width)
+                    by_http, more = open_page(browser, f"http://127.0.0.1:{port}/{name}", width)
                     problems += [f"http: {p}" for p in more]
                     if by_file != by_http:
                         problems.append("file:// and http:// give different pictures")
@@ -89,8 +85,8 @@ def main():
                     failed += bool(problems)
             browser.close()
     finally:
-        server.terminate()
-        server.wait()
+        server.shutdown()
+        server.server_close()
     return 1 if failed else 0
 
 

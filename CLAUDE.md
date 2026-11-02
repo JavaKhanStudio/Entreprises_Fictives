@@ -17,6 +17,7 @@ python3 -m http.server 8802             # then http://127.0.0.1:8802/
 python3 tools/check_sites.py            # the gate: must pass before any push (needs dig and DNS)
 python3 tests/test_check_sites.py       # each refusal of the gate, on scratch pages
 python3 tools/render_pages.py OUT index.html   # both file:// and http, 1280 and 390, pictures in OUT
+python3 tests/test_render_pages.py             # two render runs at once each prove their own tree
 ```
 
 A new page starts as a copy of `shared/modele.html`: its footer is compared byte for byte.
