@@ -1,12 +1,12 @@
-/* The root list only. It stays plain: each company brings its own look on its own site. */
+/* The root list only: manila folders on a dark desk, Simon's pick on r10. */
 
 body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #f6f5f1;
+  background: #3c4048;
   color: #24262b;
-  font: 1.0625rem/1.55 system-ui, sans-serif;
+  font: 1.0625rem/1.55 'Courier New', Courier, monospace;
 }
 
 main {
@@ -17,23 +17,43 @@ main {
   padding: 3rem 1.25rem;
 }
 
-h1 { margin: 0 0 1rem; font-size: 2.25rem; line-height: 1.15; }
+h1 { margin: 0 0 1rem; color: #f4f4f2; font-size: 2.25rem; line-height: 1.15; }
 
-.chapo { margin: 0 0 2.5rem; }
+.chapo { margin: 0 0 2.5rem; color: #f4f4f2; }
 
 .entreprises { margin: 0; padding: 0; list-style: none; }
 
-.entreprises li { padding: 1.25rem 0; border-top: 1px solid #c9c7bf; }
+.entreprises li {
+  position: relative;
+  margin-bottom: 1.25rem;
+  padding: 1.25rem;
+  border-radius: 3px 14px 3px 3px;
+  background: #e6cf9f;
+}
 
-.entreprises h2 { margin: 0 0 0.25rem; font-size: 1.3rem; line-height: 1.3; }
+.entreprises li::after {
+  content: 'FICTIF';
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  padding: 0 0.35rem;
+  border: 2px solid #9c2b22;
+  color: #9c2b22;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transform: rotate(4deg);
+}
 
-.entreprises a { color: #1d4e89; }
+.entreprises h2 { margin: 0 0 0.25rem; padding-right: 4.5rem; font-size: 1.3rem; line-height: 1.3; }
+
+.entreprises a { color: #24262b; }
 
 .entreprises p { margin: 0; }
 
 .a-venir {
   margin-left: 0.4rem;
-  color: #5c5e63;
+  color: #24262b;
+  white-space: nowrap;
   font-size: 0.875rem;
   font-weight: 400;
   font-style: italic;
