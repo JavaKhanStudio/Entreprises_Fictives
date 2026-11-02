@@ -8,10 +8,12 @@
 label = "Skeleton & gate"
 description = "What all the sites share: shared/, the root index, the footer, the check gate"
 context = """
-FILES (planned): index.html (the root list of the three companies), shared/base.css, tools/check_sites.py.
-GATE (planned): python3 tools/check_sites.py walks every .html and must pass before any push. It refuses a page with no noindex meta or no fictional footer, a <form>, a tel: link, an http(s) resource, an em dash, a domain that is not .example, a domain that resolves (dig).
-RULE: what two sites share lives ONCE, in shared/. Their look does not: each company has its own CSS on top. HTML has no include, so the footer is copied verbatim in each page and the gate compares it to the one in shared/ (planned).
-OPEN: double-click must work, so links are relative and nothing needs a server: a page tested only through http.server can hide a broken file:// path. Test both.
+FILES: index.html + index.css (the root list of the three companies), shared/base.css (what every page shares, no company's look), shared/modele.html (the page every site starts from, and the reference footer), tools/check_sites.py (the gate), tests/test_check_sites.py (each refusal proved), tools/render_pages.py (the browser's view).
+GATE: python3 tools/check_sites.py walks every .html and .css and must pass before any push. It refuses, by rule name: noindex, footer, form, tel, external (an http(s) resource, also in CSS), live-link (an a href to any domain, mailto), relative (a link from /), dead-link (also a wrong case, also a folder), em-dash, domain (not .example), resolves (dig says the name exists or cannot tell: offline, the gate fails), phone (outside ARCEP's fiction ranges, cited in the script), index (a company's index.html the root list does not link).
+TEST: python3 tests/test_check_sites.py when the gate changes; a new refusal gets its scratch page there, and a false alarm goes into test_what_the_gate_lets_through.
+RENDER: python3 tools/render_pages.py OUT_DIR index.html merlin/index.html opens each page over file:// and http://127.0.0.1:8802, at 1280 and 390, fails on a failed request, on base.css not applied, on a page wider than its window or on the two ways differing. Needs port 8802 free. Attach the pictures with atelier attach.
+RULE: what two sites share lives ONCE, in shared/. Their look does not: each company has its own CSS on top. HTML has no include, so the footer is copied verbatim from shared/modele.html into each page and the gate compares bytes. To change its words, change every page in the same commit.
+OPEN: double-click must work, so links are relative and name their file (merlin/index.html, never merlin/: over file:// a folder opens a listing). A page tested only through http.server can hide a broken file:// path: render_pages.py tests both.
 """
 
 [tags.merlin]
@@ -19,6 +21,8 @@ label = "Papeterie Merlin"
 description = "The site of Papeterie Merlin, in merlin/"
 context = """
 FILES (planned): merlin/index.html and its pages, merlin/merlin.css. Domain: papeterie-merlin.example.
+LINK: in index.html, make the company's h2 a link to merlin/index.html and drop its "à venir" span; the gate refuses the site otherwise (rule index). Delete merlin/.gitkeep.
+START: copy shared/modele.html to merlin/, then add the company's stylesheet after base.css. Render with tools/render_pages.py (see #shared).
 CANON: ~/Documents/GitHub/Social_Engineering_en_visuel/faux-president/js/i18n.js, steps.research (the page on Eve's laptop): since 1987, 12 followers, Mme Merlin "Presidente Executive Principale" always travelling, Alice "Directrice des Directions" Bob's boss, Bob "Ninja des virements" the accountant, conquering abroad, #PapierAgile. The capsule reuses these names: the site must not contradict them. faux-president/sources.md says what is invented there.
 ATTACK SURFACE TO KEEP, from the Lumisol sample (~/Documents/Claude_GDrive_HQ/boards/social-engineering/verif/r32/kit.py, company dropped by Simon): an address format, a client portal, supplier invoices by PDF mail, a recent hire in accounting, a lone overworked IT person mid migration to Microsoft 365, a payment threshold, a press release naming a contract. Do not reuse from it: the 02 40 number, PayFlow, Claire Fontaine, Thomas Berger, Karim Haddad, Saint-Herblain.
 """
@@ -28,6 +32,8 @@ label = "Gobelin Hurlant"
 description = "The site of the indie game studio Gobelin Hurlant, in gobelin/"
 context = """
 FILES (planned): gobelin/index.html and its pages, gobelin/gobelin.css. Domain: gobelin-hurlant.example.
+LINK: in index.html, make the company's h2 a link to gobelin/index.html and drop its "à venir" span; the gate refuses the site otherwise (rule index). Delete gobelin/.gitkeep.
+START: copy shared/modele.html to gobelin/, then add the company's stylesheet after base.css. Render with tools/render_pages.py (see #shared).
 SURFACE: a public Discord and its fans, a publisher, a build under NDA, crunch worn as a badge. Different from Merlin: the money is not the prize here, the build and the accounts are.
 """
 
@@ -36,6 +42,8 @@ label = "Etude Courtepaille"
 description = "The site of the notary's office Etude Courtepaille, in courtepaille/"
 context = """
 FILES (planned): courtepaille/index.html and its pages, courtepaille/courtepaille.css. Domain: etude-courtepaille.example.
+LINK: in index.html, make the company's h2 a link to courtepaille/index.html and drop its "à venir" span; the gate refuses the site otherwise (rule index). Delete courtepaille/.gitkeep.
+START: copy shared/modele.html to courtepaille/, then add the company's stylesheet after base.css. Render with tools/render_pages.py (see #shared).
 SURFACE: large property transfers, elderly clients, paper first, a website that looks its age. Simon kept the name (2026-11-02) though Courtepaille is also a restaurant chain: the site says nothing of restaurants. No real notary's name, checked by search: the public directory is https://www.notaires.fr/fr/directory.
 """
 

@@ -10,12 +10,16 @@ Plain HTML and CSS. No build step, no framework, no JS unless a ticket shows the
 links only, nothing fetched from outside (no CDN, no web font): a page also opens by
 double-click on Windows, macOS and Linux. Students need a browser, nothing else.
 
-## Run and test (planned, ticket 1 makes them real)
+## Run and test
 
 ```bash
 python3 -m http.server 8802             # then http://127.0.0.1:8802/
-python3 tools/check_sites.py            # the gate: must pass before any push
+python3 tools/check_sites.py            # the gate: must pass before any push (needs dig and DNS)
+python3 tests/test_check_sites.py       # each refusal of the gate, on scratch pages
+python3 tools/render_pages.py OUT index.html   # both file:// and http, 1280 and 390, pictures in OUT
 ```
+
+A new page starts as a copy of `shared/modele.html`: its footer is compared byte for byte.
 
 ## Rules the gate holds
 
@@ -34,3 +38,6 @@ model is `~/Documents/GitHub/Social_Engineering_en_visuel/faux-president/js/i18n
 All page text is in French. Simon reads every site before it counts as done.
 
 ## Traps
+
+- Link `merlin/index.html`, never `merlin/`: over file:// a folder opens a listing.
+- A dotted word in text reads as a domain (`fin.Le`, `M.Bob`): put the space in, the gate is right.
