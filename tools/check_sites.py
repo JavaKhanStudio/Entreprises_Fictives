@@ -9,6 +9,11 @@ page must carry is the one in shared/modele.html, byte for byte.
 
 A domain dig cannot answer for (no dig, no network) is a refusal too: unchecked is not clean.
 
+Phone numbers the gate does not see, on purpose: fewer than 8 digits (118 218, 3615), a number
+split across tags, two numbers with a single space between them, and a run of digits with no +
+that does not start with 0, 33 or the North American shape (1-800-555-0100): it reads as a
+reference, and so does an unprefixed foreign number in any other shape.
+
 Phone numbers: the only ones allowed are those the French numbering plan keeps for fiction,
 "Numéros pour œuvres audiovisuelles", ARCEP decision no 2025-2215 of 27 November 2025, plan
 version of 1 January 2026, p. 54/67: https://www.arcep.fr/uploads/tx_gsavis/25-2215.pdf
@@ -37,8 +42,15 @@ BARE_EMAIL = re.compile(r"(?<![\w.+-])[\w.+-]+@[\w-]+(?![\w-]|\.\w)")
 # Not domains: the file names a page may show or link to.
 FILE_SUFFIXES = {"html", "htm", "css", "svg", "png", "jpg", "jpeg", "gif", "webp", "ico",
                  "js", "pdf", "txt", "docx", "xlsx"}
-# Digits with at most two separators between them: 01 99 00 12 34, +33 (0)1.99.00.12.34
-PHONE = re.compile(r"(?<![\d])\+?\d(?:[ \u00a0\u2009\u202f.()\-]{0,2}\d){7,14}(?!\d)")
+# Digits with up to three separators between them: 01 99 00 12 34, +33 (0)1.99.00.12.34,
+# 01 - 23 - 45 - 67 - 89, 01/23/45/67/89. Not inside a word, a reference or a path.
+PHONE_SEPARATOR = r"[ \u00a0\u2009\u202f.()/\-]"
+PHONE = re.compile(rf"(?<![\w/\-])\+?\d(?:{PHONE_SEPARATOR}{{0,3}}\d)*(?!\w)")
+# Between two numbers in a row, or a number and something else: "01 99 00 12 34 - 2026".
+PHONE_GAP = re.compile(rf"{PHONE_SEPARATOR}{{2,}}")
+# A date is many digits and no phone number. Blanked before reading digits, at the same length.
+DATE = re.compile(r"(?<!\d)(?:\d{1,2}[/.\-]\d{1,2}[/.\-]\d{4}|\d{4}-\d{2}-\d{2})(?!\d)")
+NORTH_AMERICAN = re.compile(r"1[ .\-]?\(?\d{3}\)?[ .\-]?\d{3}[ .\-]?\d{4}")
 # Attributes that hold a URL, and that a page therefore fetches or goes to.
 URL_ATTRS = {"href", "src", "srcset", "poster", "data", "action", "formaction", "background",
              "cite", "ping", "xlink:href"}
@@ -173,16 +185,37 @@ def check_css(root, refusals, path, line, css):
 def phone_refusal(number):
     """Why this run of digits is a refused phone number; None when it is fine or no phone."""
     digits = re.sub(r"\D", "", number)
-    if number.startswith("+") or digits.startswith("00"):
+    if len(digits) < 8:
+        return None
+    if number.startswith("+") or re.match(r"00[1-9]\d{7,}$", digits):
         country = digits.removeprefix("00")
         if not country.startswith("33"):
             return f"{number}: a foreign number, ARCEP reserves none of those for fiction"
         digits = "0" + country[2:].lstrip("0")
-    if len(digits) != 10 or not digits.startswith("0"):
-        return None
-    if digits.startswith(FICTION_PHONE_ROOTS):
+    elif re.fullmatch(r"33[1-9]\d{8}", digits):
+        digits = "0" + digits[2:]
+    elif NORTH_AMERICAN.fullmatch(number):
+        return f"{number}: a foreign number, ARCEP reserves none of those for fiction"
+    if not re.fullmatch(r"0[1-9]\d{8}", digits) or digits.startswith(FICTION_PHONE_ROOTS):
         return None
     return f"{number}: outside the ranges ARCEP reserves for fiction"
+
+
+def is_one_number(run):
+    digits = re.sub(r"\D", "", run)
+    return (run.startswith("+") or NORTH_AMERICAN.fullmatch(run)
+            or re.fullmatch(r"0[1-9]\d{8}|33[1-9]\d{8}", digits))
+
+
+def phone_refusals(text):
+    """Each refused number in this text, as (where it starts, why)."""
+    undated = DATE.sub(lambda date: "\u00a7" * len(date.group(0)), text)
+    for run in PHONE.finditer(undated):
+        pieces = [run.group(0)] if is_one_number(run.group(0)) else PHONE_GAP.split(run.group(0))
+        for piece in pieces:
+            why = phone_refusal(piece)
+            if why:
+                yield run.start() + run.group(0).index(piece), why
 
 
 def check_text(refusals, path, line, text, domains):
@@ -200,10 +233,8 @@ def check_text(refusals, path, line, text, domains):
     for found in BARE_EMAIL.finditer(text):
         refusals.add(path, line + text.count("\n", 0, found.start()), "domain",
                      f"email {found.group(0)} does not end in .example")
-    for found in PHONE.finditer(text):
-        why = phone_refusal(found.group(0))
-        if why:
-            refusals.add(path, line + text.count("\n", 0, found.start()), "phone", why)
+    for start, why in phone_refusals(text):
+        refusals.add(path, line + text.count("\n", 0, start), "phone", why)
 
 
 def check_page(root, refusals, path, source, footer, domains):

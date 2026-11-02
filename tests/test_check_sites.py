@@ -3,8 +3,9 @@
 
     python3 tests/test_check_sites.py
 
-The scratch pages are built in a temporary folder from the real shared/ and index.html: nothing
-here is an .html the gate or GitHub Pages would pick up.
+The scratch pages are built in a temporary folder from the real shared/ and a frozen root index
+(the real one links each finished site, and those folders are not copied): nothing here is an
+.html the gate or GitHub Pages would pick up.
 """
 
 import os
@@ -22,6 +23,9 @@ with open(os.path.join(REPO, "shared/modele.html"), encoding="utf-8") as model_f
     MODEL = model_file.read()
 BODY = "<p>Le contenu de la page.</p>"
 NOINDEX = '  <meta name="robots" content="noindex">\n'
+SCRATCH_INDEX = MODEL.replace(BODY, """<h2>Papeterie Merlin <span class="a-venir">à venir</span></h2>
+    <h2>Gobelin Hurlant <span class="a-venir">à venir</span></h2>
+    <h2>Étude Courtepaille <span class="a-venir">à venir</span></h2>""").replace("../shared/", "shared/")
 
 
 def nothing_resolves(_domain):
@@ -33,8 +37,7 @@ class Gate(unittest.TestCase):
         self.root = tempfile.mkdtemp(prefix="check_sites_")
         self.addCleanup(shutil.rmtree, self.root)
         shutil.copytree(os.path.join(REPO, "shared"), os.path.join(self.root, "shared"))
-        for name in ("index.html", "index.css"):
-            shutil.copy(os.path.join(REPO, name), self.root)
+        self.write("index.html", SCRATCH_INDEX)
         for company in check_sites.COMPANIES:
             os.mkdir(os.path.join(self.root, company))
         self.write("merlin/cible.html", MODEL)
@@ -147,6 +150,22 @@ class Gate(unittest.TestCase):
             with self.subTest(number=number):
                 self.refused("phone", f"<p>Appelez le {number}</p>")
 
+    def test_phone_with_wide_separators(self):
+        self.refused("phone", "<p>Appelez le 01 - 23 - 45 - 67 - 89</p>")
+
+    def test_phone_with_slashes(self):
+        self.refused("phone", "<p>Appelez le 01/23/45/67/89</p>")
+
+    def test_french_phone_with_33_and_no_plus(self):
+        self.refused("phone", "<p>Appelez le 33123456789</p>")
+
+    def test_north_american_phone_with_no_plus(self):
+        self.refused("phone", "<p>Bureau de Chicago : 1-800-555-0100</p>")
+
+    def test_second_phone_in_a_row_is_still_read(self):
+        self.refused("phone", "<p>01 99 00 12 34 - 02 40 12 34 56</p>")
+        self.refused("phone", "<p>02 40 12 34 56 / 01 99 00 12 34</p>")
+
     def test_foreign_phone(self):
         self.refused("phone", "<p>Bureau de Londres : +44 20 7946 0958</p>")
 
@@ -181,6 +200,10 @@ class Gate(unittest.TestCase):
         <p>extranet.papeterie-merlin.example. Une phrase après le point.</p>
         <p>facture-2026.pdf, Merlin S.A.R.L., 12.50 EUR, le 02.11.2026, depuis 1987</p>
         <p>SIRET 123 456 789 00012, TVA FR76123456789, IBAN FR76 3000 6000 0112 3456 7890 189</p>
+        <p>01 - 99 - 00 - 12 - 34, 06/39/98/12/34, 33199001234</p>
+        <p>01 99 00 12 34 - 01 99 00 12 35</p>
+        <p>Du 01/02/2026 - 03/04/2026, 2026-11-02, 02-11-2026, en 2026. 01 99 00 12 34</p>
+        <p>Réf. 2026-004512-17, dossier 2026/0001234, FAC-0612345678, de 10 000 - 20 000 EUR</p>
         <p>#PapierAgile, @MmeMerlin, 12 abonnés, 👏 1 (elle-même), 45 000 EUR</p>
         <a href="cible.html#equipe">interne</a> <a href="#haut">haut</a>
         <img src="data:image/gif;base64,R0lGOD" alt="">
