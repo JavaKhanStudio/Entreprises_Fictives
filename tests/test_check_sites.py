@@ -162,6 +162,40 @@ class Gate(unittest.TestCase):
     def test_north_american_phone_with_no_plus(self):
         self.refused("phone", "<p>Bureau de Chicago : 1-800-555-0100</p>")
 
+    def test_phone_wrapped_by_hand(self):
+        self.refused("phone", "<p>Appelez le 01 23\n45 67 89</p>")
+        self.refused("phone", "<p>Appelez le 01 23\n            45 67 89</p>")
+        self.write("merlin/page.html", MODEL.replace(BODY, "<p>01 23\n    45 67 89</p>"))
+        refusal = check_sites.check_tree(self.root, nothing_resolves)[0]
+        self.assertIn("01 23 45 67 89: outside", refusal)
+
+    def test_phone_with_tabs(self):
+        self.refused("phone", "<p>Appelez le 01\t23\t45\t67\t89</p>")
+
+    def test_phone_with_en_dashes(self):
+        self.refused("phone", "<p>Appelez le 01\u201323\u201345\u201367\u201389</p>")
+        self.refused("phone", "<p>Appelez le 01&ndash;23&ndash;45&ndash;67&ndash;89</p>")
+
+    def test_phone_with_non_breaking_hyphens(self):
+        self.refused("phone", "<p>Appelez le 01\u201123\u201145\u201167\u201189</p>")
+
+    def test_phone_with_commas(self):
+        self.refused("phone", "<p>Appelez le 01,23,45,67,89</p>")
+
+    def test_phone_with_underscores(self):
+        self.refused("phone", "<p>Appelez le 01_23_45_67_89</p>")
+
+    def test_north_american_phone_with_an_en_dash(self):
+        self.refused("phone", "<p>Bureau de Chicago : 1\u2013800\u2013555\u20130100</p>")
+
+    def test_widened_separators_do_not_hide_a_second_number(self):
+        # Each of these ended a number before the separators widened: it still must.
+        for between in ("\n", "\n        ", "\t", ",", ", ", "\u2013", "\u2011", "_", "  "):
+            for first in ("01 99 00 12 34", "+33 1 99 00 12 34"):
+                with self.subTest(between=between, first=first):
+                    self.refused("phone", f"<p>{first}{between}02 40 12 34 56</p>")
+                    self.refused("phone", f"<p>2026{between}02 40 12 34 56</p>")
+
     def test_second_phone_in_a_row_is_still_read(self):
         self.refused("phone", "<p>01 99 00 12 34 - 02 40 12 34 56</p>")
         self.refused("phone", "<p>02 40 12 34 56 / 01 99 00 12 34</p>")
@@ -204,6 +238,16 @@ class Gate(unittest.TestCase):
         <p>01 99 00 12 34 - 01 99 00 12 35</p>
         <p>Du 01/02/2026 - 03/04/2026, 2026-11-02, 02-11-2026, en 2026. 01 99 00 12 34</p>
         <p>Réf. 2026-004512-17, dossier 2026/0001234, FAC-0612345678, de 10 000 - 20 000 EUR</p>
+        <p>01\u201399\u201300\u201312\u201334, 01,99,00,12,34, 01_99_00_12_34, 01\t99\t00\t12\t34</p>
+        <p>01 99
+           00 12 34
+           01 99 00 12 35</p>
+        <p>1,50 EUR, 12,50 EUR, de 10\u201320 EUR, 10 000\u201320 000 EUR, 1 500,50\u20132 500,50 EUR</p>
+        <p>pages 01, 02, 03, 04, 05 et 0,5 0,6 0,7 0,8 0,9</p>
+        <p>en 2026
+           depuis 1987, 45 000
+           EUR, du 02/11/2026\u201303/11/2026, photo_2026_11.png</p>
+        <svg><polygon points="0,10 5,20 3,40,1"/></svg>
         <p>#PapierAgile, @MmeMerlin, 12 abonnés, 👏 1 (elle-même), 45 000 EUR</p>
         <a href="cible.html#equipe">interne</a> <a href="#haut">haut</a>
         <img src="data:image/gif;base64,R0lGOD" alt="">
