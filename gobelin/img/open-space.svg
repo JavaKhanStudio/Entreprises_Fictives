@@ -17,4 +17,4 @@
 <g fill="#f0f5e4"><rect x="190" y="340" width="20" height="26"/><rect x="384" y="340" width="20" height="26"/><rect x="580" y="344" width="20" height="26"/></g>
 <g><ellipse cx="115" cy="380" rx="36" ry="18" fill="#8fce3a"/><path d="M84 376 l-20 -12 16 24z M146 376 l20 -12 -16 24z" fill="#8fce3a"/><text x="96" y="378" font-size="17" fill="#12160f" font-weight="700">zzz</text></g>
 <rect x="290" y="372" width="70" height="30" fill="#d9c98f"/><rect x="296" y="366" width="70" height="30" fill="#e8d9a0"/><rect x="480" y="372" width="24" height="30" fill="#c01f4c"/><rect x="510" y="372" width="24" height="30" fill="#c01f4c"/>
-</svg>
+<defs><radialGradient id="lumiere" cx=".35" cy=".2" r=".95"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/></radialGradient></defs><path d="M0 0H640V46H0ZM0 272H640V420H0Z" fill="url(#lumiere)"/></svg>

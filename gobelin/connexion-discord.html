@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Ce lien était un piège</title>
+  <link rel="stylesheet" href="../shared/base.css">
+  <link rel="stylesheet" href="gobelin.css">
+</head>
+<body>
+  <main class="piege">
+    <div class="piege-alerte">
+      <h1>Ce lien était un piège</h1>
+      <p>Vous venez de cliquer sur une adresse qui n’était pas le Discord du studio. Sur une vraie attaque, la page suivante aurait été une fausse connexion à Discord, et le mot de passe saisi serait parti chez l’attaquant.</p>
+      <p>Ici, rien ne s’est passé. Cette page fait partie de l’exercice et ne collecte rien.</p>
+    </div>
+
+    <h2>Ce que l’adresse disait déjà</h2>
+    <p class="piege-adresse">d1sc0rd-gobelin-hurlant.<strong>cle-beta-gratuite.example</strong>/connexion?mdp=oui</p>
+    <ol>
+      <li><strong>Le vrai domaine est à la fin.</strong> Il se lit juste avant le premier <code>/</code> : ici <code>cle-beta-gratuite.example</code>. Ce domaine n’est ni celui de Discord ni celui du studio. Tout ce qui est écrit à sa gauche, son propriétaire le choisit librement.</li>
+      <li><strong>Un nom connu, mal écrit.</strong> Dans <code>d1sc0rd</code>, des chiffres remplacent des lettres pour imiter le nom de Discord.</li>
+      <li><strong>Un cadeau pour vous faire aller vite.</strong> Une clé de bêta gratuite donne envie de cliquer avant de réfléchir.</li>
+      <li><strong>Une demande de connexion.</strong> <code>connexion</code> et <code>mdp</code> (mot de passe) annoncent ce que la page va vous réclamer.</li>
+    </ol>
+
+    <h2>Ce qu’il faut faire</h2>
+    <ul>
+      <li>Avant de cliquer, lisez l’adresse en entier et repérez le vrai domaine.</li>
+      <li>En cas de doute, ne suivez pas le lien : passez par le site officiel, ou demandez à la personne par un autre moyen.</li>
+      <li>Si vous avez déjà cliqué, ne saisissez rien. Si vous avez saisi un mot de passe, changez-le tout de suite, et prévenez le responsable informatique si c’est un compte de travail.</li>
+    </ul>
+
+    <p><a href="index.html">Retour au site de Gobelin Hurlant</a></p>
+  </main>
+<footer class="site-fictif">
+    <p><strong>Site fictif à but pédagogique.</strong> Les entreprises, les employés et les domaines présentés ici n’existent pas : toute ressemblance avec une entreprise ou une personne réelle serait fortuite. Ce site ne collecte rien.</p>
+  </footer>
+</body>
+</html>

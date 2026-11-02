@@ -1,20 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400" font-family="ui-monospace,DejaVu Sans Mono,Menlo,Consolas,monospace" font-weight="700">
-<rect width="640" height="400" fill="#171d12"/>
-<path d="M0 0H640V60L600 120 570 60 520 150 480 50 420 110 390 40 330 130 290 50 230 120 190 40 130 140 90 60 40 120 0 70Z" fill="#2b3621"/>
-<path d="M0 400V320Q160 280 320 310T640 300V400Z" fill="#2b3621"/>
-<circle cx="470" cy="210" r="86" fill="#b9f73e" opacity=".14"/>
-<g transform="translate(120 150)">
-<path d="M34 60 L-22 30 L30 92Z" fill="#b9f73e"/><path d="M146 60 L202 30 L150 92Z" fill="#b9f73e"/>
-<path d="M28 74 Q28 18 90 18 Q152 18 152 74 Q152 156 90 158 Q28 156 28 74Z" fill="#b9f73e"/>
-<circle cx="68" cy="68" r="13" fill="#fff"/><circle cx="112" cy="68" r="13" fill="#fff"/><circle cx="70" cy="72" r="4" fill="#12160f"/><circle cx="110" cy="72" r="4" fill="#12160f"/>
-<path d="M58 94 Q90 80 122 94 Q118 148 90 150 Q62 148 58 94Z" fill="#3a0d1e"/><path d="M64 94l6 12 6-14zM104 92l6 14 6-12z" fill="#f0f5e4"/><ellipse cx="90" cy="134" rx="15" ry="9" fill="#ff6fb5"/>
-<path d="M40 158h100l14 92H26Z" fill="#40215c"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+<defs>
+<linearGradient id="fond" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10201f"/><stop offset=".55" stop-color="#16281c"/><stop offset="1" stop-color="#090c0b"/></linearGradient>
+<radialGradient id="halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#c8ff4f" stop-opacity=".5"/><stop offset=".55" stop-color="#7fd02c" stop-opacity=".14"/><stop offset="1" stop-color="#7fd02c" stop-opacity="0"/></radialGradient>
+<radialGradient id="peau" cx=".42" cy=".28" r=".85"><stop offset="0" stop-color="#d8ff72"/><stop offset=".55" stop-color="#9ddf34"/><stop offset="1" stop-color="#4f8f1c"/></radialGradient>
+<linearGradient id="oreille" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3f55a"/><stop offset="1" stop-color="#4f8f1c"/></linearGradient>
+<linearGradient id="gorge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d0612"/><stop offset="1" stop-color="#5c1230"/></linearGradient>
+<linearGradient id="habit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a2f86"/><stop offset="1" stop-color="#25123c"/></linearGradient>
+<linearGradient id="bas" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#090c0b" stop-opacity="0"/><stop offset=".42" stop-color="#090c0b"/></linearGradient>
+<filter id="ombre" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".55"/></filter>
+</defs>
+<rect width="800" height="600" fill="url(#fond)"/>
+<circle cx="330" cy="290" r="320" fill="url(#halo)"/>
+<path d="M0 0H800V70L760 170 722 80 672 210 628 70 566 160 530 60 468 190 420 70 362 150 318 56 262 180 214 66 160 200 118 80 66 170 0 90Z" fill="#0d1a17"/>
+<path d="M0 0H800V30L740 96 700 36 610 110 560 30 470 100 410 28 330 92 270 26 180 110 130 34 60 92 0 40Z" fill="#070e0d"/>
+<path d="M0 600V430Q120 390 260 420T520 410T800 430V600Z" fill="#0f1c14"/>
+<g filter="url(#ombre)" transform="translate(58 6) scale(.84)">
+<path d="M196 470h268l34 150H162Z" fill="url(#habit)"/>
+<path d="M226 228 L96 150 L214 318Z" fill="url(#oreille)"/><path d="M434 228 L564 150 L446 318Z" fill="url(#oreille)"/>
+<path d="M208 262 Q208 118 330 118 Q452 118 452 262 Q452 470 330 476 Q208 470 208 262Z" fill="url(#peau)"/>
+<path d="M250 208 l58 26 -8 18 -56 -24z M410 208 l-58 26 8 18 56 -24z" fill="#23340e"/>
+<circle cx="284" cy="256" r="25" fill="#fbfff0"/><circle cx="376" cy="256" r="25" fill="#fbfff0"/><circle cx="290" cy="262" r="8" fill="#10150b"/><circle cx="370" cy="262" r="8" fill="#10150b"/>
+<path d="M262 318 Q330 288 398 318 Q392 452 330 458 Q268 452 262 318Z" fill="url(#gorge)"/>
+<path d="M274 316l13 30 14-40zM359 306l14 40 13-30z" fill="#f6f8e6"/>
+<ellipse cx="330" cy="424" rx="36" ry="22" fill="#ff6fb5"/>
 </g>
-<g transform="translate(400 150) rotate(6)">
-<rect width="160" height="130" fill="#f0f5e4" stroke="#12160f" stroke-width="4"/>
-<text x="14" y="30" font-size="18" fill="#12160f">AVIS DE</text><text x="14" y="52" font-size="18" fill="#12160f">CONTRÔLE</text>
-<path d="M14 70h130M14 86h130M14 102h90" stroke="#12160f" stroke-width="3"/><circle cx="130" cy="108" r="14" fill="none" stroke="#c8325d" stroke-width="4"/>
+<g transform="translate(520 196) rotate(7)" filter="url(#ombre)">
+<rect width="196" height="176" rx="5" fill="#f3f1e4"/>
+<text x="18" y="38" font-size="21" font-weight="800" fill="#14170f">AVIS DE</text><text x="18" y="63" font-size="21" font-weight="800" fill="#14170f">CONTRÔLE</text>
+<path d="M18 84h160M18 104h160M18 124h104" stroke="#a7a692" stroke-width="5" stroke-linecap="round"/>
+<g transform="rotate(-14 150 142)"><circle cx="150" cy="142" r="21" fill="none" stroke="#d32d5d" stroke-width="5"/><path d="M137 142h26" stroke="#d32d5d" stroke-width="5"/></g>
 </g>
-<rect x="0" y="318" width="640" height="82" fill="#12160f"/><text x="320" y="374" text-anchor="middle" font-size="44" fill="#ff6fb5" stroke="#12160f" stroke-width="2">GROTTE FISCALE</text>
-<text x="320" y="46" text-anchor="middle" font-size="22" fill="#f0f5e4">Le fisc arrive. Hurlez.</text>
+<rect y="400" width="800" height="200" fill="url(#bas)"/>
+<text x="400" y="534" text-anchor="middle" font-size="76" font-weight="900" letter-spacing="-1" fill="#f6f8ee">GROTTE FISCALE</text>
+<text x="400" y="572" text-anchor="middle" font-size="24" font-weight="600" fill="#ff8cc4">Le fisc arrive. Hurlez.</text>
 </svg>
