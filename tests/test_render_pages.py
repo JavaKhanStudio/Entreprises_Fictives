@@ -25,7 +25,7 @@ def scratch_tree(root, name, title):
     shutil.copytree(os.path.join(REPO, "shared"), os.path.join(tree, "shared"))
     shutil.copy(os.path.join(REPO, "tools", "render_pages.py"), os.path.join(tree, "tools"))
     with open(os.path.join(REPO, "shared", "modele.html"), encoding="utf-8") as model:
-        page = model.read().replace("../shared/", "shared/").replace("Titre de la page", title)
+        page = model.read().replace('href="base.css"', 'href="shared/base.css"').replace("Titre de la page", title)
     with open(os.path.join(tree, "index.html"), "w", encoding="utf-8") as index:
         index.write(page)
     return tree

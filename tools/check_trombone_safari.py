@@ -16,6 +16,14 @@ read from the page's own buffer. What it does NOT prove: that a Mac shows it. On
 2026-11-02) no WebGL canvas reached a screenshot or a screen capture, not even a control that only
 clears red, and the runner is a virtual machine asking for reduced motion, so merlin.js's motion
 is switched back on by the server below. Only a look on a real Mac settles the screen.
+
+    os_check.py --os macos --run 'python3 tools/check_trombone_safari.py --file-probe' > LOG
+
+--file-probe answers what a screen capture cannot: what Safari really loaded over file://. It writes
+scratch copies of the pages holding a little script that reports to a local server by image beacon,
+opens each with `open -a Safari` as a student does, prints what each said, and removes the copies.
+It fails on a resource refused or a page wider than its window: Safari refuses over file:// what is
+above the opened page's folder (r61), which left each site without shared/base.css.
 """
 
 import base64
@@ -28,6 +36,7 @@ import tempfile
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -112,6 +121,7 @@ def print_frame(name, jpeg):
 
 CALME = 'window.matchMedia("(prefers-reduced-motion: reduce)").matches'
 patched = {"motion": False}
+reports = {}
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -121,6 +131,12 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
         pass
 
     def do_GET(self):
+        if self.path.startswith("/sonde?"):
+            query = urllib.parse.parse_qs(self.path.split("?", 1)[1])
+            reports[query["n"][0]] = json.loads(query["d"][0])
+            self.send_response(204)
+            self.end_headers()
+            return
         if patched["motion"] and self.path.startswith("/merlin/merlin.js"):
             body = (REPO / "merlin/merlin.js").read_text(encoding="utf-8")
             assert CALME in body
@@ -221,6 +237,58 @@ def on_the_mac():
     return 1 if failed else 0
 
 
+# Goes first in <head>, so that it hears a stylesheet's error event too.
+SONDE = """<script>(function () {
+  var failed = [];
+  document.addEventListener('error', function (e) { var t = e.target; if (t && t.tagName) failed.push(t.href || t.src); }, true);
+  addEventListener('load', function () { setTimeout(function () {
+    var e = document.documentElement, q = function (s) { var r = document.querySelector(s); r = r && r.getBoundingClientRect(); return r ? [r.left, r.right] : null; };
+    var d = {scrollWidth: e.scrollWidth, inner: innerWidth, client: e.clientWidth, failed: failed, url: location.href,
+             margin: getComputedStyle(document.body).marginLeft, sizing: getComputedStyle(document.body).boxSizing,
+             footer: getComputedStyle(document.querySelector('.site-fictif')).backgroundColor,
+             main: q('main'), sheets: [].map.call(document.querySelectorAll('link[rel=stylesheet]'), function (l) { return [l.getAttribute('href'), !!l.sheet]; })};
+    new Image().src = 'http://127.0.0.1:PORT/sonde?n=NAME&d=' + encodeURIComponent(JSON.stringify(d));
+  }, 1500); });
+})();</script>"""
+
+
+def file_probe():
+    """What real Safari loads over file://, read from inside the page."""
+    print(subprocess.run(["sw_vers"], capture_output=True, text=True).stdout)
+    port = serve()
+    scratch = []
+
+    def copy(name, source, target):
+        html = (REPO / source).read_text(encoding="utf-8")
+        html = html.replace("<head>", "<head>" + SONDE.replace("PORT", str(port)).replace("NAME", name), 1)
+        scratch.append(REPO / target)
+        (REPO / target).write_text(html, encoding="utf-8")
+        return REPO / target
+
+    # The root last: opening it may widen what this Safari may read, which would hide a refusal.
+    steps = [(site, f"{site}/index.html", f"{site}/_sonde.html") for site in ("merlin", "gobelin", "courtepaille")]
+    steps.append(("root", "index.html", "_sonde.html"))
+    failed = False
+    try:
+        for name, source, target in steps:
+            subprocess.run(["open", "-a", "Safari", str(copy(name, source, target))], check=True)
+            for _ in range(40):
+                if name in reports:
+                    break
+                time.sleep(0.5)
+            print("REPORT", name, json.dumps(reports.get(name, "nothing came back")), flush=True)
+            said = reports.get(name)
+            failed = failed or not said or bool(said["failed"]) or said["scrollWidth"] > said["client"]
+            shot = Path(tempfile.gettempdir()) / f"{name}.png"
+            subprocess.run(["screencapture", "-x", str(shot)], check=False)
+            if shot.exists():
+                print_frame(f"probe-{name}", small_jpeg(shot.read_bytes()))
+    finally:
+        for path in scratch:
+            path.unlink(missing_ok=True)
+    return 1 if failed else 0
+
+
 def extract(log, out):
     out.mkdir(parents=True, exist_ok=True)
     name, parts, wrote = None, [], 0
@@ -240,4 +308,6 @@ def extract(log, out):
 if __name__ == "__main__":
     if len(sys.argv) == 4 and sys.argv[1] == "--extract":
         sys.exit(extract(Path(sys.argv[2]), Path(sys.argv[3])))
+    if sys.argv[1:] == ["--file-probe"]:
+        sys.exit(file_probe())
     sys.exit(on_the_mac())

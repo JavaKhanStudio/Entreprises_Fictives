@@ -25,7 +25,7 @@ BODY = "<p>Le contenu de la page.</p>"
 NOINDEX = '  <meta name="robots" content="noindex">\n'
 SCRATCH_INDEX = MODEL.replace(BODY, """<h2>Papeterie Merlin <span class="a-venir">à venir</span></h2>
     <h2>Gobelin Hurlant <span class="a-venir">à venir</span></h2>
-    <h2>Étude Courtepaille <span class="a-venir">à venir</span></h2>""").replace("../shared/", "shared/")
+    <h2>Étude Courtepaille <span class="a-venir">à venir</span></h2>""").replace('href="base.css"', 'href="shared/base.css"')
 
 
 def nothing_resolves(_domain):
@@ -40,6 +40,7 @@ class Gate(unittest.TestCase):
         self.write("index.html", SCRATCH_INDEX)
         for company in check_sites.COMPANIES:
             os.mkdir(os.path.join(self.root, company))
+            shutil.copy(os.path.join(REPO, "shared/base.css"), os.path.join(self.root, company))
         self.write("merlin/cible.html", MODEL)
 
     def write(self, path, content):
@@ -58,6 +59,21 @@ class Gate(unittest.TestCase):
 
     def test_the_real_skeleton_passes_and_so_does_the_model_page(self):
         self.assertEqual(check_sites.check_tree(self.root, nothing_resolves), [])
+
+    def test_a_stylesheet_above_the_folder(self):
+        self.refused("above-folder", page=MODEL.replace('href="base.css"', 'href="../shared/base.css"'))
+
+    def test_a_picture_above_the_folder_in_css(self):
+        self.write("merlin/merlin.css", "body { background: url('../shared/a.png'); }\n")
+        self.assertEqual(self.rules(), ["above-folder"])
+
+    def test_a_link_up_is_not_a_load(self):
+        self.write("merlin/page.html", MODEL.replace(BODY, '<a href="../index.html">Accueil</a>'))
+        self.assertEqual(self.rules(), [])
+
+    def test_a_copy_of_base_css_that_differs(self):
+        self.write("merlin/base.css", "body { margin: 8px; }\n")
+        self.assertEqual(self.rules(), ["base-copy"])
 
     def test_no_noindex(self):
         self.refused("noindex", page=MODEL.replace(NOINDEX, ""))
@@ -301,7 +317,7 @@ class Gate(unittest.TestCase):
         <p>#PapierAgile, @MmeMerlin, 12 abonnés, 👏 1 (elle-même), 45 000 EUR</p>
         <a href="cible.html#equipe">interne</a> <a href="#haut">haut</a>
         <img src="data:image/gif;base64,R0lGOD" alt="">
-        <style>.bob.ninja { color: red; } p { background: url(../shared/base.css); }</style>
+        <style>.bob.ninja { color: red; } p { background: url(base.css); }</style>
         """
         self.write("merlin/page.html", MODEL.replace(BODY, allowed))
         self.assertEqual(check_sites.check_tree(self.root, nothing_resolves), [])

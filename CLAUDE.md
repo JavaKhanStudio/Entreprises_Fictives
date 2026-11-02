@@ -20,6 +20,7 @@ python3 tools/render_pages.py OUT index.html   # both file:// and http, 1280 and
 python3 tools/check_trombone.py [OUT]   # Merlin's moving parts, which the renders freeze
 python3 tools/check_trombone_browsers.py OUT   # the clip in Firefox and headed Chrome, real card, no window on screen
 python3 tools/check_trombone_safari.py        # real Safari, run through skill test-windows-mac: its docstring says what it cannot prove
+python3 tools/check_trombone_safari.py --file-probe   # same way: what Safari really loads over file://, each site's width against its window
 python3 tools/check_badge.py [OUT]      # Gobelin's 3D badge: its sway, turn and flip, also frozen
 python3 tools/check_badge_browsers.py OUT [--control flat|gold]   # the badge's pixels in Firefox against Chrome, no window on screen
 python3 tools/check_badge_safari.py --extract LOG OUT   # read a Safari run; the run itself is in its docstring (macOS runner)
@@ -53,5 +54,7 @@ Before writing or changing text a student reads, read `.claude/skills/humour/SKI
 
 ## Traps
 
+- Safari over file:// refuses what is above the opened page's folder: a page loads nothing through `../`.
+  So a site holds a copy of `shared/base.css` as `<company>/base.css`. Change the one in `shared/`, then copy it.
 - Link `merlin/index.html`, never `merlin/`: over file:// a folder opens a listing.
 - A dotted word in text reads as a domain (`fin.Le`, `M.Bob`): put the space in, the gate is right.

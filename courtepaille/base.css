@@ -1,0 +1,21 @@
+/* What every page shares, and nothing of a company's look: no colour and no font but the
+   footer's. Each company's own stylesheet comes after this one. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body { margin: 0; overflow-wrap: break-word; }
+
+img, svg { max-width: 100%; height: auto; }
+
+/* The footer keeps its own colours, so that it stays readable on every company's palette. */
+.site-fictif {
+  padding: 0.75rem 1rem;
+  background: #24262b;
+  color: #f4f4f2;
+  font: 0.875rem/1.45 system-ui, sans-serif;
+  text-align: center;
+}
+
+.site-fictif p { max-width: 60rem; margin: 0 auto; }

@@ -32,6 +32,8 @@ import sys
 import urllib.parse
 
 MODEL_PAGE = "shared/modele.html"
+# Safari over file:// loads nothing above the opened page's folder, so each site holds a copy.
+BASE_CSS = "shared/base.css"
 # The root index must link each of these once its index.html exists (check_index_links).
 COMPANIES = ("merlin", "gobelin", "courtepaille")
 FICTION_PHONE_ROOTS = ("019900", "026191", "035301", "046571", "053649", "063998")
@@ -185,6 +187,10 @@ def check_url(root, refusals, path, line, url, from_tag=None):
         refusals.add(path, line, "relative", f"{url} starts at the root: it breaks over file://")
         return
     target = urllib.parse.unquote(url.split("#")[0].split("?")[0])
+    if from_tag != "a" and os.path.normpath(target).startswith(".."):
+        refusals.add(path, line, "above-folder",
+                     f"loads {url}, above its folder: Safari refuses that over file://")
+        return
     resolved = os.path.normpath(os.path.join(os.path.dirname(path), target)).replace(os.sep, "/")
     if resolved.startswith("..") or not exact_case_exists(root, resolved):
         refusals.add(path, line, "dead-link", f"{url} leads to nothing")
@@ -341,6 +347,8 @@ def check_tree(root, status_of=dig_status):
     domains = {}
     for path in walk(root):
         source = read(root, path)
+        if os.path.basename(path) == "base.css" and path != BASE_CSS and source != read(root, BASE_CSS):
+            refusals.add(path, 1, "base-copy", f"differs from {BASE_CSS}: change that one, then copy it")
         if path.lower().endswith(".css"):
             check_css(root, refusals, path, 1, source)
         else:
