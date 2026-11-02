@@ -73,7 +73,10 @@ def render(base, out):
         browser = playwright.chromium.launch(channel="chrome")
         for path in RENDERED:
             for width in (1280, 390):
-                page = browser.new_page(viewport={"width": width, "height": 800})
+                # Reduced motion, as in tools/render_pages.py: Merlin's sections reveal on scroll,
+                # and a full-page picture that never scrolled shows them blank (r5).
+                page = browser.new_page(viewport={"width": width, "height": 800},
+                                        reduced_motion="reduce")
                 page.on("requestfailed", lambda r: problems.append(f"request failed: {r.url}"))
                 page.on("response", lambda r: r.status >= 400
                         and problems.append(f"{r.status}: {r.url}"))
