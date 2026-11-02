@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" font-family="Georgia,'DejaVu Serif',serif" font-weight="700">
+<defs>
+<linearGradient id="or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0ad"/><stop offset=".45" stop-color="#d7a331"/><stop offset=".7" stop-color="#fbe48e"/><stop offset="1" stop-color="#8f6212"/></linearGradient>
+<linearGradient id="peau" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d3ff66"/><stop offset="1" stop-color="#7fb81e"/></linearGradient>
+<path id="rond" d="M100 100m-82 0a82 82 0 1 1 164 0a82 82 0 1 1-164 0"/>
+<path id="feuille" d="M0 0q7-9 17-7q-3 10-17 7z" fill="url(#or)" stroke="#6d4a0d" stroke-width=".7"/>
+</defs>
+<circle cx="100" cy="100" r="98" fill="url(#or)" stroke="#6d4a0d" stroke-width="2"/>
+<circle cx="100" cy="100" r="92" fill="none" stroke="#6d4a0d" stroke-width=".8" stroke-dasharray="1 3"/>
+<circle cx="100" cy="100" r="72" fill="#22301a" stroke="#6d4a0d" stroke-width="2"/>
+<circle cx="100" cy="100" r="72" fill="none" stroke="#f3d877" stroke-width="1"/>
+<text font-size="13.5" letter-spacing="1.1" fill="#4c3206"><textPath href="#rond">72 HEURES SANS DORMIR · 72 HEURES SANS DORMIR ·</textPath></text>
+<g transform="translate(100 100)">
+<g id="b"><use href="#feuille" transform="rotate(158) translate(64 0) rotate(-68)"/><use href="#feuille" transform="rotate(142) translate(64 0) rotate(-68)"/><use href="#feuille" transform="rotate(126) translate(64 0) rotate(-68)"/><use href="#feuille" transform="rotate(110) translate(64 0) rotate(-68)"/><use href="#feuille" transform="rotate(94) translate(64 0) rotate(-68)"/><use href="#feuille" transform="rotate(78) translate(64 0) rotate(-68)"/><use href="#feuille" transform="rotate(62) translate(64 0) rotate(-68)"/><use href="#feuille" transform="rotate(46) translate(64 0) rotate(-68)"/></g>
+<use href="#b" transform="scale(-1 1)"/>
+</g>
+<g transform="translate(40 40) scale(1)">
+<path d="M30 54 L2 30 L28 74Z M90 54 L118 30 L92 74Z" fill="url(#peau)" stroke="#2c3d0b" stroke-width="2" stroke-linejoin="round"/>
+<path d="M26 58 Q26 18 60 18 Q94 18 94 58 Q94 110 60 112 Q26 110 26 58Z" fill="url(#peau)" stroke="#2c3d0b" stroke-width="2"/>
+<path d="M36 41 l20 9 M84 41 l-20 9" stroke="#2c3d0b" stroke-width="4" stroke-linecap="round"/>
+<ellipse cx="46" cy="54" rx="9" ry="6.5" fill="#fff8d9" stroke="#2c3d0b" stroke-width="1.5"/><ellipse cx="74" cy="54" rx="9" ry="6.5" fill="#fff8d9" stroke="#2c3d0b" stroke-width="1.5"/>
+<circle cx="48" cy="55" r="2.2" fill="#12160f"/><circle cx="72" cy="53" r="2.2" fill="#12160f"/>
+<path d="M36 62q10 6 19 0M65 62q10 6 19 0" fill="none" stroke="#6a3f7c" stroke-width="3" stroke-linecap="round"/>
+<path d="M40 72 Q60 64 80 72 Q77 104 60 106 Q43 104 40 72Z" fill="#12160f"/>
+<path d="M43 72l5 9 5-11zM67 70l5 11 5-9z" fill="#f0f5e4"/><ellipse cx="60" cy="96" rx="9" ry="6" fill="#ff6fb5"/>
+</g>
+<path d="M60 24 l9 17 13-14 9 13 9-16 9 16 9-13 13 14 9-17 -5 30 h-70z" fill="url(#or)" stroke="#6d4a0d" stroke-width="1.2" stroke-linejoin="round" transform="translate(0 2)"/>
+<circle cx="83" cy="47" r="2.2" fill="#c01f4c"/><circle cx="100" cy="47" r="2.6" fill="#b6f23c"/><circle cx="117" cy="47" r="2.2" fill="#c01f4c"/>
+</svg>

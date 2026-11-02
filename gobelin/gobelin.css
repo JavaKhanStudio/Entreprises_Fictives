@@ -111,8 +111,6 @@ h3 { margin: 0; font-size: 1.1rem; }
 
 figure { max-width: 44rem; margin: 1.5rem 0; }
 figure img { display: block; width: 100%; border-radius: 14px; box-shadow: var(--ombre); }
-figure.badge { max-width: 13rem; }
-figure.badge img { border-radius: 0; box-shadow: none; }
 figcaption { margin-top: 0.6rem; color: var(--mousse); font-size: 0.9rem; }
 
 /* A tall picture beside its text; above it on a phone */
@@ -213,6 +211,370 @@ a code { color: inherit; }
 .piege ol, .piege ul { padding-left: 1.25rem; }
 .piege li { margin: 0.6rem 0; }
 .piege h2 { margin-top: 2rem; font-size: 1.3rem; }
+
+/* The Héros du Crunch badge: an object, not a picture. Real 3D, CSS only.
+   .balance sways on the strap, .tour turns right round once a cycle, and .plaque flips to its
+   back when the case is hovered or tapped. Hover is read on .vitrine, which does not move: read
+   on the card, edge-on it would lose the pointer and flicker. Frozen at an angle under reduced
+   motion. tools/check_badge.py looks at what the renders freeze. */
+figure.badge { max-width: 44rem; }
+.vitrine {
+  --or: linear-gradient(115deg, #fff0ad, #d7a331 38%, #fbe48e 56%, #a87818 78%, #f6da80);
+  position: relative;
+  isolation: isolate;
+  height: 36rem;
+  overflow: hidden;
+  border: 1px solid var(--trait);
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 42%, rgb(255 240 190 / 0.17), transparent 70%),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.012) 0 2px, transparent 2px 5px),
+    var(--relief);
+  box-shadow: inset 0 0 60px rgb(0 0 0 / 0.55), var(--ombre);
+  cursor: pointer;
+  perspective: 1100px;
+  perspective-origin: 50% 45%;
+}
+.vitrine * { box-sizing: border-box; }
+.ombre {
+  position: absolute;
+  top: 7.5rem;
+  left: 50%;
+  width: 15rem;
+  height: 25rem;
+  margin-left: -7rem;
+  border-radius: 18px;
+  background: rgb(0 0 0 / 0.55);
+  filter: blur(16px);
+  animation: ombre-tour 26s infinite;
+}
+.balance, .tour, .plaque, .relief, .tranche { transform-style: preserve-3d; }
+.balance {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 17.5rem;
+  height: 100%;
+  margin-left: -8.75rem;
+  transform-origin: 50% 0;
+  transform: rotateX(4deg) rotateY(-22deg);
+  animation: balance 11s ease-in-out infinite;
+}
+.tour { position: absolute; inset: 0; animation: tour 26s infinite; }
+
+/* The strap, a stitched and woven ribbon, then the crimp */
+.cordon {
+  position: absolute;
+  top: -1rem;
+  left: 50%;
+  width: 2.6rem;
+  height: 5.1rem;
+  margin-left: -1.3rem;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.32), transparent 22% 78%, rgb(0 0 0 / 0.32)),
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.1) 0 1px, transparent 1px 3px),
+    var(--hurle);
+  outline: 1px dashed rgb(255 255 255 / 0.65);
+  outline-offset: -4px;
+}
+.cordon::before {
+  content: "HÉROS DU CRUNCH · HÉROS DU CRUNCH";
+  display: block;
+  margin: 0 auto;
+  color: #6d1a45;
+  font: 800 0.72rem/2.6rem var(--code);
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+}
+.sertissage {
+  position: absolute;
+  top: 3.7rem;
+  left: 50%;
+  width: 3rem;
+  height: 1.05rem;
+  margin-left: -1.5rem;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #f4f6f8, #8c939b 45%, #dfe3e7 60%, #6a7078);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+}
+
+/* The card. Its thickness is 11 real layers, liner and flute by turns */
+.plaque {
+  position: absolute;
+  top: 6.5rem;
+  left: 0;
+  width: 17.5rem;
+  height: 26rem;
+  transition: transform 0.9s cubic-bezier(0.3, 1.25, 0.5, 1);
+}
+.vitrine:hover .plaque, .vitrine:focus .plaque { transform: rotateY(180deg); }
+.tranche, .tranche i, .recto, .verso { position: absolute; inset: 0; border-radius: 16px; }
+.tranche i, .recto, .verso {
+  -webkit-mask-image: radial-gradient(ellipse 1.5rem 0.42rem at 50% 1.5rem, transparent 97%, #000 100%);
+  mask-image: radial-gradient(ellipse 1.5rem 0.42rem at 50% 1.5rem, transparent 97%, #000 100%);
+}
+.tranche i { background: #c49c62; }
+.tranche i:nth-child(even) { background: #71552f; }
+.tranche i:nth-child(1) { transform: translateZ(-5px); }
+.tranche i:nth-child(2) { transform: translateZ(-4px); }
+.tranche i:nth-child(3) { transform: translateZ(-3px); }
+.tranche i:nth-child(4) { transform: translateZ(-2px); }
+.tranche i:nth-child(5) { transform: translateZ(-1px); }
+.tranche i:nth-child(7) { transform: translateZ(1px); }
+.tranche i:nth-child(8) { transform: translateZ(2px); }
+.tranche i:nth-child(9) { transform: translateZ(3px); }
+.tranche i:nth-child(10) { transform: translateZ(4px); }
+.tranche i:nth-child(11) { transform: translateZ(5px); }
+
+.recto, .verso {
+  background:
+    url(img/kraft.svg),
+    radial-gradient(ellipse at 35% 22%, #e2c390, #c8a56f 58%, #a98551);
+  backface-visibility: hidden;
+}
+.recto { transform: translateZ(6px); color: #2a1c08; text-align: center; }
+/* The frame: two gilded lines and an engraved ground, as on a banknote */
+.recto::before {
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  border: 2px solid #a87818;
+  border-radius: 11px;
+  background:
+    repeating-radial-gradient(circle at 50% 54%, transparent 0 5px, rgb(107 70 15 / 0.13) 5px 6px),
+    repeating-conic-gradient(from 0deg at 50% 54%, transparent 0 4deg, rgb(107 70 15 / 0.07) 4deg 8deg);
+  box-shadow: inset 0 0 0 3px #c8a56f, inset 0 0 0 4px #a87818;
+}
+.recto p { position: absolute; left: 0; right: 0; margin: 0; }
+.heros {
+  top: 2.5rem;
+  color: #2a1c08;
+  font: 900 1.3rem/1.2 Georgia, "DejaVu Serif", serif;
+  letter-spacing: 0.16em;
+  text-shadow: 0 1px 0 rgb(255 240 200 / 0.55);
+  text-transform: uppercase;
+}
+.engagement {
+  top: 20.6rem;
+  font: 800 1.02rem/1.2 var(--code);
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 0 rgb(255 240 200 / 0.55);
+  text-transform: uppercase;
+}
+.matiere { top: 22.15rem; font: 700 0.76rem/1.2 var(--code); }
+.reflet {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(110deg, transparent 42%, rgb(255 250 225 / 0.34) 50%, transparent 58%) 0 0 / 300% 100%;
+  animation: reflet 11s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* The word stands off the card: six layers of letter, gold on top */
+.crunch, .relief i {
+  position: absolute;
+  top: 3.85rem;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font: 900 3.35rem/1.05 Impact, "Arial Black", system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.relief { position: absolute; inset: 0; }
+.relief i { color: #6e1029; font-style: normal; }
+.relief i::before { content: "Crunch"; }
+.relief i:nth-child(1) { transform: translateZ(7px); }
+.relief i:nth-child(2) { transform: translateZ(8px); }
+.relief i:nth-child(3) { transform: translateZ(9px); color: #8a1533; }
+.relief i:nth-child(4) { transform: translateZ(10px); color: #8a1533; }
+.relief i:nth-child(5) { transform: translateZ(11px); color: #a81b40; }
+.relief i:nth-child(6) { transform: translateZ(12px); color: #a81b40; }
+.crunch {
+  transform: translateZ(13px);
+  background: var(--or);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The medal, on a pleated rosette with two tails */
+.rubans {
+  position: absolute;
+  top: 15.5rem;
+  left: 50%;
+  width: 8.4rem;
+  height: 4.8rem;
+  margin-left: -4.2rem;
+  background:
+    linear-gradient(90deg, #a81b40 0 2.6rem, transparent 2.6rem 5.8rem, #0f6b4b 5.8rem);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 84% 84%, 69% 100%, 69% 0, 31% 0, 31% 100%, 16% 84%, 0 100%);
+  transform: translateZ(7px);
+}
+.cocarde {
+  position: absolute;
+  top: 7.9rem;
+  left: 50%;
+  width: 11rem;
+  height: 11rem;
+  margin-left: -5.5rem;
+  border-radius: 50%;
+  background: repeating-conic-gradient(#d13358 0 6deg, #80122e 6deg 12deg);
+  -webkit-mask-image: radial-gradient(circle, #000 69%, transparent 71%);
+  mask-image: radial-gradient(circle, #000 69%, transparent 71%);
+  transform: translateZ(9px);
+}
+.medaille {
+  position: absolute;
+  top: 8.75rem;
+  left: 50%;
+  width: 9.3rem;
+  height: 9.3rem;
+  margin-left: -4.65rem;
+  border-radius: 50%;
+  box-shadow: 0 3px 5px rgb(0 0 0 / 0.5);
+  transform: translateZ(14px);
+}
+
+/* The sticker: its colours move with the sway */
+.holo {
+  position: absolute;
+  top: 16.2rem;
+  right: 1rem;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 1px solid rgb(255 255 255 / 0.8);
+  border-radius: 50%;
+  background: conic-gradient(#ff8cc4, #ffe27a, #8dffb0, #7fd4ff, #c9a0ff, #ff8cc4);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+  transform: translateZ(8px) rotate(-14deg);
+  animation: holo 11s linear infinite;
+}
+.holo span { color: #1b2030; font: 900 0.56rem/1 var(--code); letter-spacing: 0.02em; text-transform: uppercase; }
+
+/* Four rivets, which hold nothing */
+.rivet {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #bfc5cc 40%, #5b6169 90%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.65), 0 0 0 2px rgb(107 70 15 / 0.5);
+  transform: translateZ(8px);
+}
+.r1 { top: 1.05rem; left: 1.05rem; }
+.r2 { top: 1.05rem; right: 1.05rem; }
+.r3 { bottom: 1.05rem; left: 1.05rem; }
+.r4 { bottom: 1.05rem; right: 1.05rem; }
+
+/* The eyelet and the clip through it, seen from both sides */
+.oeillet {
+  position: absolute;
+  top: 0.82rem;
+  left: 50%;
+  width: 3.5rem;
+  height: 1.36rem;
+  margin-left: -1.75rem;
+  border: 0.24rem solid #b9bfc7;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.7), inset 0 1px 2px rgb(0 0 0 / 0.7);
+}
+.oeillet.devant { transform: translateZ(7px); }
+.oeillet.derriere { transform: translateZ(-7px); }
+.attache {
+  position: absolute;
+  top: -2.2rem;
+  left: 50%;
+  width: 1.1rem;
+  height: 3.8rem;
+  margin-left: -0.55rem;
+  border: 0.22rem solid #dfe3e7;
+  border-radius: 0.55rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.6);
+}
+.attache.devant { transform: translateZ(8px); }
+.attache.derriere { transform: translateZ(-8px); }
+
+/* The back: the spec sheet, stamped */
+.verso { transform: rotateY(180deg) translateZ(6px); padding: 3rem 1.4rem 1rem; color: #2a1c08; }
+/* The rivets come through on this side */
+.verso::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  --clou: radial-gradient(circle, #8a9099 0 0.28rem, #4c5158 0.3rem 0.36rem, transparent 0.38rem);
+  background: var(--clou) 1.05rem 1.05rem, var(--clou) right 1.05rem top 1.05rem, var(--clou) 1.05rem bottom 1.05rem, var(--clou) right 1.05rem bottom 1.05rem;
+  background-repeat: no-repeat;
+  background-size: 1rem 1rem;
+  pointer-events: none;
+}
+.verso h3 {
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #2a1c08;
+  font: 900 1.05rem/1.2 Georgia, "DejaVu Serif", serif;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.verso dl { margin: 0; font-size: 0.8rem; line-height: 1.25; }
+.verso dl div { padding: 0.32rem 0; border-bottom: 1px dotted rgb(42 28 8 / 0.6); }
+.verso dt { color: #5b4520; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.verso dd { margin: 0; font-weight: 700; }
+.tampon {
+  position: absolute;
+  right: 1rem;
+  bottom: 3rem;
+  margin: 0;
+  padding: 0.1rem 0.5rem;
+  border: 3px double #16408f;
+  border-radius: 6px;
+  color: #16408f;
+  font: 900 1.05rem/1.3 var(--code);
+  letter-spacing: 0.08em;
+  opacity: 0.72;
+  text-transform: uppercase;
+  transform: rotate(-11deg);
+}
+.barres {
+  position: absolute;
+  bottom: 0.9rem;
+  left: 2.3rem;
+  right: 2.3rem;
+  height: 1.3rem;
+  background: repeating-linear-gradient(90deg, #2a1c08 0 2px, transparent 2px 4px, #2a1c08 4px 5px, transparent 5px 9px, #2a1c08 9px 12px, transparent 12px 14px);
+}
+
+@keyframes balance {
+  0%, 100% { transform: rotateX(4deg) rotateZ(0.7deg) rotateY(-22deg); }
+  50% { transform: rotateX(4deg) rotateZ(-0.7deg) rotateY(20deg); }
+}
+/* Once a cycle the card goes right round, which is how a phone finds out it has a back */
+@keyframes tour {
+  0%, 70% { transform: rotateY(0deg); animation-timing-function: ease-in-out; }
+  88%, 100% { transform: rotateY(360deg); }
+}
+@keyframes ombre-tour {
+  0%, 70%, 88%, 100% { transform: scaleX(1); }
+  75%, 83% { transform: scaleX(0.3); }
+  79% { transform: scaleX(0.95); }
+}
+@keyframes reflet {
+  0%, 100% { background-position: 100% 0; }
+  50% { background-position: 0 0; }
+}
+@keyframes holo {
+  to { filter: hue-rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .balance, .tour, .ombre, .reflet, .holo { animation: none; }
+  .plaque { transition: none; }
+}
 
 @media (min-width: 720px) {
   h1 { font-size: 3rem; }
