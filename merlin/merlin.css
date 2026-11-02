@@ -391,6 +391,7 @@ main > section:not(.encadre) ul:not([class]) li::marker { color: var(--violet); 
 
 @media (max-width: 40rem) {
   body { font-size: 1rem; }
+  .marque { flex: 0 1 auto; }
   .marque small { white-space: normal; }
   .demo { display: none; }
   .tete { padding-inline: 1rem; }

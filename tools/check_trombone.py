@@ -27,7 +27,7 @@ from playwright.sync_api import sync_playwright
 REPO = Path(__file__).resolve().parent.parent
 HOME = (REPO / "merlin/index.html").as_uri()
 PAGES = sorted((REPO / "merlin").glob("*.html"))
-WIDTHS = (360, 600, 768, 1000, 1100, 1190, 1280, 1920)
+WIDTHS = (320, 360, 600, 768, 1000, 1100, 1190, 1280, 1920)
 failures = []
 
 
