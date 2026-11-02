@@ -75,6 +75,8 @@ nav a[aria-current] { background: #6d1610; border-style: inset; border-color: #6
   letter-spacing: 0.15em;
 }
 
+.compteur a, .compteur a:visited { display: inline; padding: 0; background: none; border: 0; color: inherit; font-size: inherit; text-decoration: none; }
+
 .contenu { flex: 1; min-width: 0; padding: 0.5rem 1.25rem 1rem; }
 
 h1 { margin: 0.5rem 0 0.75rem; color: #6d1610; font-size: 1.7rem; line-height: 1.2; }

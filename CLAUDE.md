@@ -26,6 +26,7 @@ python3 tools/check_badge_browsers.py OUT [--control flat|gold]   # the badge's 
 python3 tools/check_badge_safari.py --extract LOG OUT   # read a Safari run; the run itself is in its docstring (macOS runner)
 python3 tests/test_render_pages.py             # two render runs at once each prove their own tree
 python3 tools/check_pages.py [--render OUT]    # the served site: each page and local link answers 200, noindex and footer in the body
+python3 tools/check_courtepaille_egg.py [OUT]  # Courtepaille's counter looks the same with its hidden link
 ```
 
 A new page starts as a copy of `shared/modele.html`: its footer is compared byte for byte.
