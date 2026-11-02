@@ -58,9 +58,9 @@ DATES: no year in the plot, it runs as a yearly habit (Simon, r4). The pages agr
 label = "Hosting"
 description = "GitHub Pages for the public repo"
 context = """
-HOST: GitHub Pages on JavaKhanStudio/Entreprises_Fictives, main branch, root (Simon, p4246). Not switched on until the three sites pass the gate.
+HOST: GitHub Pages on JavaKhanStudio/Entreprises_Fictives, main branch, root (Simon, p4246). On since r5. .nojekyll keeps it serving the tree as committed: without it Jekyll generates README.html and CLAUDE.html, pages with no noindex and no footer.
 ROBOTS: every page stays noindex, there is no sitemap and no search engine submission: these sites are not meant to be found.
-CHECK: gh api repos/JavaKhanStudio/Entreprises_Fictives/pages, then curl each page under https://javakhanstudio.github.io/Entreprises_Fictives/.
+CHECK: gh api repos/JavaKhanStudio/Entreprises_Fictives/pages, then python3 tools/check_pages.py (each page and local link under https://javakhanstudio.github.io/Entreprises_Fictives/).
 """
 
 [tags.docs]

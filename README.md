@@ -28,4 +28,5 @@ rien.
 ## Ouvrir les sites
 
 Un simple navigateur suffit, sous Windows, macOS ou Linux : ouvrez `index.html` d'un
-double-clic. Les sites sont en cours de construction ; leur adresse publique sera donnée ici.
+double-clic, ou allez à leur adresse publique :
+<https://javakhanstudio.github.io/Entreprises_Fictives/>

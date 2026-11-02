@@ -24,6 +24,7 @@ python3 tools/check_badge.py [OUT]      # Gobelin's 3D badge: its sway, turn and
 python3 tools/check_badge_browsers.py OUT [--control flat|gold]   # the badge's pixels in Firefox against Chrome, no window on screen
 python3 tools/check_badge_safari.py --extract LOG OUT   # read a Safari run; the run itself is in its docstring (macOS runner)
 python3 tests/test_render_pages.py             # two render runs at once each prove their own tree
+python3 tools/check_pages.py [--render OUT]    # the served site: each page and local link answers 200, noindex and footer in the body
 ```
 
 A new page starts as a copy of `shared/modele.html`: its footer is compared byte for byte.
