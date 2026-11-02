@@ -1,0 +1,195 @@
+/* Étude Courtepaille: a site made in 2003 by a nephew, and left alone since. Straight serif,
+   parchment, bevelled buttons, blue links. Old in look only: it still fits a phone. */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #d8cba8;
+  background-image: repeating-linear-gradient(45deg, rgba(90, 65, 30, 0.07) 0 2px, transparent 2px 7px);
+  color: #2a2118;
+  font: 1.0625rem/1.5 "Times New Roman", Times, Georgia, serif;
+}
+
+main { flex: 1; width: 100%; padding: 1rem 0.5rem 2rem; }
+
+.cadre {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fbf6e6;
+  border: 3px double #6d1610;
+}
+
+.bandeau {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #6d1610;
+  color: #f4e7b8;
+  border-bottom: 4px ridge #c6a94f;
+}
+
+.sceau { flex: none; width: 84px; border: 2px solid #c6a94f; border-radius: 50%; }
+
+.nom { margin: 0; font-size: 2rem; font-variant: small-caps; letter-spacing: 0.06em; line-height: 1.1; }
+.devise { margin: 0.25rem 0 0; font-size: 0.95rem; font-style: italic; }
+
+.colonnes { display: flex; align-items: stretch; }
+
+nav {
+  flex: none;
+  width: 164px;
+  padding: 0.75rem 0.6rem;
+  background: #e8dcb9;
+  border-right: 2px groove #c6a94f;
+}
+
+nav ul { margin: 0; padding: 0; list-style: none; }
+
+nav li { margin-bottom: 0.35rem; }
+
+nav a {
+  display: block;
+  padding: 0.3rem 0.4rem;
+  background: #d9d3c4;
+  border: 2px outset #f2eee2;
+  color: #00008b;
+  font-size: 0.95rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+nav a[aria-current] { background: #6d1610; border-style: inset; border-color: #6d1610; color: #f4e7b8; text-decoration: none; }
+
+.compteur { margin: 1rem 0 0; font-size: 0.85rem; text-align: center; }
+
+.compteur span {
+  display: inline-block;
+  padding: 0.1rem 0.3rem;
+  width: max-content;
+  background: #000;
+  color: #36e02f;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+}
+
+.contenu { flex: 1; min-width: 0; padding: 0.5rem 1.25rem 1rem; }
+
+h1 { margin: 0.5rem 0 0.75rem; color: #6d1610; font-size: 1.7rem; line-height: 1.2; }
+
+h2 {
+  margin: 1.5rem 0 0.5rem;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid #c6a94f;
+  color: #6d1610;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+h3 { margin: 1rem 0 0.25rem; font-size: 1.05rem; }
+
+p { margin: 0 0 0.75rem; }
+
+a { color: #00008b; }
+a:visited { color: #551a8b; }
+nav a:visited { color: #00008b; }
+nav a[aria-current]:visited { color: #f4e7b8; }
+
+.illustration { display: block; margin: 0 auto 1rem; border: 4px ridge #c6a94f; }
+
+.signature-texte { text-align: right; }
+
+.nouveau { color: #d00000; font-variant: small-caps; }
+
+.avis { padding-left: 1.25rem; }
+.avis li { margin-bottom: 0.5rem; }
+
+blockquote { margin: 0 0 0.75rem; padding: 0.5rem 0.75rem; background: #f1e8cc; border-left: 4px solid #c6a94f; font-style: italic; }
+cite { display: block; font-size: 0.92rem; font-style: normal; text-align: right; }
+
+table { width: 100%; margin-bottom: 1rem; border-collapse: collapse; background: #fffdf4; }
+th, td { padding: 0.35rem 0.5rem; border: 1px solid #8a7440; text-align: left; vertical-align: top; }
+thead th { background: #e8dcb9; }
+tbody th { width: 40%; font-weight: normal; background: #f1e8cc; }
+td { overflow-wrap: anywhere; }
+
+address { margin-bottom: 0.75rem; font-style: normal; }
+
+.pied-etude {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: #e8dcb9;
+  border-top: 4px ridge #c6a94f;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Team */
+.employe {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  background: #fffdf4;
+  border: 1px solid #8a7440;
+}
+
+.employe h2 { margin: 0; padding: 0; border: 0; }
+.portrait { width: 96px; }
+.titre { margin: 0; font-style: italic; font-weight: bold; }
+.fonction { margin: 0; }
+.bio { margin: 0.25rem 0 0; font-size: 0.92rem; color: #5d4f3a; }
+.posts { grid-column: 1 / -1; }
+
+.post { margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: #f1e8cc; border: 1px dashed #8a7440; }
+.post p { margin-bottom: 0.4rem; }
+.post-qui { font-weight: bold; font-size: 0.92rem; }
+.tags { color: #00008b; font-size: 0.92rem; }
+.likes { margin: 0; font-size: 0.92rem; }
+.photo-post { display: block; margin: 0.25rem 0 0.5rem; border: 1px solid #8a7440; }
+
+/* Organisation chart */
+.orga { text-align: center; }
+.case { padding: 0.4rem 0.6rem; background: #fffdf4; border: 2px solid #6d1610; font-size: 0.95rem; line-height: 1.3; }
+.chef { max-width: 22rem; margin: 0 auto; background: #f1e8cc; }
+.trait { width: 2px; height: 1.1rem; margin: 0 auto; background: #6d1610; }
+.branches { display: flex; gap: 0.5rem; padding-top: 0.6rem; border-top: 2px solid #6d1610; }
+.branche { flex: 1; min-width: 0; }
+.pole { margin: 0 0 0.25rem; font-variant: small-caps; font-weight: bold; }
+.vide { border-style: dashed; background: transparent; }
+.hors-cadre { margin: 1rem auto 0; max-width: 26rem; border: 2px dotted #5d4f3a; }
+
+/* Letterhead */
+.lettre { padding: 1.25rem; background: #fdf8e8; border: 1px solid #b7a878; box-shadow: 2px 2px 0 #b7a878; }
+.entete { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #6d1610; }
+.entete img { flex: none; width: 64px; }
+.entete p { margin: 0; font-size: 0.95rem; line-height: 1.25; }
+.droite { text-align: right; }
+.signe { width: max-content; max-width: 100%; margin-left: auto; text-align: center; }
+.signe img { display: block; width: 220px; }
+.signe p { margin: 0; line-height: 1.25; }
+.note-bas { margin-top: 0.75rem; font-size: 0.92rem; font-style: italic; }
+
+.annonce .ref { font-size: 0.95rem; font-style: italic; }
+
+@media (max-width: 640px) {
+  main { padding: 0.5rem 0.25rem 1rem; }
+  .bandeau { padding: 0.6rem; gap: 0.6rem; }
+  .sceau { width: 60px; }
+  .nom { font-size: 1.5rem; }
+  .devise { font-size: 0.85rem; }
+  .colonnes { flex-direction: column; }
+  nav { width: auto; border-right: 0; border-bottom: 2px groove #c6a94f; }
+  nav ul { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; }
+  nav li { margin: 0; }
+  .compteur { margin-top: 0.5rem; }
+  .contenu { padding: 0.25rem 0.75rem 0.75rem; }
+  .branches { flex-direction: column; }
+  .lettre { padding: 0.75rem; }
+  .employe { grid-template-columns: 72px minmax(0, 1fr); padding: 0.5rem; }
+  .portrait { width: 72px; }
+}
