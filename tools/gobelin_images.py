@@ -214,6 +214,10 @@ def make(names):
 SHIP = {name: (256, 82) for name in ("maelle", "bastien", "ingrid", "nolan", "lou", "theo", "yasmine", "odile")}
 SHIP |= {"cle": (1216, 80), "capture": (1000, 78), "forge": (1000, 78), "bureau": (1000, 78),
          "inspecteur": (1000, 78), "morve": (560, 80), "cave": (560, 80), "open-space": (1216, 86)}
+# The lighter copy gobelin/index.html offers in its srcset, named name-width.webp: the home page
+# shows these pictures far smaller than their full size (r58). Name, width, webp quality.
+PORTRAITS = ("maelle", "bastien", "ingrid", "nolan", "lou", "theo", "yasmine", "odile")
+SMALLER = {name: (168, 72) for name in PORTRAITS} | {"cle": (720, 72), "capture": (720, 72)}
 BOLD = "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Bold.ttf"
 # What the whiteboard says: the same words as the alt text in a-propos.html and equipe.html.
 BOARD_LINES = (("JALON BÊTA : VEN. 13/11", (176, 28, 62), 56),
@@ -279,10 +283,14 @@ def ship():
             write_board(picture, BOARD_INSIDE)
         if name == "cle":
             poster_title(picture)
-        height = round(picture.height * width / picture.width)
-        target = IMG / f"{name}.webp"
-        picture.resize((width, height), Image.LANCZOS).save(target, quality=quality, method=6)
-        print(f"{target.name}: {width}x{height}, {target.stat().st_size // 1024} KB")
+        out = [(IMG / f"{name}.webp", width, quality)]
+        if name in SMALLER:
+            small, small_quality = SMALLER[name]
+            out.append((IMG / f"{name}-{small}.webp", small, small_quality))
+        for target, size, q in out:
+            height = round(picture.height * size / picture.width)
+            picture.resize((size, height), Image.LANCZOS).save(target, quality=q, method=6)
+            print(f"{target.name}: {size}x{height}, {target.stat().st_size // 1024} KB")
 
 
 def main():
