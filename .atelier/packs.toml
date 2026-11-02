@@ -1,0 +1,59 @@
+# Entreprises fictives' TAGS AND THEIR CONTEXT PACKS (board slug entreprises-fictives).
+# FIRST DRAFT, written from the brief before any code existed (p4246, 2026-11-02): every path
+# marked (planned) is not there yet. Refine with /write-context-pack as the code arrives, and
+# fix a pack IN THE SAME COMMIT as what made it stale. Only [tags.<slug>] tables belong here.
+# THIS REPO IS PUBLIC: nothing here but what can be read by anyone.
+
+[tags.shared]
+label = "Skeleton & gate"
+description = "What all the sites share: shared/, the root index, the footer, the check gate"
+context = """
+FILES (planned): index.html (the root list of the three companies), shared/base.css, tools/check_sites.py.
+GATE (planned): python3 tools/check_sites.py walks every .html and must pass before any push. It refuses a page with no noindex meta or no fictional footer, a <form>, a tel: link, an http(s) resource, an em dash, a domain that is not .example, a domain that resolves (dig).
+RULE: what two sites share lives ONCE, in shared/. Their look does not: each company has its own CSS on top. HTML has no include, so the footer is copied verbatim in each page and the gate compares it to the one in shared/ (planned).
+OPEN: double-click must work, so links are relative and nothing needs a server: a page tested only through http.server can hide a broken file:// path. Test both.
+"""
+
+[tags.merlin]
+label = "Papeterie Merlin"
+description = "The site of Papeterie Merlin, in merlin/"
+context = """
+FILES (planned): merlin/index.html and its pages, merlin/merlin.css. Domain: papeterie-merlin.example.
+CANON: ~/Documents/GitHub/Social_Engineering_en_visuel/faux-president/js/i18n.js, steps.research (the page on Eve's laptop): since 1987, 12 followers, Mme Merlin "Presidente Executive Principale" always travelling, Alice "Directrice des Directions" Bob's boss, Bob "Ninja des virements" the accountant, conquering abroad, #PapierAgile. The capsule reuses these names: the site must not contradict them. faux-president/sources.md says what is invented there.
+ATTACK SURFACE TO KEEP, from the Lumisol sample (~/Documents/Claude_GDrive_HQ/boards/social-engineering/verif/r32/kit.py, company dropped by Simon): an address format, a client portal, supplier invoices by PDF mail, a recent hire in accounting, a lone overworked IT person mid migration to Microsoft 365, a payment threshold, a press release naming a contract. Do not reuse from it: the 02 40 number, PayFlow, Claire Fontaine, Thomas Berger, Karim Haddad, Saint-Herblain.
+"""
+
+[tags.gobelin]
+label = "Gobelin Hurlant"
+description = "The site of the indie game studio Gobelin Hurlant, in gobelin/"
+context = """
+FILES (planned): gobelin/index.html and its pages, gobelin/gobelin.css. Domain: gobelin-hurlant.example.
+SURFACE: a public Discord and its fans, a publisher, a build under NDA, crunch worn as a badge. Different from Merlin: the money is not the prize here, the build and the accounts are.
+"""
+
+[tags.courtepaille]
+label = "Etude Courtepaille"
+description = "The site of the notary's office Etude Courtepaille, in courtepaille/"
+context = """
+FILES (planned): courtepaille/index.html and its pages, courtepaille/courtepaille.css. Domain: etude-courtepaille.example.
+SURFACE: large property transfers, elderly clients, paper first, a website that looks its age. Simon kept the name (2026-11-02) though Courtepaille is also a restaurant chain: the site says nothing of restaurants. No real notary's name, checked by search: the public directory is https://www.notaires.fr/fr/directory.
+"""
+
+[tags.hosting]
+label = "Hosting"
+description = "GitHub Pages for the public repo"
+context = """
+HOST: GitHub Pages on JavaKhanStudio/Entreprises_Fictives, main branch, root (Simon, p4246). Not switched on until the three sites pass the gate.
+ROBOTS: every page stays noindex, there is no sitemap and no search engine submission: these sites are not meant to be found.
+CHECK: gh api repos/JavaKhanStudio/Entreprises_Fictives/pages, then curl each page under https://javakhanstudio.github.io/Entreprises_Fictives/.
+"""
+
+[tags.docs]
+label = "Docs & board words"
+description = "CLAUDE.md, README.md; the packs and lexicon"
+context = """
+The board's own upkeep lands here: the Maintenance tickets for Context packs, Lexicon, Tag vocabulary and Doctrine (atelier r853).
+.atelier/packs.toml holds one [tags.<slug>] per tag. A pack line names a file or a command; one that does not gets cut. `atelier --project entreprises-fictives doctor context_packs` lists paths that moved.
+Lexicon: `atelier --project entreprises-fictives term list`; a new word: atelier --project entreprises-fictives term add "<word>" --short "<one line>" --tags <tag>
+Doctrine: this board has no lines of its own (Simon, p4246) and reads social-engineering's. CLAUDE.md is loaded by every session: keep it short. README.md is French and public.
+"""
