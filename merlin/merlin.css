@@ -1,0 +1,186 @@
+/* Papeterie Merlin: a school exercise book that has read too many management books.
+   Cream paper, blue ink, the red margin line, French "Seyes" ruling. */
+
+:root {
+  --papier: #fbf8ef;
+  --encre: #1f3a6e;
+  --texte: #262b36;
+  --pale: #5a6478;
+  --marge: #c8413b;
+  --ligne: #d4e0f0;
+  --blanc: #fff;
+}
+
+body {
+  background: var(--papier);
+  color: var(--texte);
+  font: 1.0625rem/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+h1, h2, h3 { color: var(--encre); font-family: Georgia, "Times New Roman", serif; line-height: 1.2; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.9rem); margin: 0 0 0.75rem; }
+h2 { font-size: 1.5rem; margin: 0 0 0.75rem; }
+h3 { font-size: 1.1rem; margin: 0 0 0.35rem; }
+a { color: var(--encre); }
+
+/* The header: the top of the page of the exercise book. */
+.tete {
+  padding: 0.9rem 1rem 0;
+  background: var(--blanc);
+  border-bottom: 3px solid var(--marge);
+}
+.tete > * { max-width: 68rem; margin-inline: auto; }
+.marque { display: flex; align-items: center; gap: 0.75rem; color: inherit; text-decoration: none; }
+.marque strong { display: block; color: var(--encre); font: 700 1.5rem/1.1 Georgia, "Times New Roman", serif; }
+.marque small { display: block; color: var(--pale); font-size: 0.875rem; }
+.marque img { flex: none; }
+.tete ul { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.75rem auto 0; padding: 0; list-style: none; }
+.tete nav a {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px 6px 0 0;
+  color: var(--encre);
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+.tete nav a:hover { background: var(--ligne); }
+.tete nav a[aria-current] { background: var(--marge); color: var(--blanc); }
+
+/* The page: ruled lines and a red margin line down the left. */
+main {
+  max-width: 68rem;
+  margin: 1.5rem auto 2.5rem;
+  padding: 1.75rem 1.5rem 1.75rem 3rem;
+  background-color: var(--blanc);
+  background-image: linear-gradient(90deg, transparent 1.75rem, var(--marge) 1.75rem, var(--marge) 1.85rem, transparent 1.85rem);
+  box-shadow: 0 1px 6px rgba(31, 58, 110, 0.18);
+}
+main > section { margin-top: 2.25rem; }
+.chapo { font-size: 1.2rem; color: var(--pale); margin-top: 0; }
+.surtitre { color: var(--marge); font-weight: 700; margin: 0 0 0.25rem; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.875rem; }
+.note { color: var(--pale); font-style: italic; }
+
+.bouton {
+  display: inline-block;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  background: var(--encre);
+  color: var(--blanc);
+  text-decoration: none;
+}
+.bouton:hover { background: var(--marge); }
+
+.encadre {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ligne);
+  border-left: 4px solid var(--encre);
+  background: #f6f9fd;
+}
+.encadre h2 { font-size: 1.25rem; }
+.encadre p:last-child { margin-bottom: 0; }
+
+.deux { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.25rem; align-items: start; }
+
+/* Home. */
+.une { display: grid; grid-template-columns: 1fr minmax(12rem, 20rem); gap: 1.5rem; align-items: center; margin-top: 0 !important; }
+.produits, .chiffres, .valeurs { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.produits { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+.produits li { padding: 1rem; border: 1px solid var(--ligne); text-align: center; }
+.produits p { margin: 0; font-size: 0.95rem; }
+.chiffres { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+.chiffres li { color: var(--pale); font-size: 0.95rem; }
+.chiffres strong { display: block; color: var(--marge); font: 700 2.1rem/1.1 Georgia, "Times New Roman", serif; }
+
+/* About. */
+.frise { margin: 0; padding: 0; list-style: none; }
+.frise li { padding: 0.45rem 0; border-bottom: 1px solid var(--ligne); }
+.frise strong { display: inline-block; min-width: 7.5rem; color: var(--marge); }
+.valeurs { grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
+.valeurs p { margin: 0; }
+
+/* Team. */
+.sommaire { font-size: 0.95rem; }
+.fiche { padding-top: 1.75rem; border-top: 2px dashed var(--ligne); scroll-margin-top: 1rem; }
+.identite { display: flex; align-items: center; gap: 1rem; }
+.identite img { flex: none; width: 7rem; }
+.identite h2 { margin: 0; }
+.titre { margin: 0.1rem 0; color: var(--marge); font-weight: 700; }
+.accroche { margin: 0; color: var(--pale); font-size: 0.95rem; }
+.fil { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.9rem; }
+.fil h3 { grid-column: 1 / -1; margin: 0; font-size: 1rem; }
+
+.post { padding: 0.75rem 1rem; border: 1px solid var(--ligne); border-radius: 8px; background: var(--blanc); box-shadow: 0 1px 3px rgba(31, 58, 110, 0.12); }
+.post p { margin: 0 0 0.5rem; }
+.post .quand { color: var(--pale); font-size: 0.85rem; }
+.post .tags { color: var(--encre); font-size: 0.9rem; font-weight: 600; }
+.post .likes { margin: 0; color: var(--pale); font-size: 0.875rem; }
+.post.grand { max-width: 36rem; }
+.post.grand .quand { display: flex; align-items: center; gap: 0.5rem; }
+.post.grand .quand img { flex: none; }
+
+/* Org chart: a tree from 52rem up, an indented list below. */
+.arbre, .arbre ul { margin: 0; padding: 0; list-style: none; }
+.boite {
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--encre);
+  border-radius: 6px;
+  background: var(--blanc);
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+.boite strong, .boite span { display: block; }
+.boite span { color: var(--pale); font-size: 0.82rem; }
+.boite.vide { border-style: dashed; border-color: var(--pale); background: #fafafa; }
+
+.arbre ul { margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--encre); }
+.arbre li { margin-top: 0.6rem; position: relative; }
+.arbre ul > li::before {
+  content: "";
+  position: absolute;
+  top: 1.2rem;
+  left: -1rem;
+  width: 1rem;
+  border-top: 2px solid var(--encre);
+}
+
+/* Contact. */
+.plan { width: 100%; border: 1px solid var(--ligne); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th, td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--ligne); text-align: left; vertical-align: top; }
+thead th { color: var(--encre); border-bottom: 2px solid var(--encre); }
+tbody td:nth-child(2) { overflow-wrap: anywhere; }
+
+blockquote { margin: 1rem 0; padding-left: 1rem; border-left: 4px solid var(--marge); font-family: Georgia, "Times New Roman", serif; font-style: italic; }
+.texte { max-width: 44rem; }
+
+@media (min-width: 52rem) {
+  .arbre, .arbre ul { display: flex; justify-content: center; }
+  .arbre ul { margin: 0; padding: 1.1rem 0 0; border: 0; position: relative; }
+  .arbre li { display: flex; flex-direction: column; align-items: center; margin: 0; padding: 1.1rem 0.4rem 0; flex: 0 1 auto; min-width: 0; text-align: center; }
+  .arbre > li { padding-top: 0; }
+  .arbre ul::before { content: ""; position: absolute; top: 0; left: 50%; height: 1.1rem; border-left: 2px solid var(--encre); }
+  .arbre ul > li::before { top: 0; left: 0; right: 0; width: auto; border-top: 2px solid var(--encre); }
+  .arbre ul > li:first-child::before { left: 50%; }
+  .arbre ul > li:last-child::before { right: 50%; }
+  .arbre ul > li:only-child::before { display: none; }
+  .arbre ul > li::after { content: ""; position: absolute; top: 0; left: 50%; height: 1.1rem; border-left: 2px solid var(--encre); }
+  .boite { max-width: 11rem; }
+}
+
+@media (max-width: 40rem) {
+  body { font-size: 1rem; }
+  main { margin: 0 0 1.5rem; padding: 1.25rem 0.9rem 1.25rem 2rem; background-image: linear-gradient(90deg, transparent 1rem, var(--marge) 1rem, var(--marge) 1.1rem, transparent 1.1rem); box-shadow: none; }
+  .marque img { width: 44px; }
+  .marque strong { font-size: 1.25rem; }
+  .tete nav a { padding: 0.3rem 0.55rem; font-size: 0.9rem; }
+  .une { grid-template-columns: 1fr; }
+  .une > img { max-width: 13rem; margin-inline: auto; }
+  .identite { align-items: flex-start; }
+  .identite img { width: 5rem; }
+  .frise strong { display: block; }
+  table, tbody, tr, th, td { display: block; }
+  thead { display: none; }
+  tbody tr { padding: 0.5rem 0; border-bottom: 1px solid var(--ligne); }
+  tbody th, tbody td { padding: 0.15rem 0; border: 0; }
+}

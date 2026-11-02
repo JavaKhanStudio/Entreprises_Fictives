@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img">
+<circle cx="60" cy="60" r="60" fill="#d9d2ec"/>
+<path d="M12 28l26 6-6 5-5-2-3 2 1-5-6-2z" fill="#fff"/><path d="M34 54c0-20 12-24 26-24s26 4 26 24v26H34z" fill="#c4c2cf"/><path d="M18 120c2-26 20-36 42-36s40 10 42 36z" fill="#5a3f8c"/>
+<rect x="52" y="74" width="16" height="16" rx="6" fill="#f2c9a6"/>
+<circle cx="60" cy="56" r="24" fill="#f2c9a6"/>
+<path d="M36 52c2-16 14-20 24-20s22 4 24 20c-14 2-30-2-36-10-2 4-6 8-12 10z" fill="#c4c2cf"/><circle cx="50" cy="56" r="3" fill="#222"/><circle cx="70" cy="56" r="3" fill="#222"/><path d="M50 70q10 8 20 0" fill="none" stroke="#222" stroke-width="2.5" stroke-linecap="round"/><path d="M34 38L60 2l26 36c-16 6-36 6-52 0z" fill="#1f3a6e"/><circle cx="58" cy="20" r="2" fill="#f4d35e"/><circle cx="68" cy="28" r="2" fill="#f4d35e"/><circle cx="50" cy="30" r="2" fill="#f4d35e"/><rect x="44" y="51" width="13" height="9" rx="3" fill="#222"/><rect x="63" y="51" width="13" height="9" rx="3" fill="#222"/><path d="M57 55h6" stroke="#222" stroke-width="2"/>
+</svg>

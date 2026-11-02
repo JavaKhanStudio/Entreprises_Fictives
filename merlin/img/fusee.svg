@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img">
+<defs><clipPath id="c"><path d="M160 30c32 28 48 72 48 120v76h-96v-76c0-48 16-92 48-120z"/></clipPath></defs>
+<path d="M112 170l-40 50 40 6zM208 170l40 50-40 6z" fill="#c8413b"/>
+<path d="M160 30c32 28 48 72 48 120v76h-96v-76c0-48 16-92 48-120z" fill="#fff" stroke="#1f3a6e" stroke-width="4"/>
+<g clip-path="url(#c)"><path d="M112 90h96" stroke="#9db7dc"/><path d="M112 102h96" stroke="#9db7dc"/><path d="M112 114h96" stroke="#9db7dc"/><path d="M112 126h96" stroke="#9db7dc"/><path d="M112 138h96" stroke="#9db7dc"/><path d="M112 150h96" stroke="#9db7dc"/><path d="M112 162h96" stroke="#9db7dc"/><path d="M112 174h96" stroke="#9db7dc"/><path d="M112 186h96" stroke="#9db7dc"/><path d="M112 198h96" stroke="#9db7dc"/><path d="M112 210h96" stroke="#9db7dc"/><path d="M112 222h96" stroke="#9db7dc"/><path d="M130 40v190" stroke="#c8413b" stroke-width="2"/></g>
+<circle cx="160" cy="120" r="20" fill="#d9e6f7" stroke="#1f3a6e" stroke-width="4"/>
+<path d="M132 226h56l-14 34h-28z" fill="#f4b23e"/>
+<g fill="none" stroke="#7a8aa0" stroke-width="4" stroke-linecap="round"><path d="M150 272v18a7 7 0 0 0 14 0v-24a4 4 0 0 0-8 0v20"/><path d="M104 268v16a6 6 0 0 0 12 0v-20a4 4 0 0 0-7 0v16" transform="rotate(-18 110 275)"/><path d="M206 268v16a6 6 0 0 0 12 0v-20a4 4 0 0 0-7 0v16" transform="rotate(16 212 275)"/></g>
+<g fill="#e2b93b"><circle cx="60" cy="70" r="4"/><circle cx="258" cy="56" r="3"/><circle cx="276" cy="140" r="4"/><circle cx="40" cy="160" r="3"/></g>
+</svg>

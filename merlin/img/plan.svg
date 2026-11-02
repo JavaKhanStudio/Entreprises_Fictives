@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img">
+<rect width="480" height="320" fill="#eef3e6"/>
+<path d="M-10 250c90-40 160 30 260-10s150-50 240-30v120H-10z" fill="#bcd6ee"/>
+<text x="330" y="262" font-family="Georgia, serif" font-style="italic" font-size="20" fill="#1f3a6e">La Marge</text>
+<path d="M0 90h480M150 0v320" stroke="#fff" stroke-width="16" fill="none"/>
+<path d="M150 150h190" stroke="#fff" stroke-width="10" fill="none"/>
+<text x="168" y="140" font-family="system-ui, sans-serif" font-size="14" fill="#444">Impasse du Massicot</text>
+<text x="200" y="78" font-family="system-ui, sans-serif" font-size="14" fill="#444">Rue du Grand Format</text>
+<rect x="320" y="166" width="70" height="44" fill="#fbf8ef" stroke="#1f3a6e" stroke-width="3"/>
+<path d="M355 180c-6-12 14-12 8-2l-4 12z" fill="#c8413b"/>
+<circle cx="355" cy="150" r="12" fill="#c8413b"/><circle cx="355" cy="150" r="4" fill="#fff"/><path d="M345 158l10 18 10-18z" fill="#c8413b"/>
+<text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" fill="#444">Saint-Buvard-sur-Marge</text>
+</svg>
