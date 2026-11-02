@@ -196,6 +196,31 @@ class Gate(unittest.TestCase):
                     self.refused("phone", f"<p>{first}{between}02 40 12 34 56</p>")
                     self.refused("phone", f"<p>2026{between}02 40 12 34 56</p>")
 
+    def test_phone_touching_other_digits_after_it(self):
+        self.refused("phone", "<p>Appelez le 01 23 45 67 89 24/24</p>")
+
+    def test_phone_touching_a_postcode(self):
+        self.refused("phone", "<p>75007 01 23 45 67 89</p>")
+
+    def test_phone_touching_a_year(self):
+        self.refused("phone", "<p>&copy; 2026 01 23 45 67 89</p>")
+
+    def test_two_phones_joined_by_a_slash(self):
+        self.refused("phone", "<p>0612345678/0712345678</p>")
+        self.refused("phone", "<p>0639981234/0712345678</p>")
+
+    def test_two_phones_joined_by_a_hyphen(self):
+        self.refused("phone", "<p>0612345678-0712345678</p>")
+
+    def test_two_phones_with_one_space(self):
+        self.refused("phone", "<p>01 99 00 12 34 02 40 12 34 56</p>")
+
+    def test_prefixed_phones_touching_other_digits(self):
+        for number in ("+33 6 12 34 56 78 24", "0033 6 12 34 56 78 24", "2026 33 6 12 34 56 78",
+                       "2026 1-800-555-0100"):
+            with self.subTest(number=number):
+                self.refused("phone", f"<p>{number}</p>")
+
     def test_second_phone_in_a_row_is_still_read(self):
         self.refused("phone", "<p>01 99 00 12 34 - 02 40 12 34 56</p>")
         self.refused("phone", "<p>02 40 12 34 56 / 01 99 00 12 34</p>")
@@ -248,6 +273,9 @@ class Gate(unittest.TestCase):
            depuis 1987, 45 000
            EUR, du 02/11/2026\u201303/11/2026, photo_2026_11.png</p>
         <svg><polygon points="0,10 5,20 3,40,1"/></svg>
+        <p>01 99 00 12 34 24/24, 75007 01 99 00 12 34, 2026 01 99 00 12 34</p>
+        <p>0199001234/0639981234, +33 1 99 00 12 34 24, 01 99 00 12 34 06 39 98 12 34</p>
+        <p>IBAN FR14 2004 1010 0505 0001 3000 606, SIRET 012 345 678 00012, 0612 3456 7890</p>
         <p>#PapierAgile, @MmeMerlin, 12 abonnés, 👏 1 (elle-même), 45 000 EUR</p>
         <a href="cible.html#equipe">interne</a> <a href="#haut">haut</a>
         <img src="data:image/gif;base64,R0lGOD" alt="">

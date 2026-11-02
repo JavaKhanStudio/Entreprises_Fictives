@@ -10,12 +10,13 @@ page must carry is the one in shared/modele.html, byte for byte.
 A domain dig cannot answer for (no dig, no network) is a refusal too: unchecked is not clean.
 
 Phone numbers the gate does not see, on purpose: fewer than 8 digits (118 218, 3615), a number
-split across tags, a number with more digits after a single space, dot, slash or hyphen (two
-numbers in a row, 01 23 45 67 89 24/24), a comma number that is not five pairs joined by bare
-commas (01, 02, 03, 04, 05 is a list, and SVG points are not phones), a mark that is not in PHONE_SEPARATOR (middle dot, colon, semicolon, pipe, a
-zero-width character), and a run of digits with no + that does not start with 0, 33 or the North
-American shape (1-800-555-0100): it reads as a reference, and so does an unprefixed foreign
-number in any other shape.
+split across tags, a long run whose groups of digits never add up to a number (0612 3456 7890, an
+IBAN, a SIRET: a number is only read where a group starts and ends), a comma number that is not
+five pairs joined by bare commas (01, 02, 03, 04, 05 is a list, and SVG points are not phones), a
+mark that is not in PHONE_SEPARATOR (middle dot, colon, semicolon, pipe, a zero-width character),
+and a run of digits with no + that does not start with 0, 33 or the North American shape
+(1-800-555-0100): it reads as a reference, and so does an unprefixed foreign number in any other
+shape.
 
 Phone numbers: the only ones allowed are those the French numbering plan keeps for fiction,
 "Numéros pour œuvres audiovisuelles", ARCEP decision no 2025-2215 of 27 November 2025, plan
@@ -56,6 +57,9 @@ PHONE = re.compile(rf"(?<![\w/\-])\+?\d(?:{PHONE_SEPARATOR}{{0,3}}\d)*(?!\w)")
 # break or tab, a comma, an underscore, a typographic dash.
 PHONE_GAP = re.compile(rf"[\s{PHONE_MARKS}]{{2,}}|[^\S \u00a0\u2009\u202f]|[,_\u2010-\u2013\u2212]")
 COMMA_NUMBER = re.compile(r"\d\d(?:,\d\d){4}")
+# The groups of a run, and the digits of a French number, national or with its country code.
+PHONE_GROUP = re.compile(r"\+?\d+")
+FRENCH_DIGITS = re.compile(r"0[1-9]\d{8}|(?:00)?330?[1-9]\d{8}")
 # A date is many digits and no phone number. Blanked before reading digits, at the same length.
 DATE = re.compile(r"(?<!\d)(?:\d{1,2}[/.\-]\d{1,2}[/.\-]\d{4}|\d{4}-\d{2}-\d{2})(?!\d)")
 NORTH_AMERICAN_GAP = r"[\s.\-\u2010-\u2013\u2212]*"
@@ -221,15 +225,36 @@ def is_one_number(run):
             or re.fullmatch(r"0[1-9]\d{8}|33[1-9]\d{8}", digits))
 
 
+def numbers_in(run):
+    """Each number in a longer run, on whole groups, as (start, number): 75007 01 23 45 67 89."""
+    groups = list(PHONE_GROUP.finditer(run))
+    first = 0
+    while first < len(groups):
+        for last in range(first, len(groups)):
+            number = run[groups[first].start():groups[last].end()]
+            digits = re.sub(r"\D", "", number)
+            if FRENCH_DIGITS.fullmatch(digits) or NORTH_AMERICAN.fullmatch(number):
+                yield groups[first].start(), number
+                first = last
+                break
+        first += 1
+
+
 def phone_refusals(text):
     """Each refused number in this text, as (where it starts, why)."""
     undated = DATE.sub(lambda date: "\u00a7" * len(date.group(0)), text)
     for run in PHONE.finditer(undated):
         pieces = [run.group(0)] if is_one_number(run.group(0)) else PHONE_GAP.split(run.group(0))
         for piece in pieces:
+            start = run.start() + run.group(0).index(piece)
             why = phone_refusal(piece)
             if why:
-                yield run.start() + run.group(0).index(piece), why
+                yield start, why
+                continue
+            for offset, number in numbers_in(piece):
+                why = phone_refusal(number)
+                if why:
+                    yield start + offset, why
 
 
 def check_text(refusals, path, line, text, domains):
