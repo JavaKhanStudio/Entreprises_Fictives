@@ -221,6 +221,25 @@ class Gate(unittest.TestCase):
             with self.subTest(number=number):
                 self.refused("phone", f"<p>{number}</p>")
 
+    def test_phone_glued_to_a_label_with_a_hyphen(self):
+        self.refused("phone", "<p>Tel-0612345678</p>")
+
+    def test_phone_glued_to_a_label(self):
+        self.refused("phone", "<p>T0612345678</p>")
+
+    def test_phone_glued_to_a_label_with_a_slash(self):
+        self.refused("phone", "<p>T\u00e9l/0612345678</p>")
+
+    def test_phone_after_a_bare_slash_or_hyphen(self):
+        self.refused("phone", "<p>/0612345678</p>")
+        self.refused("phone", "<p>Appelez le -0612345678</p>")
+
+    def test_phone_glued_to_each_label(self):
+        for label in ("TEL", "T\u00c9L", "tel_", "Fax", "Fax-", "Mob", "Mob/", "Mobile",
+                      "T\u00e9l\u00e9phone-", "Portable", "GSM", "Phone"):
+            with self.subTest(label=label):
+                self.refused("phone", f"<p>{label}0612345678</p>")
+
     def test_second_phone_in_a_row_is_still_read(self):
         self.refused("phone", "<p>01 99 00 12 34 - 02 40 12 34 56</p>")
         self.refused("phone", "<p>02 40 12 34 56 / 01 99 00 12 34</p>")
@@ -276,6 +295,9 @@ class Gate(unittest.TestCase):
         <p>01 99 00 12 34 24/24, 75007 01 99 00 12 34, 2026 01 99 00 12 34</p>
         <p>0199001234/0639981234, +33 1 99 00 12 34 24, 01 99 00 12 34 06 39 98 12 34</p>
         <p>IBAN FR14 2004 1010 0505 0001 3000 606, SIRET 012 345 678 00012, 0612 3456 7890</p>
+        <p>Tel-0199001234, T0199001234, T\u00e9l/0199001234, /0199001234, T-shirt 2026, T2, Fax 2026</p>
+        <p>Hotel-0612345678, Contact0612345678, FAC/0612345678, dossier/0612345678.pdf</p>
+        <p>a/b-0612345678, ./0612345678.pdf</p>
         <p>#PapierAgile, @MmeMerlin, 12 abonnés, 👏 1 (elle-même), 45 000 EUR</p>
         <a href="cible.html#equipe">interne</a> <a href="#haut">haut</a>
         <img src="data:image/gif;base64,R0lGOD" alt="">

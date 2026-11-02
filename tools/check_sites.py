@@ -14,9 +14,10 @@ split across tags, a long run whose groups of digits never add up to a number (0
 IBAN, a SIRET: a number is only read where a group starts and ends), a comma number that is not
 five pairs joined by bare commas (01, 02, 03, 04, 05 is a list, and SVG points are not phones), a
 mark that is not in PHONE_SEPARATOR (middle dot, colon, semicolon, pipe, a zero-width character),
-and a run of digits with no + that does not start with 0, 33 or the North American shape
-(1-800-555-0100): it reads as a reference, and so does an unprefixed foreign number in any other
-shape.
+a number glued to a word that is not a phone label in PHONE_LABEL, or after a word and a slash or
+hyphen (FAC-0612345678, Contact0612345678, dossier/0612345678.pdf), and a run of digits with no +
+that does not start with 0, 33 or the North American shape (1-800-555-0100): it reads as a
+reference, and so does an unprefixed foreign number in any other shape.
 
 Phone numbers: the only ones allowed are those the French numbering plan keeps for fiction,
 "Numéros pour œuvres audiovisuelles", ARCEP decision no 2025-2215 of 27 November 2025, plan
@@ -51,7 +52,11 @@ FILE_SUFFIXES = {"html", "htm", "css", "svg", "png", "jpg", "jpeg", "gif", "webp
 # Whitespace of any kind and length counts once: a browser shows a hand-wrapped line as one space.
 PHONE_MARKS = r".()/\-,_\u2010-\u2013\u2212"
 PHONE_SEPARATOR = rf"(?:\s+(?!\s)|[{PHONE_MARKS}])"
-PHONE = re.compile(rf"(?<![\w/\-])\+?\d(?:{PHONE_SEPARATOR}{{0,3}}\d)*(?!\w)")
+PHONE = re.compile(rf"(?<!\w)(?<![\w.][/\-])\+?\d(?:{PHONE_SEPARATOR}{{0,3}}\d)*(?!\w)")
+# A label glued to its number: Tel-0612345678, T0612345678, Tél/0612345678. Blanked like a date,
+# so the number is read; the word has to be whole, Hotel-0612345678 is a reference.
+PHONE_LABEL = re.compile(r"(?<!\w)(?:t|tel|tél|telephone|téléphone|phone|fax|mob|mobile|portable"
+                         r"|gsm)[/\-_]?(?=\+?\d)", re.I)
 # Between two numbers in a row, when the run is not one number: two separators or more
 # ("01 99 00 12 34 - 2026"), or one that does not sit inside a number on its own account: a line
 # break or tab, a comma, an underscore, a typographic dash.
@@ -242,7 +247,8 @@ def numbers_in(run):
 
 def phone_refusals(text):
     """Each refused number in this text, as (where it starts, why)."""
-    undated = DATE.sub(lambda date: "\u00a7" * len(date.group(0)), text)
+    blank = lambda found: "\u00a7" * len(found.group(0))
+    undated = PHONE_LABEL.sub(blank, DATE.sub(blank, text))
     for run in PHONE.finditer(undated):
         pieces = [run.group(0)] if is_one_number(run.group(0)) else PHONE_GAP.split(run.group(0))
         for piece in pieces:
