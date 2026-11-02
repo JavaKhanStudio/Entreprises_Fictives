@@ -101,10 +101,17 @@
     "}"
   ].join("\n");
 
+  /* No GPU, as on a virtual machine: the clip draws in software and would take the page's thread. */
+  function sansGpu() {
+    var essai = document.createElement("canvas").getContext("webgl");
+    var pilote = essai && essai.getExtension("WEBGL_debug_renderer_info");
+    return !!pilote && /swiftshader|llvmpipe|software/i.test(essai.getParameter(pilote.UNMASKED_RENDERER_WEBGL));
+  }
+
   function trombone(toile, repli) {
-    var gl = null;
+    var gl = null, leger = sansGpu();
     try {
-      gl = toile.getContext("webgl", { alpha: true, antialias: true, premultipliedAlpha: true });
+      gl = toile.getContext("webgl", { alpha: true, antialias: !leger, premultipliedAlpha: true });
     } catch (e) { gl = null; }
     if (!gl) return;
 
@@ -140,10 +147,10 @@
 
     /* The angle a still picture shows, and where the turning starts from. */
     var lacet = 0.6, tangage = -0.14, inertie = 0.5, tire = false, vu = true;
-    var dernier = 0, debut = 0;
+    var dernier = 0, debut = 0, pair = false;
 
     function dessine(t) {
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var dpr = leger ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       var l = Math.round(toile.clientWidth * dpr), h = Math.round(toile.clientHeight * dpr);
       if (!l || !h) return;
       if (toile.width !== l || toile.height !== h) { toile.width = l; toile.height = h; }
@@ -173,7 +180,7 @@
         lacet += inertie * dt;
         inertie += (0.5 - inertie) * Math.min(dt * 1.2, 1);
       }
-      if (vu) dessine(t - debut);
+      if (vu && (!leger || (pair = !pair))) dessine(t - debut);
       window.requestAnimationFrame(image);
     }
 

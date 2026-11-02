@@ -3,8 +3,8 @@
 
     python3 tools/clip_takes.py OUT_DIR [--lighthouse]
 
-Works on `git archive HEAD` in a temporary folder, never on the checkout. Each take is a patch
-of merlin/merlin.js. Writes OUT_DIR/clip.png, one equal column per take, for
+Simon picked B: merlin/merlin.js now holds it. Works on `git archive` of TAKEN_FROM, the commit
+before his pick, in a temporary folder, never on the checkout. Each take is a patch of its merlin/merlin.js. Writes OUT_DIR/clip.png, one equal column per take, for
 `atelier attach --stamp 1A,1B,1C`. With --lighthouse, also runs Lighthouse three times on each take
 over http and prints the score and the blocking time (needs npx; several minutes).
 """
@@ -23,6 +23,7 @@ from playwright.sync_api import sync_playwright
 
 REPO = Path(__file__).resolve().parent.parent
 SERVE = Path.home() / "Documents/GitHub/atelier/tools/serve_static.py"
+TAKEN_FROM = "c03c509"
 # What tools/check_trombone.py launches, and the renderer Lighthouse's Chrome ends up with.
 SOFTWARE_GL = ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
 STILL_ON_SOFTWARE = """if (!gl) return;
@@ -72,7 +73,7 @@ TAKES = {"A": as_is, "B": cheaper_on_software, "C": still_on_software}
 def tree(work, letter):
     root = Path(work) / letter
     root.mkdir()
-    archive = subprocess.run(["git", "archive", "HEAD"], cwd=REPO, capture_output=True, check=True)
+    archive = subprocess.run(["git", "archive", TAKEN_FROM], cwd=REPO, capture_output=True, check=True)
     subprocess.run(["tar", "-x", "-C", str(root)], input=archive.stdout, check=True)
     js = root / "merlin/merlin.js"
     js.write_text(TAKES[letter](js.read_text(encoding="utf-8")), encoding="utf-8")

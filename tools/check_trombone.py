@@ -5,6 +5,7 @@
 
 Over file://, as a double-click opens it, in Chrome:
 - the paperclip draws and turns, and stops under reduced motion;
+- on this software rendering it takes the cheap path: 1x pixels, no antialiasing;
 - dragging it turns it, even stopped;
 - the caption sits clear of the canvas, and the clip stays whole inside it at every angle a turn
   or a drag can reach, at 1280 and 390;
@@ -96,6 +97,18 @@ def whole_at_every_angle(browser, width):
     context.close()
 
 
+def cheap_without_a_gpu(browser, errors):
+    """This Chrome draws in software, so merlin.js takes its cheap path, even on a 2x screen."""
+    context, page = opened(browser, errors, device_scale_factor=2)
+    page.wait_for_timeout(500)
+    size, css, smooth = page.evaluate("""() => {
+      const c = document.getElementById('trombone');
+      return [c.width, c.clientWidth, c.getContext('webgl').getContextAttributes().antialias];
+    }""")
+    check(size == css and not smooth, f"no GPU: 1x pixels and no antialiasing ({size} px for {css}, antialias {smooth})")
+    context.close()
+
+
 def frames_of_the_turn(browser, width, out, errors):
     context, page = opened(browser, errors, width)
     # Tall enough to need no scroll: scrolled, the sticky header lies over the top of the phone's clip.
@@ -119,6 +132,7 @@ def main():
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(channel="chrome", args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"])
 
+        cheap_without_a_gpu(browser, errors)
         context, page = opened(browser, errors)
         clip = page.locator("#trombone")
         check(clip.is_visible() and not page.locator("#trombone-repli").is_visible(),

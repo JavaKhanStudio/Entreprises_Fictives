@@ -44,6 +44,23 @@ FPS = """() => new Promise(done => {
 })"""
 
 
+# On a real card the clip keeps its full quality: merlin.js only lowers it where there is no GPU.
+FULL_QUALITY = """() => {
+  const c = document.getElementById('trombone');
+  return c.width === Math.round(c.clientWidth * 2) && c.getContext('webgl').getContextAttributes().antialias;
+}"""
+
+
+def full_quality(browser, width):
+    context = browser.new_context(viewport={"width": width, "height": 1300}, device_scale_factor=2)
+    page = context.new_page()
+    page.goto(HOME, wait_until="load")
+    page.wait_for_timeout(500)
+    answer = page.evaluate(FULL_QUALITY)
+    context.close()
+    return answer
+
+
 def drawn_share(png):
     """The share of the canvas that is clip, on the black ground the probe gives it."""
     shot = Image.open(io.BytesIO(png)).convert("L")
@@ -86,6 +103,7 @@ def one(browser, name, width, out):
         page.wait_for_timeout(900)
     result["clip_share"] = [round(s, 3) for s in shares]
     context.close()
+    result["full_quality"] = full_quality(browser, width)
     return result
 
 
@@ -117,7 +135,8 @@ def verdict(results):
                   ("no page error", not r["errors"])]
         if r["canvas_shows"]:
             checks += [(f"the clip turns: {r['frames_differ']} of {FRAMES} frames differ", r["frames_differ"] == FRAMES),
-                       (f"the canvas holds a clip: {r['clip_share']}", all(0.005 < s < 0.4 for s in r["clip_share"]))]
+                       (f"the canvas holds a clip: {r['clip_share']}", all(0.005 < s < 0.4 for s in r["clip_share"])),
+                       ("full quality: antialiased, at 2x pixels", r["full_quality"])]
         checks.append((f"on a real card: {r.get('renderer')}", bool(renderer) and not any(s in renderer for s in SOFTWARE)))
         for what, ok in checks:
             print(f"{'OK  ' if ok else 'FAIL'} {label}: {what}")
