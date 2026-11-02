@@ -6,17 +6,21 @@
 Over file://, as a double-click opens it, in Chrome:
 - the paperclip draws and turns, and stops under reduced motion;
 - dragging it turns it, even stopped;
+- the caption sits clear of the canvas, and the clip stays whole inside it at every angle a turn
+  or a drag can reach, at 1280 and 390;
 - without WebGL, and without JavaScript, the drawn clip shows and every word is still there;
 - the counters end on the number the HTML holds, and a scrolled-to section ends up visible;
 - no page is wider than its window at any width between phone and large screen.
 
-With OUT_DIR, leaves frames of the turning clip there. Needs Playwright and Chrome.
+With OUT_DIR, leaves frames of the turning clip there, caption included, at 1280 and 390. Needs Playwright and Chrome.
 """
 
+import io
 import re
 import sys
 from pathlib import Path
 
+from PIL import Image
 from playwright.sync_api import sync_playwright
 
 REPO = Path(__file__).resolve().parent.parent
@@ -47,6 +51,66 @@ def text_of(path):
     return " ".join(re.sub(r"\s+", " ", words).split())
 
 
+def whole_at_every_angle(browser, width):
+    """Turn the stopped clip by dragging it, on a black ground, and look at the canvas's rim.
+
+    A drag moves the angle by a fixed amount per pixel (merlin.js), so this visits known angles,
+    where a timed frame of the turn lands wherever the machine's speed puts it. RIM leaves room for
+    the float and the sway, which reduced motion switches off.
+    """
+    RIM = 0.02
+    context = browser.new_context(viewport={"width": width, "height": 1300}, reduced_motion="reduce")
+    page = context.new_page()
+    page.goto(HOME, wait_until="load")
+    page.add_style_tag(content=".une { background: #000 !important; } .une::before, .une::after, .scene::before { display: none !important; }")
+    clip = page.locator("#trombone")
+    clip.scroll_into_view_if_needed()
+    box = clip.bounding_box()
+    cap = page.locator(".astuce").bounding_box()
+    check(cap["y"] >= box["y"] + box["height"], f"at {width} the caption sits under the canvas")
+    middle = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+
+    def drag(dx, dy):
+        page.mouse.move(*middle)
+        page.mouse.down()
+        page.mouse.move(middle[0] + dx, middle[1] + dy, steps=2)
+        page.mouse.up()
+
+    cut = []
+    frames = 0
+    # Pitch stops at -0.9 and 0.9 (merlin.js), 0.006 a pixel: 400 px from the start reaches either.
+    for pitch, label in ((0, "start"), (-400, "up"), (800, "down")):
+        drag(0, pitch)
+        for step in range(16):
+            drag(40, 0)  # 0.01 a pixel: 16 steps of 0.4 go past a whole turn of 6.28
+            page.wait_for_timeout(30)
+            shot = Image.open(io.BytesIO(clip.screenshot())).convert("L")
+            frames += 1
+            w, h = shot.size
+            rim = max(1, round(w * RIM))
+            edges = [shot.crop(b) for b in ((0, 0, w, rim), (0, h - rim, w, h), (0, 0, rim, h), (w - rim, 0, w, h))]
+            bright = max(e.getextrema()[1] for e in edges)
+            if bright > 40:
+                cut.append(f"{label}/{step}")
+    check(not cut, f"at {width} the clip stays inside its canvas over {frames} angles {cut[:8] if cut else ''}")
+    context.close()
+
+
+def frames_of_the_turn(browser, width, out, errors):
+    context, page = opened(browser, errors, width)
+    # Tall enough to need no scroll: scrolled, the sticky header lies over the top of the phone's clip.
+    page.set_viewport_size({"width": width, "height": 1300})
+    scene = page.locator(".scene")
+    # The caption hangs under the square, so the picture takes it in.
+    box = scene.bounding_box()
+    cap = page.locator(".astuce").bounding_box()
+    area = {"x": box["x"], "y": box["y"], "width": box["width"], "height": cap["y"] + cap["height"] + 6 - box["y"]}
+    for i in range(6):
+        page.wait_for_timeout(900)
+        page.screenshot(path=str(out / f"tourne-{width}-{i}.png"), clip=area)
+    context.close()
+
+
 def main():
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else None
     if out:
@@ -64,8 +128,6 @@ def main():
         for i in range(6):
             page.wait_for_timeout(900)
             frames.append(clip.screenshot())
-            if out:
-                (out / f"tourne-{i}.png").write_bytes(frames[-1])
         check(len(set(frames)) == len(frames), f"the clip turns: {len(set(frames))} of 6 frames differ")
         page.mouse.wheel(0, 5000)
         page.wait_for_timeout(2200)
@@ -91,6 +153,11 @@ def main():
         check(page.evaluate("document.querySelectorAll('.monte').length") == 0,
               "under reduced motion no section waits to rise")
         context.close()
+
+        for width in (1280, 390):
+            whole_at_every_angle(browser, width)
+            if out:
+                frames_of_the_turn(browser, width, out, errors)
 
         context, page = opened(browser, errors, java_script_enabled=False)
         check(page.locator("#trombone-repli").is_visible() and not page.locator("#trombone").is_visible(),

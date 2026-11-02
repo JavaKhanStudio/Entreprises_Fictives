@@ -167,7 +167,7 @@ main > :last-child { margin-bottom: clamp(3rem, 7vw, 5rem); }
 .pile img { width: 34px; height: 34px; margin-left: -9px; border: 2px solid var(--nuit); border-radius: 50%; }
 .pile img:first-child { margin-left: 0; }
 
-.scene { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1; max-width: 34rem; margin: 0 auto; }
+.scene { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1; max-width: 34rem; margin: 0 auto 2.75rem; }
 .scene::before {
   content: "";
   position: absolute;
@@ -180,9 +180,10 @@ main > :last-child { margin-bottom: clamp(3rem, 7vw, 5rem); }
 .scene canvas { cursor: grab; touch-action: pan-y; }
 .scene canvas:active { cursor: grabbing; }
 .scene [hidden] { display: none; }
+/* Under the square, never in it: the clip turns over the whole of its canvas. */
 .astuce {
   position: absolute;
-  bottom: 3%;
+  top: calc(100% + 0.5rem);
   left: 50%;
   transform: translateX(-50%);
   padding: 0.25rem 0.8rem;
