@@ -2,11 +2,16 @@
 """The takes of r19: the icon each company wears in a browser tab.
 
     python3 tools/icon_takes.py OUT_DIR
+    python3 tools/icon_takes.py --shipped OUT_DIR
 
 Writes one sheet per company in OUT_DIR, one equal column per take, so that
 `atelier attach --stamp 1A,1B,1C` can letter them. Each column shows the icon in a light tab and
 a dark tab, drawn at the real 16 px then enlarged 3 times without smoothing, then the drawing
 at 128 px. Touches nothing in the checkout.
+
+Simon picked 1B, 2C, 3B and 4A: the first three are <company>/img/icone.svg, written from these
+takes, the root wears icon.svg. --shipped draws one sheet, shipped.png, of those files as they are
+on disk, in the same tabs: to change an icon, edit its file and read this sheet.
 """
 
 import sys
@@ -86,6 +91,9 @@ border-radius:8px 8px 0 0;margin-top:0}}
 img{{width:16px;height:16px;flex:none}}
 </style><div class="tab"><img src="{icon}"><span>{title}</span></div>"""
 
+SHIPPED = {"racine": "icon.svg", "merlin": "merlin/img/icone.svg", "gobelin": "gobelin/img/icone.svg",
+           "courtepaille": "courtepaille/img/icone.svg"}
+
 THEMES = (("#dee1e6", "#fff", "#202124"), ("#202124", "#35363a", "#e8eaed"))
 
 
@@ -120,23 +128,38 @@ def panel(browser, title, code, tmp, stem):
     return sheet
 
 
+def join(panels):
+    sheet = Image.new("RGB", (PANEL_W * len(panels), PANEL_H), "#f4f4f4")
+    for n, one in enumerate(panels):
+        sheet.paste(one, (PANEL_W * n, 0))
+    draw = ImageDraw.Draw(sheet)
+    for n in range(1, len(panels)):
+        draw.line([(PANEL_W * n, 0), (PANEL_W * n, PANEL_H)], fill="#bbb", width=2)
+    return sheet
+
+
 def main():
-    if len(sys.argv) != 2:
+    args = sys.argv[1:]
+    shipped = "--shipped" in args
+    if shipped:
+        args.remove("--shipped")
+    if len(args) != 1:
         sys.exit(__doc__)
-    out = Path(sys.argv[1])
+    out = Path(args[0])
     out.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="icon-takes-") as tmp, sync_playwright() as p:
         browser = p.chromium.launch()
-        for company, (title, takes) in TAKES.items():
-            sheet = Image.new("RGB", (PANEL_W * len(takes), PANEL_H), "#f4f4f4")
-            for n, (letter, code) in enumerate(takes.items()):
-                sheet.paste(panel(browser, title, code, tmp, f"{company}-{letter}"), (PANEL_W * n, 0))
-            draw = ImageDraw.Draw(sheet)
-            for n in range(1, len(takes)):
-                draw.line([(PANEL_W * n, 0), (PANEL_W * n, PANEL_H)], fill="#bbb", width=2)
-            target = out / f"{company}.png"
-            sheet.save(target)
+        if shipped:
+            target = out / "shipped.png"
+            join([panel(browser, TAKES[name][0], REPO.joinpath(path).read_text(encoding="utf-8"), tmp,
+                        f"shipped-{name}") for name, path in SHIPPED.items()]).save(target)
             print(target)
+        else:
+            for company, (title, takes) in TAKES.items():
+                target = out / f"{company}.png"
+                join([panel(browser, title, code, tmp, f"{company}-{letter}")
+                      for letter, code in takes.items()]).save(target)
+                print(target)
         browser.close()
 
 
