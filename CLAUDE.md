@@ -39,27 +39,11 @@ model is `~/Documents/GitHub/Social_Engineering_en_visuel/faux-president/js/i18n
 `steps.research.site`. The clues stay usable: the joke never hides what an attacker would read.
 All page text is in French. Simon reads every site before it counts as done.
 
-Humour stays quiet (Simon, r4, 2026-11-02). Never explain a joke; a reader who misses it is
-fine, it is for the ones who think. Say the fact and stop:
-- Not "Dernière mise à jour : 2 novembre 2026 (la précédente datait de 2009)", but "Dernière
-  mise à jour : 2 novembre 2009".
-- Not "fait par mon neveu", but "Fait par Robert Courtepaille": the family name, on a company
-  whose owner has another first name, lets a reader work out the rest.
-- Cut a sentence where the company winks at its own absurdity (`Le stationnement est libre, le
-  temps l'est aussi`). Nobody at that company would write it. What they would write straight
-  can stay, however absurd (`Il ne sera pas joignable, n'ayant pas de téléphone`).
-- A joke is an exaggeration of something relatable. It is funny once: `👏 1 (lui-même)` on every
-  post is not a joke any more. How many absurd titles a company keeps is Simon's call per site
-  (all seven at Courtepaille, four at Merlin).
-- Likes and hashtags belong to a social network. Use them only on a site that could have them
-  (a notary's own site does not). Where they exist they follow real life: a woman gets more
-  likes than a man, the young secretary too many. Subtle, dark, never explained. That bias is in
-  the numbers and nowhere else: never spare the women the silliness (Simon, r4: "Women can be
-  silly too").
-- A clue goes where the company would put it for its own reasons. A table called "Qui signe
-  quoi" is on the nose; the same fact in the org chart's boxes is not.
-- A joke the reader cannot decode is not subtle, it is a miss (`goût des cartons`).
-Do not try too hard.
+Humour stays quiet (Simon, r4): never explain a joke, say the fact and stop. A joke exaggerates
+something real and is funny once. The likes bias is in the numbers and nowhere else: "Women can
+be silly too". Absurd titles are Simon's call per site: all seven at Courtepaille, four at Merlin.
+Before writing or changing text a student reads, read `.claude/skills/humour/SKILL.md` (missing:
+`atelier skills install humour`).
 
 ## Traps
 
