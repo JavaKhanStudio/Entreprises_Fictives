@@ -9,9 +9,13 @@ likes (429), so it is reported on its own line, as "web: refused" when so, and t
 pass: say which names went unchecked on the web.
 
 A known name and a nonsense one go first through each source: a source where the known one
-scores nothing or the nonsense one scores something is not answering, and is not used. Bing and
-DuckDuckGo failed this control on 2026-11-02 (a score of zero for Thomas Pesquet), so they are
-not here. Exit 1 when a name has a hit, to read by eye; 2 when the APIs fail their control.
+scores nothing or the nonsense one scores something is not answering, and is not used. On the web
+the known name is a modest one, because fame hides a fuzzy engine: on 2026-11-02 Bing gave Thomas
+Pesquet 15 mentions and Odile Decq 0, answering a script with pages on the first name Odile, its
+quotes ignored. A zero from it means nothing, so it is not here, nor DuckDuckGo. Brave answered
+this client 429 at 20 s and at 120 s between requests, so a slower pace does not cure it.
+Exit 1 when a name has a hit, to read by eye; 2 when the APIs fail their control; 3 when no name
+has a hit but one went unchecked on the web, which is not a pass.
 Python stdlib. Needs the network. A student never runs this.
 """
 
@@ -28,9 +32,10 @@ BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/201001
            "Accept-Language": "fr,en;q=0.8"}
 API = {"User-Agent": "EntreprisesFictives-check_names/1.0 (educational, fictional sites)"}
 KNOWN = "Thomas Pesquet"
+WEB_KNOWN = "Odile Decq"
 NONSENSE = "Zorglaxe Vrumpfeldt"
 PAUSE = 6
-WEB_PAUSE = 20  # Brave answers 429 to anything quicker
+WEB_PAUSE = 20
 
 
 def fetch(url, headers):
@@ -92,16 +97,16 @@ def web_mentions(name):
 def web_control():
     """How many mentions the page's echo alone makes; None when the web is not answering."""
     try:
-        known = web_mentions(KNOWN)
+        known = web_mentions(WEB_KNOWN)
         time.sleep(WEB_PAUSE)
         echo = len(web_mentions(NONSENSE))
     except urllib.error.URLError as error:
         print(f"web: refused at the control ({error})")
         return None
     if len(known) <= echo:
-        print(f"web: not answering ({KNOWN} {len(known)} mentions, {NONSENSE} {echo})")
+        print(f"web: not answering ({WEB_KNOWN} {len(known)} mentions, {NONSENSE} {echo})")
         return None
-    print(f"web control: {KNOWN} {len(known)} mentions, {NONSENSE} {echo} (the echo)")
+    print(f"web control: {WEB_KNOWN} {len(known)} mentions, {NONSENSE} {echo} (the echo)")
     return echo
 
 
@@ -114,7 +119,7 @@ def main():
         print("Wikipedia or Wikidata failed the control, stopping")
         return 2
     echo = web_control()
-    taken = 0
+    taken = unchecked = 0
     for name in sys.argv[1:]:
         time.sleep(PAUSE)
         hits = wikipedia_hits(name) + wikidata_hits(name)
@@ -127,11 +132,12 @@ def main():
                 web = f"web: {len(extra)} mentions"
             except urllib.error.URLError as error:
                 web = f"web: refused ({error})"
+        unchecked += not web.endswith("mentions")
         print(f"{name}: {len(hits)} hits, {web}", flush=True)
         for line in hits[:6]:
             print(f"    {line}", flush=True)
         taken += bool(hits)
-    return 1 if taken else 0
+    return 1 if taken else 3 if unchecked else 0
 
 
 if __name__ == "__main__":
