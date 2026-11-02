@@ -21,11 +21,14 @@ OPEN: double-click must work, so links are relative and name their file (merlin/
 label = "Papeterie Merlin"
 description = "The site of Papeterie Merlin, in merlin/"
 context = """
-FILES (planned): merlin/index.html and its pages, merlin/merlin.css. Domain: papeterie-merlin.example.
+FILES: merlin/index.html and its pages, merlin/merlin.css, merlin/merlin.js. Domain: papeterie-merlin.example.
 LINK: in index.html, make the company's h2 a link to merlin/index.html and drop its "à venir" span; the gate refuses the site otherwise (rule index). Delete merlin/.gitkeep.
 START: copy shared/modele.html to merlin/, then add the company's stylesheet after base.css. Render with tools/render_pages.py (see #shared).
 CANON: ~/Documents/GitHub/Social_Engineering_en_visuel/faux-president/js/i18n.js, steps.research (the page on Eve's laptop): since 1987, 12 followers, Mme Merlin "Presidente Executive Principale" always travelling, Alice "Directrice des Directions" Bob's boss, Bob "Ninja des virements" the accountant, conquering abroad, #PapierAgile. The capsule reuses these names: the site must not contradict them. faux-president/sources.md says what is invented there.
 ATTACK SURFACE TO KEEP, from the Lumisol sample (~/Documents/Claude_GDrive_HQ/boards/social-engineering/verif/r32/kit.py, company dropped by Simon): an address format, a client portal, supplier invoices by PDF mail, a recent hire in accounting, a lone overworked IT person mid migration to Microsoft 365, a payment threshold, a press release naming a contract. Do not reuse from it: the 02 40 number, PayFlow, Claire Fontaine, Thomas Berger, Karim Haddad, Saint-Herblain.
+LOOK: Simon on r2: more real, more professional, and the company would vibe-code its site. So a generated-landing-page look (dark bands, one gradient, glass header, cards). Its jokes stay quiet: nothing on the site says the clip is useless.
+SCRIPT: merlin/merlin.js is the one JS of the sites: the WebGL clip with no library, counters, reveals. A classic script, because file:// refuses modules. Every word stays in the HTML, and img/trombone-3d.svg shows without WebGL or JS. The clip is a tube swept along the same path as img/trombone.svg.
+MOTION: tools/render_pages.py renders under reduced motion, so its pictures show the clip standing still. python3 tools/check_trombone.py checks what moves, the two fallbacks, and overflow at 8 widths. Run it when merlin.js or merlin.css changes.
 """
 
 [tags.gobelin]

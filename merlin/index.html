@@ -7,11 +7,13 @@
   <title>Accueil | Papeterie Merlin</title>
   <link rel="stylesheet" href="../shared/base.css">
   <link rel="stylesheet" href="merlin.css">
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <script src="merlin.js" defer></script>
 </head>
 <body>
   <header class="tete">
     <a class="marque" href="index.html">
-      <img src="img/logo.svg" alt="" width="56" height="56">
+      <img src="img/logo.svg" alt="" width="40" height="40">
       <span><strong>Papeterie Merlin</strong><small>Nous disruptons le papier depuis 1987 · 12 abonnés</small></span>
     </a>
     <nav aria-label="Menu du site">
@@ -25,51 +27,73 @@
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
+    <a class="demo" href="contact.html">Réserver une démo</a>
   </header>
   <main>
     <section class="une">
       <div>
-        <h1>Nous disruptons le papier depuis 1987</h1>
+        <a class="badge" href="communique.html"><span>Nouveau</span> 14 écoles du Val de Marge nous font confiance</a>
+        <h1>Nous disruptons <em>le papier</em> depuis 1987</h1>
         <p class="chapo">Cahiers, ramettes, trombones : depuis Saint-Buvard-sur-Marge, la Papeterie Merlin accompagne la feuille dans sa transformation. Nous ne vendons pas du papier. Nous vendons ce que le papier a de plus agile.</p>
-        <p><a class="bouton" href="a-propos.html">Découvrir notre vision</a></p>
+        <p class="actions"><a class="bouton" href="a-propos.html">Découvrir notre vision</a> <a class="bouton second" href="contact.html">Réserver une démo</a></p>
+        <p class="preuve"><span class="pile"><img src="img/merlin.svg" alt="" width="36" height="36"><img src="img/alice.svg" alt="" width="36" height="36"><img src="img/bob.svg" alt="" width="36" height="36"><img src="img/maelle.svg" alt="" width="36" height="36"></span> Rejoignez nos 12 abonnés</p>
       </div>
-      <img src="img/fusee.svg" alt="Une fusée en papier quadrillé qui décolle, suivie d'une traînée de trombones" width="320" height="320">
+      <figure class="scene">
+        <img id="trombone-repli" src="img/trombone-3d.svg" alt="Le Trombone Bienveillant" width="420" height="420">
+        <canvas id="trombone" role="img" aria-label="Le Trombone Bienveillant, en 3D, qui tourne sur lui-même" hidden></canvas>
+        <figcaption class="astuce" hidden>Le Trombone Bienveillant · Faites-le tourner</figcaption>
+      </figure>
+    </section>
+
+    <section class="defile" aria-label="Ils nous font confiance">
+      <p>Ils nous font confiance</p>
+      <div class="ruban">
+        <ul>
+          <li>Communauté de communes du Val de Marge</li><li>Cartonnerie du Val de Marge</li><li>Encres de la Marge</li><li>Crédit de la Marge</li>
+        </ul>
+        <ul aria-hidden="true">
+          <li>Communauté de communes du Val de Marge</li><li>Cartonnerie du Val de Marge</li><li>Encres de la Marge</li><li>Crédit de la Marge</li>
+        </ul>
+      </div>
     </section>
 
     <section>
-      <h2>Le mot de notre Présidente</h2>
-      <article class="post grand">
-        <p class="quand"><img src="img/merlin.svg" alt="" width="40" height="40"> Mme Merlin a publié, il y a 2 jours</p>
-        <p><strong>🚀 Humble et honorée de vous annoncer :</strong><br>nous partons conquérir l’étranger !</p>
-        <p class="tags">#Croissance #Bienveillance #PapierAgile</p>
-        <p class="likes">👏 1 (elle-même)</p>
-      </article>
-    </section>
-
-    <section>
+      <p class="surtitre">Produits</p>
       <h2>Notre écosystème de solutions</h2>
       <ul class="produits">
-        <li><img src="img/cahier.svg" alt="" width="96" height="96"><h3>Le Cahier Disruptif</h3><p>96 pages, grands carreaux.</p></li>
-        <li><img src="img/ramette.svg" alt="" width="96" height="96"><h3>La Ramette Agile</h3><p>500 feuilles A4, 80 g. Livrée par itérations.</p></li>
-        <li><img src="img/trombone.svg" alt="" width="96" height="96"><h3>Le Trombone Bienveillant</h3><p>Il retient sans juger.</p></li>
-        <li><img src="img/surligneur.svg" alt="" width="96" height="96"><h3>Le Surligneur Résilient</h3><p>Jaune fluo. Rechargeable.</p></li>
+        <li class="carte"><img src="img/cahier.svg" alt="" width="72" height="72"><h3>Le Cahier Disruptif</h3><p>96 pages, grands carreaux.</p></li>
+        <li class="carte"><img src="img/ramette.svg" alt="" width="72" height="72"><h3>La Ramette Agile</h3><p>500 feuilles A4, 80 g. Livrée par itérations.</p></li>
+        <li class="carte"><img src="img/trombone.svg" alt="" width="72" height="72"><h3>Le Trombone Bienveillant</h3><p>Il retient sans juger.</p></li>
+        <li class="carte"><img src="img/surligneur.svg" alt="" width="72" height="72"><h3>Le Surligneur Résilient</h3><p>Jaune fluo. Rechargeable.</p></li>
       </ul>
     </section>
 
     <section class="deux">
-      <div class="encadre">
-        <h2>Déjà client ?</h2>
-        <p>Vos commandes et vos factures vous attendent dans l’espace client : <strong>portail.papeterie-merlin.example</strong></p>
-        <p>Connexion avec votre adresse mail et le mot de passe reçu par courriel. Migration en cours : il se peut que l’on vous demande de vous reconnecter.</p>
+      <div>
+        <p class="surtitre">Leadership</p>
+        <h2>Le mot de notre Présidente</h2>
+        <article class="post grand">
+          <p class="quand"><img src="img/merlin.svg" alt="" width="40" height="40"> Mme Merlin a publié, il y a 2 jours</p>
+          <p><strong>🚀 Humble et honorée de vous annoncer :</strong><br>nous partons conquérir l’étranger !</p>
+          <p class="tags">#Croissance #Bienveillance #PapierAgile</p>
+          <p class="likes">👏 1 (elle-même)</p>
+        </article>
       </div>
-      <div class="encadre">
-        <h2>À la une</h2>
-        <p>La Papeterie Merlin équipera les 14 écoles du Val de Marge : 48 000 cahiers, notre plus gros marché depuis 1987.</p>
-        <p><a href="communique.html">Lire le communiqué de presse</a></p>
+      <div class="pile-encadres">
+        <div class="encadre">
+          <h2>Déjà client ?</h2>
+          <p>Vos commandes et vos factures vous attendent dans l’espace client : <strong>portail.papeterie-merlin.example</strong></p>
+          <p>Connexion avec votre adresse mail et le mot de passe reçu par courriel. Migration en cours : il se peut que l’on vous demande de vous reconnecter.</p>
+        </div>
+        <div class="encadre">
+          <h2>À la une</h2>
+          <p>La Papeterie Merlin équipera les 14 écoles du Val de Marge : 48 000 cahiers, notre plus gros marché depuis 1987.</p>
+          <p><a href="communique.html">Lire le communiqué de presse</a></p>
+        </div>
       </div>
     </section>
 
-    <section>
+    <section class="bande">
       <h2>Merlin en chiffres</h2>
       <ul class="chiffres">
         <li><strong>1987</strong> l’année où tout a commencé</li>
@@ -79,6 +103,23 @@
       </ul>
     </section>
   </main>
+  <div class="pied">
+    <div>
+      <p class="pied-nom"><img src="img/logo.svg" alt="" width="28" height="28"> Papeterie Merlin</p>
+      <p>7 impasse du Massicot, 99470 Saint-Buvard-sur-Marge</p>
+      <p>#Croissance #Bienveillance #PapierAgile</p>
+    </div>
+    <ul>
+      <li><a href="a-propos.html">À propos</a></li>
+      <li><a href="equipe.html">L’équipe</a></li>
+      <li><a href="organigramme.html">Organigramme</a></li>
+    </ul>
+    <ul>
+      <li><a href="offre-emploi.html">Recrutement</a></li>
+      <li><a href="communique.html">Presse</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
   <footer class="site-fictif">
     <p><strong>Site fictif à but pédagogique.</strong> Les entreprises, les employés et les domaines présentés ici n’existent pas : toute ressemblance avec une entreprise ou une personne réelle serait fortuite. Ce site ne collecte rien.</p>
   </footer>

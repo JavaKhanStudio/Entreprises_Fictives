@@ -34,7 +34,10 @@ class QuietHandler(http.server.SimpleHTTPRequestHandler):
 def open_page(browser, url, width):
     """Load url at this width. Returns the picture and what went wrong."""
     problems = []
-    context = browser.new_context(viewport={"width": width, "height": 800})
+    # What moves stops under reduced motion (merlin/merlin.js, merlin/merlin.css): two pictures
+    # of a turning page would never match. tools/check_trombone.py looks at the moving one.
+    context = browser.new_context(viewport={"width": width, "height": 800},
+                                  reduced_motion="reduce")
     page = context.new_page()
     page.on("requestfailed", lambda r: problems.append(f"request failed: {r.url}"))
     page.on("response", lambda r: r.status >= 400 and "favicon" not in r.url
