@@ -71,5 +71,7 @@ context = """
 The board's own upkeep lands here: the Maintenance tickets for Context packs, Lexicon, Tag vocabulary and Doctrine (atelier r853).
 .atelier/packs.toml holds one [tags.<slug>] per tag. A pack line names a file or a command; one that does not gets cut. `atelier --project entreprises-fictives doctor context_packs` lists paths that moved.
 Lexicon: `atelier --project entreprises-fictives term list`; a new word: atelier --project entreprises-fictives term add "<word>" --short "<one line>" --tags <tag>
-Doctrine: this board has no lines of its own (Simon, p4246) and reads social-engineering's. CLAUDE.md is loaded by every session: keep it short. README.md is French and public.
+Doctrine: this board has no lines of its own and humour is no doctrine (Simon, p4246, r48): it reads social-engineering's.
+Strategy: the family's, so a line goes in social-engineering's .atelier/strategy.proposal.md (no git there), never in this repo: a file here is shadowed (atelier source(), r2203).
+CLAUDE.md is loaded by every session: keep it short. README.md is French and public.
 """
