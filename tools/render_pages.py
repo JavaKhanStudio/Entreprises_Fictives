@@ -31,6 +31,23 @@ class QuietHandler(http.server.SimpleHTTPRequestHandler):
         pass
 
 
+def whole_page(page, width):
+    """A picture of the whole page, the same every time.
+
+    Not screenshot(full_page=True): that resizes the page inside the capture, and the rounded
+    corners on a composited layer (Gobelin's sticky blurred .haut, its active menu pill) came
+    out in one of two rasters, 39 pixels apart by at most 4/255. The window takes the page's
+    height first, and the page gets two frames to settle (r41, tools/render_diff_probe.py).
+    A page of fractional height is rounded up, so a min-height: 100vh footer can sit under a
+    pixel lower than in a smaller window: one line of its text may land a pixel off (r41).
+    """
+    height = page.evaluate("document.documentElement.scrollHeight")
+    page.set_viewport_size({"width": width, "height": height})
+    page.evaluate("() => new Promise(done => requestAnimationFrame("
+                  "() => requestAnimationFrame(done)))")
+    return page.screenshot()
+
+
 def open_page(browser, url, width):
     """Load url at this width. Returns the picture and what went wrong."""
     problems = []
@@ -54,7 +71,7 @@ def open_page(browser, url, width):
     overflow = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")
     if overflow > 0:
         problems.append(f"{overflow}px wider than the window")
-    picture = page.screenshot(full_page=True)
+    picture = whole_page(page, width)
     context.close()
     return picture, problems
 

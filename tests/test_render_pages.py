@@ -5,7 +5,8 @@
 
 Two scratch trees whose index.html differ, both started at once. A run served by the other's
 server, or by anything else already on a port, gets another page over http than over file://,
-and the tool fails on that.
+and the tool fails on that. A page one colour level off over http must fail too: the comparison
+has no tolerance.
 """
 
 import os
@@ -47,6 +48,24 @@ class TwoRunsAtOnce(unittest.TestCase):
                 with open(os.path.join(tree, "out", "index.html-1280.png"), "rb") as picture:
                     pictures.append(picture.read())
             self.assertNotEqual(*pictures, "the two trees gave the same picture")
+
+    def test_one_colour_level_over_http_fails(self):
+        with tempfile.TemporaryDirectory() as root:
+            tree = scratch_tree(root, "un", "Arbre")
+            index = os.path.join(tree, "index.html")
+            with open(index, encoding="utf-8") as page:
+                text = page.read()
+            with open(index, "w", encoding="utf-8") as page:
+                page.write(text.replace("</main>", """<div id="pastille"
+                  style="width:40px;height:40px;background:rgb(100,100,100)"></div>
+                  <script>if (location.protocol === "http:")
+                  document.getElementById("pastille").style.background = "rgb(100,100,101)";
+                  </script></main>"""))
+            run = subprocess.run([sys.executable, os.path.join(tree, "tools/render_pages.py"),
+                                  os.path.join(tree, "out"), "index.html"],
+                                 capture_output=True, text=True, timeout=120)
+            self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+            self.assertIn("give different pictures", run.stdout)
 
 
 if __name__ == "__main__":
