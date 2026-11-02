@@ -45,7 +45,8 @@ context = """
 FILES (planned): courtepaille/index.html and its pages, courtepaille/courtepaille.css. Domain: etude-courtepaille.example.
 LINK: in index.html, make the company's h2 a link to courtepaille/index.html and drop its "à venir" span; the gate refuses the site otherwise (rule index). Delete courtepaille/.gitkeep.
 START: copy shared/modele.html to courtepaille/, then add the company's stylesheet after base.css. Render with tools/render_pages.py (see #shared).
-SURFACE: large property transfers, elderly clients, paper first, a website that looks its age. Simon kept the name (2026-11-02) though Courtepaille is also a restaurant chain: the site says nothing of restaurants. No real notary's name, checked by search: the public directory is https://www.notaires.fr/fr/directory.
+SURFACE: large property transfers, elderly clients, paper first, a website that looks its age. Simon kept the name (2026-11-02) though Courtepaille is also a restaurant chain: the site says nothing of restaurants.
+DATES: no year in the plot, it runs as a yearly habit (Simon, r4). The pages agree on: 16 novembre au 4 décembre, grandes ventes signed the troisième vendredi de décembre at 15 h, pli RIB three weeks before, funds the Friday before, successor the premier lundi de janvier. A duration never sits beside its start year (41 ans, no 1985). The only recent year is the footer's 2009, so no fact on a page may be dated after it. No page says neveu: the surname says it. No real notary's name, checked by search: the public directory is https://www.notaires.fr/fr/directory.
 """
 
 [tags.hosting]

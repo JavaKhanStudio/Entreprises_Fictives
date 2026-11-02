@@ -37,6 +37,17 @@ model is `~/Documents/GitHub/Social_Engineering_en_visuel/faux-president/js/i18n
 `steps.research.site`. The clues stay usable: the joke never hides what an attacker would read.
 All page text is in French. Simon reads every site before it counts as done.
 
+Humour stays quiet (Simon, r4, 2026-11-02). Never explain a joke; a reader who misses it is
+fine, it is for the ones who think. Say the fact and stop:
+- Not "Dernière mise à jour : 2 novembre 2026 (la précédente datait de 2009)", but "Dernière
+  mise à jour : 2 novembre 2009".
+- Not "fait par mon neveu", but "Fait par Robert Courtepaille": the family name, on a company
+  whose owner has another first name, lets a reader work out the rest.
+- Cut a sentence where the company winks at its own absurdity (`Le stationnement est libre, le
+  temps l'est aussi`). Nobody at that company would write it. What they would write straight
+  can stay, however absurd (`Il ne sera pas joignable, n'ayant pas de téléphone`).
+The self-given titles and `👏 1 (elle-même)` are the model's and stay. Do not try too hard.
+
 ## Traps
 
 - Link `merlin/index.html`, never `merlin/`: over file:// a folder opens a listing.
