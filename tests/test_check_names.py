@@ -9,6 +9,7 @@ as the real one did on source&eclat.com (r73).
 
 import contextlib
 import email.message
+import http.client
 import io
 import os
 import re
@@ -40,7 +41,12 @@ def fetching(url, headers):
     return rdap(url.rsplit("/", 1)[1])
 
 
-def run(*names):
+def dropped(*_args, **_kwargs):
+    """What urlopen really raises when a server closes without answering: not a URLError."""
+    raise http.client.RemoteDisconnected("Remote end closed connection without response")
+
+
+def run(*names, control=lambda: True):
     """main() on these names, without the network or the pauses: its exit code and what it printed."""
     out = io.StringIO()
     with (mock.patch.object(sys, "argv", ["check_names.py", "--no-web", "--domains", *names]),
@@ -48,7 +54,7 @@ def run(*names):
           mock.patch.object(check_names, "wikipedia_hits", lambda name: ["known"] if name == check_names.KNOWN else []),
           mock.patch.object(check_names, "wikidata_hits", lambda name: ["known"] if name == check_names.KNOWN else []),
           mock.patch.object(check_names, "public_control", lambda: dict.fromkeys(check_names.PUBLIC, lambda name: [])),
-          mock.patch.object(check_names, "domain_control", lambda: True),
+          mock.patch.object(check_names, "domain_control", control),
           mock.patch.object(check_names.time, "sleep", lambda seconds: None),
           contextlib.redirect_stdout(out)):
         return check_names.main(), out.getvalue()
@@ -98,6 +104,45 @@ class Run(unittest.TestCase):
         self.assertEqual(code, 1, out)
         self.assertRegex(out, r"(?m)^Panne: 0 hits.*unchecked on rdap panne\.com$")
         self.assertIn("Source & Éclat: 1 hits", out)
+
+    def test_rdap_dropping_the_control_is_unchecked_and_the_run_goes_on(self):
+        real_fetch, real_control = check_names.fetch, check_names.domain_control
+
+        def control():
+            with (mock.patch.object(check_names, "fetch", real_fetch),
+                  mock.patch.object(check_names.urllib.request, "urlopen", dropped)):
+                return real_control()
+
+        code, out = run("Zorglaxe", "& & &", control=control)
+        self.assertEqual(code, 3, out)
+        self.assertIn("rdap: failed at the control", out)
+        self.assertRegex(out, r"(?m)^Zorglaxe: 0 hits.*unchecked on rdap$")
+        self.assertRegex(out, r"(?m)^& & &: 0 hits.*cannot be a domain$")
+
+    def test_rdap_dropping_one_domain_is_unchecked_and_the_rest_are_asked(self):
+        def fetch(url, headers):
+            if url.endswith("/sourceeclat.com"):
+                dropped()
+            return fetching(url, headers)
+
+        with mock.patch.object(check_names, "fetch", fetch):
+            self.assertEqual(check_names.domain_hits("Source & Éclat"),
+                             (["rdap sourceeclat.fr is registered"], ["rdap sourceeclat.com"]))
+
+
+class Fetch(unittest.TestCase):
+    def test_a_dropped_connection_is_retried_then_read_as_a_urlerror(self):
+        calls = []
+
+        def urlopen(*args, **kwargs):
+            calls.append(args)
+            dropped()
+
+        with (mock.patch.object(check_names.urllib.request, "urlopen", urlopen),
+              mock.patch.object(check_names.time, "sleep", lambda seconds: None)):
+            with self.assertRaises(urllib.error.URLError):
+                check_names.fetch("https://rdap.example/domain/x.fr", {})
+        self.assertEqual(len(calls), 4)
 
 
 if __name__ == "__main__":

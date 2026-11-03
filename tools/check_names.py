@@ -23,7 +23,8 @@ name must hold the exact string, because some of them search loosely, and each s
 known name and on nonsense first; one that fails is reported and counts as unchecked. --domains
 adds RDAP for the name's .com and .fr, for companies and products, on the name's letters and digits
 (Source & Éclat is sourceeclat and source-eclat): a registered domain is a hit to read by eye, a
-domain RDAP will not answer on counts as unchecked, and a name with no domain to make is said so.
+domain RDAP will not answer on counts as unchecked, as does every domain when RDAP does not answer
+its control, and a name with no domain to make is said so.
 None of this is the open web: a small firm with a site and none of these still goes unseen, which
 is why --no-web can never exit 0.
 Exit 1 when a name has a hit, to read by eye; 2 when the APIs fail their control; 3 when no name
@@ -63,9 +64,11 @@ def fetch(url, headers):
                 raise
             wait = error.headers.get("Retry-After", "")
             time.sleep(int(wait) if wait.isdigit() else 30 * (attempt + 1))
-        except urllib.error.URLError:  # a reset connection: HTTPError, a real answer, came first
+        except (urllib.error.URLError, ConnectionError) as error:
+            # A reset connection: HTTPError, a real answer, came first. urlopen lets a connection
+            # dropped before the answer through bare (RemoteDisconnected), and callers read URLError.
             if attempt == 3:
-                raise
+                raise urllib.error.URLError(error) from error
             time.sleep(10 * (attempt + 1))
     raise AssertionError("unreachable")
 
@@ -249,9 +252,14 @@ def main():
         return 2
     echo = None if no_web else web_control()
     usable = public_control()
-    if domains and not domain_control():
-        print("RDAP failed the control, stopping")
-        return 2
+    rdap_down = False
+    try:
+        if domains and not domain_control():
+            print("RDAP failed the control, stopping")
+            return 2
+    except OSError as error:
+        print(f"rdap: failed at the control ({error})")
+        rdap_down = True
     taken = unchecked = 0
     for name in names:
         time.sleep(PAUSE)
@@ -262,7 +270,9 @@ def main():
                 hits += [f"{source} {label[:100]}" for label in holding(name, search(name))]
             except (OSError, RuntimeError, KeyError, ValueError):
                 missed.append(source)
-        if domains:
+        if rdap_down:
+            missed += ["rdap"] if domains_of(name) else []
+        elif domains:
             found, unanswered = domain_hits(name)
             hits += found
             missed += unanswered
