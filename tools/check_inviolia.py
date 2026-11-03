@@ -11,8 +11,8 @@ a word that differs from the still page, anything left faded or turned once the 
 scrolled through, a stop that does not hold the page or shows a block still at an angle, a hero
 that does not fit its pinned frame, an anchor under the sticky header, and any motion left under
 reduced motion or without the script. On the home's live map it fails on a counter that does not
-climb at the rate its own words give, a feed that does not roll or changes its words or height, a
-globe with no comets, a band that changes height, and anything that runs off screen.
+climb at the rate its own words give, a feed that does not roll or changes its height, a clock that
+does not run forward, a word in the feed the page does not have, a pair twice on screen, a globe with no comets, a band that changes height, and anything that runs off screen.
 OUT also gets a film and frames of the live map.
 Safari is not here: Playwright's WebKit is not Safari.
 Needs Playwright, Chrome, `playwright install firefox`, Pillow for OUT.
@@ -30,6 +30,9 @@ WINDOWS = ((1920, 1080), (1366, 768), (1280, 800), (1280, 672), (1000, 700), (80
 PINNED = ((1920, 1080), (1366, 768), (1280, 800), (1280, 672), (1000, 700))
 SHEET = {(1280, 800): (640, 400), (390, 844): (260, 563)}
 START = "4\u00a0812\u00a0336"
+LINE = r"(\d\d:\d\d:\d\d) · Inconnu → (.+?) · (.+?) BLOQUÉE"
+OWN = [m for m in re.findall(LINE, re.sub(r"<[^>]+>", "", (SITE / "index.html").read_text()))]
+TARGETS, ATTACKS = {m[1] for m in OWN}, {m[2] for m in OWN}
 failures = []
 
 STUCK = """() => [...document.querySelectorAll('main *')].filter(e => {
@@ -46,8 +49,9 @@ def expect(what, ok, more=""):
 
 
 def text(page):
-    # The counter is the one word that may change; stills() holds its starting value.
-    return re.sub(r"\d \d{3} \d{3}(?=attaques)", "COMPTEUR", re.sub(r"\s+", " ", page.locator("body > main").text_content())).strip()
+    # The counter and the feed's lines may change, and live() holds them to their words; stills() to the start.
+    words = re.sub(r"\d \d{3} \d{3}(?=attaques)", "COMPTEUR", re.sub(r"\s+", " ", page.locator("body > main").text_content())).strip()
+    return re.sub(LINE, "LIGNE", words)
 
 
 def frames_settle(page):
@@ -212,7 +216,8 @@ def live(page, width, height, words):
       const a = c.getBoundingClientRect(), b = i.getBoundingClientRect();
       let painted = 0;
       if (c.width) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; for (let n = 3; n < d.length; n += 4) if (d[n]) painted++; }
-      return {first: ps.reduce((m, p) => p.getBoundingClientRect().top < m[0] ? [p.getBoundingClientRect().top, p.textContent] : m, [1e9, ''])[1],
+      return {rows: ps.slice().sort((x, y) => x.getBoundingClientRect().top - y.getBoundingClientRect().top).map(p => p.textContent),
+              first: ps.reduce((m, p) => p.getBoundingClientRect().top < m[0] ? [p.getBoundingClientRect().top, p.textContent] : m, [1e9, ''])[1],
               inView: box.bottom > 0 && box.top < innerHeight, order: ps.map(p => p.style.order).join(), high: f.offsetHeight, text: f.textContent,
               painted, pic: c.toDataURL(), moving: f.getAnimations({subtree: true}).length, wide: f.scrollWidth - f.clientWidth,
               box: [box.top, box.bottom], lines: ps.map(p => { const r = p.getBoundingClientRect(); return [r.top, r.bottom]; }),
@@ -243,12 +248,32 @@ def live(page, width, height, words):
         if not seen or seen[-1] != s["first"]:
             seen.append(s["first"])
         expect(f"{label}: the feed keeps its height", s["high"] == start["high"], (start["high"], s["high"]))
-        expect(f"{label}: the feed keeps its words", s["text"] == start["text"])
         expect(f"{label}: no line wider than the feed", s["wide"] <= 0, s["wide"])
         if not s["moving"]:
+            rows = [re.fullmatch(LINE, row.strip()) for row in s["rows"]]
+            expect(f"{label}: each line is the page's own words", all(r and r[2] in TARGETS and r[3] in ATTACKS for r in rows), s["rows"])
+            if all(rows):
+                clock = [r[1] for r in rows]
+                expect(f"{label}: the clock runs forward", clock == sorted(set(clock)), clock)
+                pairs = [(r[2], r[3]) for r in rows]
+                expect(f"{label}: no pair twice on screen", len(set(pairs)) == len(pairs), pairs)
             out = [line for line in s["lines"] if line[0] < s["box"][0] - 1 or line[1] > s["box"][1] + 1]
             expect(f"{label}: at rest every line is in its box", not out, (s["box"], out))
     expect(f"{label}: the feed rolls", len(seen) >= 3, seen)
+    tall = """([targets, attacks]) => {
+      const f = document.querySelector('.flux'), p = f.lastElementChild, was = p.firstChild.textContent, seen = {};
+      for (const t of targets) for (const a of attacks) { p.firstChild.textContent = `03:12:17 · Inconnu → ${t} · ${a} `; seen[f.offsetHeight] = `${t} / ${a}`; }
+      p.firstChild.textContent = was;
+      return seen;
+    }"""
+    drawn = page.evaluate(tall, [sorted(TARGETS), sorted(ATTACKS)])
+    expect(f"{label}: every pair the feed can draw leaves it the same height", len(drawn) == 1, drawn)
+    page.set_viewport_size({"width": width - 90, "height": height})
+    page.wait_for_timeout(200)
+    drawn = page.evaluate(tall, [sorted(TARGETS), sorted(ATTACKS)])
+    expect(f"{label}: and so after a resize", len(drawn) == 1, drawn)
+    page.set_viewport_size({"width": width, "height": height})
+    page.wait_for_timeout(200)
     expect(f"{label}: the same words on the page", text(page) == words["index"])
 
     page.evaluate("scrollTo(0, document.documentElement.scrollHeight)")

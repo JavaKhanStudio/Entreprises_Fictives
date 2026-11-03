@@ -10,6 +10,8 @@ Feed.   A: the clock runs forward, lines drawn from the page's own targets and a
 
 A take is a patch on a scratch copy of inviolia/, opened over file://: the site itself is never
 touched. A patch whose old text has gone raises, so this tool cannot film something else by mistake.
+Simon picked comets B and feed A: they are in inviolia/, and tools/check_inviolia.py holds them. So this
+now raises on the live site: to film the takes again, run it from 96642c6.
 The sweep says whether a take makes the feed jump before Simon sees it. Needs Playwright, Chrome, Pillow and ffmpeg.
 """
 import re

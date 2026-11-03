@@ -227,7 +227,7 @@ td + td { color: #52e0ff; white-space: nowrap; }
   .vivant .tirs { display: block; width: 100%; aspect-ratio: 500 / 420; pointer-events: none; }
   .vivant .chiffres b.rouge { font-variant-numeric: tabular-nums; }
   .vivant .flux { display: flex; flex-direction: column; gap: .25rem; padding-block: 1rem; overflow: hidden; }  /* as tall as the still page's margins */
-  .vivant .flux p { margin: 0; }
+  .vivant .flux p { margin: 0; align-content: flex-start; }
 
   /* The quote lights up word by word. */
   .vivant .mot { color: #71839c; transition: color .25s; }

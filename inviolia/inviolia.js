@@ -111,8 +111,8 @@
     setTimeout(function () { if (scrollY === y) plusTard(); }, 200);
   }
 
-  // The live map. No new word: the counter's digits change, the feed's lines are the HTML's own, shown
-  // in another order, and the comets are paint. Nothing runs while it is off screen.
+  // The live map. No new word: the counter's digits change, the feed's lines pair the HTML's own targets
+  // and attacks, and the comets are paint. Nothing runs while it is off screen.
   function enVue(el, rappel) {
     if (!window.IntersectionObserver) { rappel(true); return; }
     new IntersectionObserver(function (e) { rappel(e[e.length - 1].isIntersecting); }).observe(el);
@@ -133,18 +133,52 @@
     }, 120);
   }
 
-  // The DOM's order never changes, so the text reads the same at any moment: only CSS order does.
+  // The DOM's order never changes, only CSS order does. The line that leaves comes back at the bottom as
+  // a new one: later than the last, a target and an attack the page already has, a pair not on screen (Simon, r90).
   function flux() {
     var boite = document.querySelector(".flux");
     if (!boite || !boite.animate) return;
     var tour = [].slice.call(boite.children), vu = false;
     if (tour.length < 2) return;
     enVue(boite, function (oui) { vu = oui; });
+    var cibles = [], sortes = [], heure = 0;
+    tour.forEach(function (p) {
+      var m = /^(\d+):(\d+):(\d+) · Inconnu → (.+?) · (.+?) *$/.exec(p.firstChild.textContent);
+      heure = m[1] * 3600 + m[2] * 60 + +m[3];
+      if (cibles.indexOf(m[4]) < 0) cibles.push(m[4]);
+      if (sortes.indexOf(m[5]) < 0) sortes.push(m[5]);
+    });
+    function deux(n) { return (n < 10 ? "0" : "") + n; }
+    function nouvelle(p) {
+      var vues = tour.map(function (q) { return q.firstChild.textContent.slice(11); }), mots;
+      do {
+        mots = "Inconnu → " + cibles[Math.floor(Math.random() * cibles.length)] + " · " + sortes[Math.floor(Math.random() * sortes.length)] + " ";
+      } while (vues.indexOf(mots) >= 0);
+      heure += 1 + Math.floor(Math.random() * 2);       // about the 1.6 s a line takes on screen
+      p.firstChild.textContent = deux(Math.floor(heure / 3600) % 24) + ":" + deux(Math.floor(heure / 60) % 60) + ":" + deux(heure % 60) + " · " + mots;
+    }
+    // A pair may wrap where another does not: each row holds the tallest, so the feed never changes height.
+    function hauteur() {
+      var p = tour[0], ecrit = p.firstChild.textContent, haut = 0;
+      p.style.minHeight = "";
+      cibles.forEach(function (c) {
+        sortes.forEach(function (s) {
+          p.firstChild.textContent = "00:00:00 · Inconnu → " + c + " · " + s + " ";
+          haut = Math.max(haut, p.offsetHeight);
+        });
+      });
+      p.firstChild.textContent = ecrit;
+      tour.forEach(function (q) { q.style.minHeight = haut + "px"; });
+    }
+    hauteur();
+    addEventListener("resize", hauteur);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(hauteur);
     function range() { tour.forEach(function (p, i) { p.style.order = i; }); }
     setInterval(function () {
       if (!vu || document.hidden) return;
       var sort = tour[0], pas = tour[1].offsetTop - sort.offsetTop;
       sort.animate({ clipPath: ["inset(0)", "inset(0 0 100% 0)"] }, { duration: 160, easing: "ease-in" }).onfinish = function () {
+        nouvelle(sort);
         tour.push(tour.shift());
         range();
         tour.forEach(function (p) {
@@ -191,35 +225,27 @@
       tirs.forEach(function (s, i) {
         var k = (t - s.t0) / s.ms;
         if (k < 0) return;
-        var m = Math.min(k, 1), part = k < 1 ? 1 : Math.max(0, 1 - (k - 1) / 0.4);
-        // The arc it has drawn, then the comet: bright enough to read over the red land.
-        c.strokeStyle = "rgba(255, 170, 178, " + 0.8 * part + ")";
-        c.lineWidth = 1.6 * e;
-        c.beginPath();
-        for (var n = 0; n <= 24; n++) {
-          var v = point(s, m * n / 24, l, h);
-          if (n) c.lineTo(v[0], v[1]); else c.moveTo(v[0], v[1]);
-        }
-        c.stroke();
+        c.globalCompositeOperation = "lighter";    // a short bolt with its glow, nothing left behind it
         if (k < 1) {
-          for (n = 0; n < 12; n++) {
-            var d = k - (n + 1) * 0.025, f = k - n * 0.025;
-            if (d < 0) break;
-            var p = point(s, d, l, h), q = point(s, f, l, h);
-            c.strokeStyle = "rgba(255, 190, 196, " + (1 - n / 12) + ")";
-            c.lineWidth = (3.6 - n * 0.2) * e;
-            c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]); c.stroke();
-          }
-          var tete = point(s, k, l, h);
-          c.fillStyle = "#fff";
-          c.beginPath(); c.arc(tete[0], tete[1], 2.6 * e, 0, 6.3); c.fill();
-        }
-        if (k >= 1) {                      // blocked, every time
+          [[9, 0.16], [5, 0.3], [2, 1]].forEach(function (g) {
+            c.lineWidth = g[0] * e;
+            for (var n = 0; n < 14; n++) {
+              var d = k - (n + 1) * 0.022, f = k - n * 0.022;
+              if (d < 0) break;
+              var p = point(s, d, l, h), q = point(s, f, l, h);
+              c.strokeStyle = "rgba(255, 60, 90, " + g[1] * (1 - n / 14) + ")";
+              c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]); c.stroke();
+            }
+          });
+        } else {                           // blocked, every time
           var r = (k - 1) / 0.4, o = point(s, 1, l, h);
-          c.strokeStyle = "rgba(57, 229, 140, " + Math.max(0, 1 - r) + ")";
-          c.lineWidth = 2 * e;
-          c.beginPath(); c.arc(o[0], o[1], (3 + r * 15) * e, 0, 6.3); c.stroke();
+          [[6, 0.25], [2, 1]].forEach(function (g) {
+            c.strokeStyle = "rgba(57, 229, 140, " + g[1] * Math.max(0, 1 - r) + ")";
+            c.lineWidth = g[0] * e;
+            c.beginPath(); c.arc(o[0], o[1], (2 + r * 11) * e, 0, 6.3); c.stroke();
+          });
         }
+        c.globalCompositeOperation = "source-over";
         if (k > 1.4) tirs[i] = tir(t);
       });
     }
