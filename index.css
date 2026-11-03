@@ -1,60 +1,306 @@
-/* The root list only: manila folders on a dark desk, Simon's pick on r10. */
+/* The root list: six targets on a dark desk, each a picture from its own site and a small
+   manila envelope (Simon on r10 chose manila, on r77 pictures, 3D and a letter that opens).
+   CSS only: no script on this page. What opens on hover also opens on keyboard focus, loops on
+   a screen with no pointer, and stands still under reduced motion. tools/check_racine.py proves
+   it; render_pages.py cannot, it freezes the page. */
+
+:root {
+  --bureau: #12141a;
+  --kraft: #e6cf9f;
+  --teinte: #e6cf9f;
+  --ressort: cubic-bezier(0.2, 0.85, 0.25, 1.15);
+}
 
 body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #3c4048;
-  color: #24262b;
+  background:
+    radial-gradient(70rem 34rem at 50% -6rem, #4a505e, transparent 70%),
+    radial-gradient(50rem 30rem at 85% 110%, #2b2f3a, transparent 70%),
+    var(--bureau);
+  color: #f4f4f2;
   font: 1.0625rem/1.55 'Courier New', Courier, monospace;
 }
 
 main {
   flex: 1;
   width: 100%;
-  max-width: 44rem;
+  max-width: 82rem;
   margin: 0 auto;
-  padding: 3rem 1.25rem;
+  padding: clamp(2rem, 6vw, 4.5rem) clamp(1rem, 3vw, 2.5rem) 5rem;
 }
 
-h1 { margin: 0 0 1rem; color: #f4f4f2; font-size: 2.25rem; line-height: 1.15; }
+h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2.3rem, 6.4vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-shadow: 0 0.06em 0 #000, 0 0.14em 0.4em rgba(0, 0, 0, 0.6);
+}
 
-.chapo { margin: 0 0 2.5rem; color: #f4f4f2; }
+.chapo { max-width: 46rem; margin: 0 0 clamp(2rem, 5vw, 3.5rem); }
 
-.entreprises { margin: 0; padding: 0; list-style: none; }
+.entreprises {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-.entreprises li {
+.merlin { --teinte: #a855f7; --cadre: 50% 50%; }
+.gobelin { --teinte: #b9f73e; --cadre: 50% 12%; }
+.courtepaille { --teinte: #9c7a4a; --cadre: 50% 50%; }
+.inviolia { --teinte: #38bdf8; --cadre: 50% 35%; }
+.dernier-prix { --teinte: #e3231b; --cadre: 62% 40%; }
+.source-eclat { --teinte: #ec4899; --cadre: 50% 35%; }
+
+.cible {
+  perspective: 62rem;
+  animation: entree 0.9s var(--ressort) backwards;
+}
+.cible:nth-child(2) { animation-delay: 0.08s; }
+.cible:nth-child(3) { animation-delay: 0.16s; }
+.cible:nth-child(4) { animation-delay: 0.24s; }
+.cible:nth-child(5) { animation-delay: 0.32s; }
+.cible:nth-child(6) { animation-delay: 0.4s; }
+
+@keyframes entree {
+  from { opacity: 0; transform: translateY(3rem) scale(0.9); }
+}
+
+.cible > a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: crosshair;
+  outline: none;
+}
+
+/* The picture is a plate standing on the desk: the three columns curve towards the reader. */
+.plaque {
   position: relative;
-  margin-bottom: 1.25rem;
-  padding: 1.25rem;
-  border-radius: 3px 14px 3px 3px;
-  background: #e6cf9f;
+  aspect-ratio: 4 / 3;
+  border-radius: 0.9rem;
+  transform-style: preserve-3d;
+  transform: rotateX(7deg) rotateY(var(--pan, 0deg));
+  box-shadow:
+    0 1px 0 #6d7280, 0 2px 0 #4a4e5a, 0 3px 0 #30333c, 0 4px 0 #1d1f26,
+    0 2.2rem 2.6rem -0.6rem rgba(0, 0, 0, 0.75);
+  transition: transform 0.55s var(--ressort), box-shadow 0.55s;
+}
+.cible:nth-child(3n + 1) { --pan: 9deg; }
+.cible:nth-child(3n) { --pan: -9deg; }
+
+.cible > a:hover .plaque,
+.cible > a:focus-visible .plaque {
+  transform: translateY(-0.5rem) translateZ(3.5rem) rotateX(0deg) rotateY(0deg);
+  box-shadow:
+    0 1px 0 #6d7280, 0 2px 0 #4a4e5a, 0 3px 0 #30333c, 0 4px 0 #1d1f26,
+    0 3.4rem 3.6rem -0.8rem rgba(0, 0, 0, 0.85),
+    0 0 0 1px var(--teinte);
 }
 
-.entreprises li::after {
-  content: 'FICTIF';
+.photo,
+.voile,
+.visee {
   position: absolute;
-  top: 0.6rem;
-  right: 0.8rem;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.photo { object-fit: cover; object-position: var(--cadre); }
+
+/* The dark foot carries the words; the light sweeps across the plate on hover. */
+.voile {
+  background:
+    linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.22) 50%, transparent 60%) 130% 0 / 300% 100% no-repeat,
+    linear-gradient(to top, rgba(8, 9, 13, 0.94) 4%, rgba(8, 9, 13, 0.62) 32%, transparent 58%);
+  transition: background-position 0.9s ease;
+}
+.cible > a:hover .voile,
+.cible > a:focus-visible .voile { background-position: -30% 0, 0 0; }
+
+/* The sight closes on the picture. */
+.visee {
+  --coin: linear-gradient(var(--teinte), var(--teinte));
+  background:
+    var(--coin) 0.8rem 0.8rem / 1.6rem 2px, var(--coin) 0.8rem 0.8rem / 2px 1.6rem,
+    var(--coin) calc(100% - 0.8rem) 0.8rem / 1.6rem 2px, var(--coin) calc(100% - 0.8rem) 0.8rem / 2px 1.6rem;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: translateZ(0.6rem) scale(1.06);
+  transition: opacity 0.25s, transform 0.45s var(--ressort);
+}
+.cible > a:hover .visee,
+.cible > a:focus-visible .visee { opacity: 1; transform: translateZ(0.6rem) scale(1); }
+
+.tampon {
+  position: absolute;
+  top: 0.9rem;
+  left: 1rem;
   padding: 0 0.35rem;
-  border: 2px solid #9c2b22;
-  color: #9c2b22;
+  border: 2px solid #f4f4f2;
+  border-radius: 2px;
+  background: #9c2b22;
+  color: #f4f4f2;
   font-size: 0.8rem;
   font-weight: 700;
-  transform: rotate(4deg);
+  transform: translateZ(1rem) rotate(-4deg);
+}
+.cible > a:hover .tampon,
+.cible > a:focus-visible .tampon { opacity: 0; }
+
+.texte {
+  position: absolute;
+  right: 8rem;
+  bottom: 0.9rem;
+  left: 1rem;
+  transform: translateZ(1.5rem);
+  text-shadow: 0 1px 3px #000;
+}
+.texte h2 { margin: 0 0 0.2rem; font-size: 1.3rem; line-height: 1.15; letter-spacing: -0.02em; }
+.texte p { margin: 0; font-size: 0.875rem; line-height: 1.3; }
+.cible > a:focus-visible h2 { text-decoration: underline; }
+
+/* The envelope stands in front of the plate. Its layers sit at their own depth, so that the flap
+   goes behind the letter once it has swung open. */
+.enveloppe {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 6.3rem;
+  height: 4.5rem;
+  transform-style: preserve-3d;
+  transform-origin: 100% 100%;
+  transform: translateZ(3.25rem) rotate(-4deg);
+  transition: transform 0.55s var(--ressort);
+}
+.cible > a:hover .enveloppe,
+.cible > a:focus-visible .enveloppe { transform: translateZ(5.5rem) rotate(0deg) scale(1.3); }
+
+.fond,
+.poche,
+.lettre { position: absolute; }
+
+.fond {
+  inset: 0;
+  border-radius: 3px;
+  background: #5d4c2b;
+  box-shadow: 0 0.7rem 1.1rem rgba(0, 0, 0, 0.6);
 }
 
-.entreprises h2 { margin: 0 0 0.25rem; padding-right: 4.5rem; font-size: 1.3rem; line-height: 1.3; }
+.lettre {
+  right: 6%;
+  bottom: 5%;
+  left: 6%;
+  height: 92%;
+  padding: 0.3rem 0.4rem;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(#fffefa, #f1eee4);
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.25);
+  transform: translateZ(0.1rem);
+  /* Closing: back in first, then the flap. */
+  transition: transform 0.28s ease-in;
+}
+.lettre img { display: block; width: 1.05rem; height: 1.05rem; margin-bottom: 0.2rem; border-radius: 3px; }
+.lettre i { display: block; height: 2px; margin-top: 3px; background: #b9b6ad; }
+.lettre i:first-of-type { width: 60%; background: var(--teinte); }
+.lettre i:last-of-type { width: 75%; }
 
-.entreprises a { color: #24262b; }
+.poche {
+  inset: 0;
+  border-radius: 3px;
+  background: conic-gradient(at 50% 42%, #d9c18c 0 130deg, #efdcb1 130deg 230deg, #cdb37b 230deg);
+  clip-path: polygon(0 0, 50% 42%, 100% 0, 100% 100%, 0 100%);
+  transform: translateZ(0.2rem);
+}
 
-.entreprises p { margin: 0; }
+/* Hinged on the envelope's top edge: two faces, manila outside and the lining inside. */
+.rabat {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: 50% 0;
+  transform: translateZ(0.3rem) rotateX(0deg);
+  transition: transform 0.4s ease-in-out 0.22s;
+}
+.rabat::before,
+.rabat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.rabat::before {
+  background: linear-gradient(#f2e0b8, var(--kraft) 40%, #cfb57e 66%);
+  clip-path: polygon(0 0, 100% 0, 50% 66%);
+}
+.rabat::after {
+  background: repeating-linear-gradient(45deg, var(--teinte) 0 3px, #1c1e26 3px 6px);
+  clip-path: polygon(50% 34%, 100% 100%, 0 100%);
+  transform: rotateX(180deg);
+}
+/* The seal, on the flap's point. */
+.rabat img {
+  position: absolute;
+  top: calc(66% - 1rem);
+  left: calc(50% - 0.55rem);
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #7d1f18, 0 1px 3px 2px rgba(0, 0, 0, 0.45);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0.05rem);
+}
 
-.a-venir {
-  margin-left: 0.4rem;
-  color: #24262b;
-  white-space: nowrap;
-  font-size: 0.875rem;
-  font-weight: 400;
-  font-style: italic;
+.cible > a:hover .rabat,
+.cible > a:focus-visible .rabat {
+  transform: translateZ(0.05rem) rotateX(180deg);
+  transition: transform 0.45s ease-in-out;
+}
+.cible > a:hover .lettre,
+.cible > a:focus-visible .lettre {
+  transform: translateZ(0.1rem) translateY(-56%);
+  transition: transform 0.5s var(--ressort) 0.3s;
+}
+
+/* A screen with no pointer never hovers: each envelope opens by itself, in turn. */
+@media (hover: none) {
+  .rabat { animation: rabat-seul 9s ease-in-out infinite; animation-delay: calc(var(--rang, 0) * 1.5s); }
+  .lettre { animation: lettre-seule 9s ease-in-out infinite; animation-delay: calc(var(--rang, 0) * 1.5s); }
+  .cible:nth-child(2) { --rang: 1; }
+  .cible:nth-child(3) { --rang: 2; }
+  .cible:nth-child(4) { --rang: 3; }
+  .cible:nth-child(5) { --rang: 4; }
+  .cible:nth-child(6) { --rang: 5; }
+}
+@keyframes rabat-seul {
+  0%, 2% { transform: translateZ(0.3rem) rotateX(0deg); }
+  8%, 26% { transform: translateZ(0.05rem) rotateX(180deg); }
+  32%, 100% { transform: translateZ(0.3rem) rotateX(0deg); }
+}
+@keyframes lettre-seule {
+  0%, 6% { transform: translateZ(0.1rem); }
+  12%, 22% { transform: translateZ(0.1rem) translateY(-56%); }
+  28%, 100% { transform: translateZ(0.1rem); }
+}
+
+@media (max-width: 62rem) {
+  .entreprises { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cible:nth-child(n) { --pan: 0deg; }
+}
+
+@media (max-width: 38rem) {
+  .entreprises { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }

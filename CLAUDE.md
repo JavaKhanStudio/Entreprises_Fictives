@@ -28,6 +28,7 @@ python3 tools/check_badge_safari.py --extract LOG OUT   # read a Safari run; the
 python3 tests/test_render_pages.py             # two render runs at once each prove their own tree
 python3 tools/check_pages.py [--render OUT]    # the served site: each page and local link answers 200, noindex and footer in the body
 python3 tools/check_courtepaille_egg.py [OUT]  # Courtepaille's counter looks the same with its hidden link
+python3 tools/check_racine.py [OUT]    # the root list's envelopes in Chrome and Firefox, which the renders freeze; --control flat must fail
 python3 tools/check_source_eclat.py    # Source & Éclat: its countdown moving, which the renders freeze, and its numbers
 ```
 
