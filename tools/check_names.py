@@ -21,9 +21,11 @@ So --no-web skips the web and says so, and PUBLIC holds what is open to scripts 
 real company, game, band or book: Steam, GLEIF, MusicBrainz, Open Library, GitHub. Each returned
 name must hold the exact string, because some of them search loosely, and each source is run on a
 known name and on nonsense first; one that fails is reported and counts as unchecked. --domains
-adds RDAP for the name's .com and .fr, for companies and products: a registered domain is a hit to
-read by eye. None of this is the open web: a small firm with a site and none of these still goes
-unseen, which is why --no-web can never exit 0.
+adds RDAP for the name's .com and .fr, for companies and products, on the name's letters and digits
+(Source & Éclat is sourceeclat and source-eclat): a registered domain is a hit to read by eye, a
+domain RDAP will not answer on counts as unchecked, and a name with no domain to make is said so.
+None of this is the open web: a small firm with a site and none of these still goes unseen, which
+is why --no-web can never exit 0.
 Exit 1 when a name has a hit, to read by eye; 2 when the APIs fail their control; 3 when no name
 has a hit but one went unchecked on the web, which is not a pass.
 Python stdlib. Needs the network. A student never runs this.
@@ -182,9 +184,22 @@ def registered(domain):
 
 
 def domains_of(name):
-    words = flat(name).replace("-", " ").split()
+    """The name's letters and digits as domains. Empty when no label of 1 to 63 of them can be made."""
+    words = re.findall(r"[a-z0-9]+", flat(name))
     return [f"{joined}.{tld}" for joined in dict.fromkeys(("".join(words), "-".join(words)))
-            for tld in ("com", "fr")]
+            if 0 < len(joined) <= 63 for tld in ("com", "fr")]
+
+
+def domain_hits(name):
+    """The name's registered domains, and those RDAP gave no answer on: one must not stop the run."""
+    hits, missed = [], []
+    for domain in domains_of(name):
+        try:
+            if registered(domain):
+                hits.append(f"rdap {domain} is registered")
+        except OSError:
+            missed.append(f"rdap {domain}")
+    return hits, missed
 
 
 def domain_control():
@@ -245,8 +260,9 @@ def main():
             except (OSError, RuntimeError, KeyError, ValueError):
                 missed.append(source)
         if domains:
-            hits += [f"rdap {domain} is registered" for domain in domains_of(name)
-                     if registered(domain)]
+            found, unanswered = domain_hits(name)
+            hits += found
+            missed += unanswered
         web = "web: skipped by --no-web" if no_web else "web: skipped, control failed"
         if echo is not None:
             time.sleep(WEB_PAUSE)
@@ -258,6 +274,7 @@ def main():
                 web = f"web: refused ({error})"
         unchecked += not web.endswith("mentions") or bool(missed)
         web += f", unchecked on {', '.join(missed)}" if missed else ""
+        web += ", cannot be a domain" if domains and not domains_of(name) else ""
         print(f"{name}: {len(hits)} hits, {web}", flush=True)
         for line in hits[:6]:
             print(f"    {line}", flush=True)
