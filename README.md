@@ -18,6 +18,8 @@ Elles sont volontairement différentes, et le ton est une parodie assumée :
   NDA, crunch.
 - **Étude Courtepaille** : office notarial traditionnel. Gros virements immobiliers, clients
   âgés, papier.
+- **Inviolia** : éditeur de cybersécurité qui vend la peur. Accès administrateur de ses clients,
+  faux courriels mensuels, niveau de menace toujours critique.
 
 ## Tout est inventé
 
