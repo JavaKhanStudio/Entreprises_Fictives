@@ -56,6 +56,40 @@ PICTURES: the portraits and the seal are SVG. The home page's photograph is cour
 DATES: no year in the plot, it runs as a yearly habit (Simon, r4). The pages agree on: 16 novembre au 4 décembre, grandes ventes signed the troisième vendredi de décembre at 15 h, pli RIB three weeks before, funds the Friday before, successor the premier lundi de janvier. A duration never sits beside its start year (41 ans, no 1985). The only recent year is the footer's 2009, so no fact on a page may be dated after it. No page says neveu: the surname says it. No real notary's name, checked by search: the public directory is https://www.notaires.fr/fr/directory.
 """
 
+[tags.inviolia]
+label = "Inviolia"
+description = "The site of the cybersecurity vendor Inviolia, in inviolia/"
+context = """
+FILES: inviolia/ does not exist until its first ticket: pages as in #merlin, inviolia/inviolia.css, inviolia/base.css (a copy, see RULE in #shared). Domain: inviolia.example.
+NEW PAGE: copy shared/modele.html to inviolia/, then add inviolia.css after base.css and the icon, as its comment says. Render with tools/render_pages.py (see #shared).
+START: the mock-up Simon chose on r70: INVIOLIA in tools/new_site_takes.py, its pictures pirate and globe in tools/new_site_images.py. Read "A new company" in CLAUDE.md first.
+GENRE: a security vendor that sells fear: hood, glowing globe, threat level always critical. Simon saw the Guy Fawkes mask the model painted on pirate and kept the picture.
+SURFACE: a vendor holding admin access to its clients, and staff used to fake emails.
+"""
+
+[tags.source-eclat]
+label = "Source & Eclat"
+description = "The site of the multi-level marketing firm Source & Eclat, in source-eclat/"
+context = """
+FILES: source-eclat/ does not exist until its first ticket: pages as in #merlin, source-eclat/source-eclat.css, source-eclat/base.css (a copy, see RULE in #shared). Domain: source-et-eclat.example.
+NEW PAGE: copy shared/modele.html to source-eclat/, then add source-eclat.css after base.css and the icon, as its comment says. Render with tools/render_pages.py (see #shared).
+START: the mock-up Simon chose on r70: SOURCE in tools/new_site_takes.py, its pictures plage and eau in tools/new_site_images.py. Read "A new company" in CLAUDE.md first.
+GENRE: multi-level marketing: sunset, countdown, rank ladder. Its voice is the nearest to merlin/equipe.html's posts: read them, and do not reuse a joke of theirs.
+SURFACE: a weekly message forwarded unchanged down the line, and money paid to a sponsor by a RIB sent in a message.
+"""
+
+[tags.dernier-prix]
+label = "Au Dernier Prix"
+description = "The site of the hard-discount funeral home Au Dernier Prix, in dernier-prix/"
+context = """
+FILES: dernier-prix/ does not exist until its first ticket: pages as in #merlin, dernier-prix/dernier-prix.css, dernier-prix/base.css (a copy, see RULE in #shared). Domain: au-dernier-prix.example.
+NEW PAGE: copy shared/modele.html to dernier-prix/, then add dernier-prix.css after base.css and the icon, as its comment says. Render with tools/render_pages.py (see #shared).
+START: the mock-up Simon chose on r70: DERNIER in tools/new_site_takes.py, its pictures cercueil, gerbe and urne in tools/new_site_images.py. Read "A new company" in CLAUDE.md first.
+GENRE: a hard-discount shop: starbursts, stars, stock left, cart.
+SPICY: the whole site is, so .claude/skills/humour/SKILL.md applies to every line. Simon's r70 pick passed Partez moins cher, Offre Couple and Je reviendrai. Any other spicy line goes to him by name on the card.
+SURFACE: death notices naming the family, the date and the address, and invoices sent as PDF by email to people who do not read them closely.
+"""
+
 [tags.hosting]
 label = "Hosting"
 description = "GitHub Pages for the public repo"

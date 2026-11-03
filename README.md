@@ -1,6 +1,6 @@
 # Entreprises fictives
 
-Les petits sites web de trois entreprises qui n'existent pas, gardés dans un seul dépôt.
+Les petits sites web d'entreprises qui n'existent pas, gardés dans un seul dépôt.
 Pour des étudiants en formation continue en cybersécurité, et pour Simon qui les évalue à
 l'oral.
 
@@ -9,7 +9,7 @@ Social Engineering : ses pages, ses employés et leurs publications, une offre d
 communiqué de presse, un organigramme. Une équipe choisit une entreprise et monte contre elle
 un hameçonnage sur papier. Les sites resserviront pour d'autres attaques.
 
-Les trois sont volontairement différentes, et le ton est une parodie assumée :
+Elles sont volontairement différentes, et le ton est une parodie assumée :
 
 - **Papeterie Merlin** : la papeterie des capsules « Social Engineering en visuel ». Une
   présidente toujours en déplacement, un comptable « ninja des virements », l'étranger à

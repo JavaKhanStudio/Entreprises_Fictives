@@ -1,6 +1,6 @@
 # Entreprises fictives: agent guide
 
-Three small static sites of invented companies, the OSINT kits of a social engineering
+Small static sites of invented companies, the OSINT kits of a social engineering
 workshop. Read README.md first. Sub board of `social-engineering`. THIS REPO IS PUBLIC: what
 you push is published.
 
@@ -53,6 +53,21 @@ something real and is funny once. The likes bias is in the numbers and nowhere e
 be silly too". Absurd titles are Simon's call per site: all seven at Courtepaille, four at Merlin.
 Before writing or changing text a student reads, read `.claude/skills/humour/SKILL.md` (missing:
 `atelier skills install humour`).
+
+## A new company
+
+Simon on r70: round 1 "all very, very bad", round 2 "WAY better. Keep the teachable moment".
+Before proposing a company or building one, read r2, r3 and r4's verdicts (`atelier show r2`).
+What changed between the rounds:
+
+- Start from a kind of company everyone has met. Round 1 started from an attack and worked back
+  to a premise: an abbey whose vows are the holes, a feud between heirs. Nobody has worked there.
+- Copy a real web genre faithfully: the vibe-coded SaaS, the game studio, Frontpage 2009, the
+  security vendor, the MLM, the hard-discount shop. Real pictures (`tools/new_site_images.py`).
+- A voice that keeps producing lines for seven pages, not a premise stated in the headline: that
+  is funny once. Clues go in afterwards, inside lines the company would write.
+- A mock-up looks like the finished thing: a full home page (`tools/new_site_takes.py`), never
+  flat text on a plain ground, the option's letter on a band that covers no word.
 
 ## Traps
 
