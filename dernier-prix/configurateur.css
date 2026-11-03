@@ -1,0 +1,211 @@
+/* The 3D coffin. CSS only, no script: the choices are radios outside any form, so nothing is sent.
+   .config:has(...) carries every choice down as a custom property. The coffin is the shape of
+   img/cercueil.webp: a plinth, four walls, a hipped lid, in planes placed by hand in px. Points: x along
+   the coffin, y down, z towards the viewer, 0 on the floor at its centre. A plane's corner sits at
+   its transform's origin, so rotateX(90deg) lays it flat facing up, rotateY(90deg) stands it on an end.
+   .scene does not move and holds 13 strips, each a label for one angle: hover turns, a tap or an
+   arrow key stays. .balance is a slow sway, off under reduced motion, and the choices still work.
+   tools/check_configurateur.py looks at what the renders freeze; the pixels are
+   tools/check_configurateur_browsers.py. */
+.config { --a: -30deg; --k: 0; --o: 0deg; --bois: url(img/bois-pin.webp); --metal: #17171a; --metal2: #55565c;
+  --doublure: linear-gradient(rgb(0 0 0 / .18), rgb(0 0 0 / .18)), url(img/bois-pin.webp);
+  --plaque: none; --p: 0; --i: 0; --q: 0; --c-k: 0; --g: 0;
+  counter-reset: total 449;
+  display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; padding: 10px 40px 30px; }
+.config:has(#m-peuplier:checked) { --bois: url(img/bois-peuplier.webp); --metal: #a97f22; --metal2: #f1d27a; counter-reset: total 519; }
+.config:has(#m-chene:checked) { --bois: url(img/bois-chene.webp); --metal: #a97f22; --metal2: #f1d27a; counter-reset: total 833; }
+.config:has(#m-peuplier:checked) { --doublure: linear-gradient(rgb(0 0 0 / .12), rgb(0 0 0 / .12)), url(img/bois-peuplier.webp); }
+.config:has(#m-chene:checked) { --doublure: linear-gradient(rgb(0 0 0 / .2), rgb(0 0 0 / .2)), url(img/bois-chene.webp); }
+.config:has(#i-poly:checked) { --doublure: radial-gradient(circle at 50% 50%, rgb(0 0 0 / .22) 0 2px, transparent 3px 11px) 0 0 / 22px 22px, linear-gradient(135deg, #e7e2d4, #c9c2ae); --i: 39; }
+.config:has(#i-satin:checked) { --doublure: radial-gradient(circle at 50% 50%, rgb(70 0 20 / .5) 0 2px, transparent 3px 11px) 0 0 / 22px 22px, linear-gradient(115deg, #e9e3ea, #fff 30%, #cfc4d2 55%, #fff 75%, #ddd3df); --i: 89; }
+.config:has(#n2:checked) { --p: 24; }
+.config:has(#n4:checked) { --p: 48; }
+.config:has(#n6:checked) { --p: 72; }
+.config:has(#q-oui:checked) { --plaque: block; --q: 25; }
+.config:has(#k-oui:checked) { --k: 1; --c-k: -40; }
+.config:has(#g-5:checked) { --g: 29; }
+.config:has(#g-10:checked) { --g: 49; }
+.config:has(#ouvert:checked) { --o: 104deg; }
+
+/* The angle: what is chosen, then what the pointer is on, which wins. */
+.config:has(.z0 :checked) .plateau { --a: -180deg; }
+.config:has(.z1 :checked) .plateau { --a: -150deg; }
+.config:has(.z2 :checked) .plateau { --a: -120deg; }
+.config:has(.z3 :checked) .plateau { --a: -90deg; }
+.config:has(.z4 :checked) .plateau { --a: -60deg; }
+.config:has(.z5 :checked) .plateau { --a: -30deg; }
+.config:has(.z6 :checked) .plateau { --a: 0deg; }
+.config:has(.z7 :checked) .plateau { --a: 30deg; }
+.config:has(.z8 :checked) .plateau { --a: 60deg; }
+.config:has(.z9 :checked) .plateau { --a: 90deg; }
+.config:has(.z10 :checked) .plateau { --a: 120deg; }
+.config:has(.z11 :checked) .plateau { --a: 150deg; }
+.config:has(.z12 :checked) .plateau { --a: 180deg; }
+.config:has(.z0:hover) .plateau { --a: -180deg; }
+.config:has(.z1:hover) .plateau { --a: -150deg; }
+.config:has(.z2:hover) .plateau { --a: -120deg; }
+.config:has(.z3:hover) .plateau { --a: -90deg; }
+.config:has(.z4:hover) .plateau { --a: -60deg; }
+.config:has(.z5:hover) .plateau { --a: -30deg; }
+.config:has(.z6:hover) .plateau { --a: 0deg; }
+.config:has(.z7:hover) .plateau { --a: 30deg; }
+.config:has(.z8:hover) .plateau { --a: 60deg; }
+.config:has(.z9:hover) .plateau { --a: 90deg; }
+.config:has(.z10:hover) .plateau { --a: 120deg; }
+.config:has(.z11:hover) .plateau { --a: 150deg; }
+.config:has(.z12:hover) .plateau { --a: 180deg; }
+
+.vitrine3d { min-width: 0; }
+.scene { position: relative; height: 520px; overflow: hidden; border: 1px solid var(--trait); border-bottom: 6px solid var(--rouge);
+  background: radial-gradient(ellipse 70% 55% at 50% 30%, #fff, transparent), linear-gradient(#d9d9d9, #efefef 58%, #b9b9b9 58.2%, #e8e8e8 72%, #cfcfcf);
+  perspective: 1700px; perspective-origin: 50% 30%; }
+.scene:has(input:focus-visible) { outline: 3px solid var(--noir); outline-offset: 2px; }
+.prix-scene { position: absolute; left: 16px; top: 14px; z-index: 3; margin: 0; padding: 4px 12px; background: var(--jaune); color: var(--rouge); font: 900 34px/1 var(--titre); pointer-events: none; }
+.scene .burst { position: absolute; right: 14px; top: 14px; z-index: 3; width: 130px; height: 130px; font-size: 15px; pointer-events: none; }
+.scene .burst b { font-size: 30px; }
+.z { position: absolute; top: 0; bottom: 0; z-index: 2; width: calc(100% / 13 + 1px); cursor: ew-resize; }
+.z input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.z0 { left: calc(0 * 100% / 13); }
+.z1 { left: calc(1 * 100% / 13); }
+.z2 { left: calc(2 * 100% / 13); }
+.z3 { left: calc(3 * 100% / 13); }
+.z4 { left: calc(4 * 100% / 13); }
+.z5 { left: calc(5 * 100% / 13); }
+.z6 { left: calc(6 * 100% / 13); }
+.z7 { left: calc(7 * 100% / 13); }
+.z8 { left: calc(8 * 100% / 13); }
+.z9 { left: calc(9 * 100% / 13); }
+.z10 { left: calc(10 * 100% / 13); }
+.z11 { left: calc(11 * 100% / 13); }
+.z12 { left: calc(12 * 100% / 13); }
+
+.camera, .balance, .plateau, .socle, .paroi, .couvercle, .poignee { transform-style: preserve-3d; }
+.camera { --s: 1; position: absolute; left: 50%; top: 66%; width: 0; height: 0; z-index: 1; transform: rotateX(-21deg) scale3d(var(--s), var(--s), var(--s)); }
+.balance, .plateau, .socle { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.balance { animation: balance3d 12s ease-in-out infinite alternate; }
+@keyframes balance3d { from { transform: rotateY(-5deg); } to { transform: rotateY(5deg); } }
+.plateau { transform: rotateY(var(--a)); transition: transform .55s cubic-bezier(.2, .8, .3, 1); }
+.sol { position: absolute; left: -280px; top: -280px; width: 560px; height: 560px; transform-origin: 50% 50%; border-radius: 50%; transform: rotateX(90deg);
+  background: repeating-conic-gradient(#2a2a2a 0 15deg, #3a3a3a 15deg 30deg); box-shadow: inset 0 0 0 10px var(--jaune), inset 0 0 0 13px var(--noir); }
+.ombre-sol { position: absolute; left: -235px; top: -85px; width: 470px; height: 170px; background: rgb(0 0 0 / .62); filter: blur(13px); transform: translateY(-1px) rotateX(90deg); }
+
+/* A plane, its wood and the light it gets. Each shows from one side only, its outside: a face turned
+   away is not drawn, so Firefox, which sorts these planes differently, cannot paint it over the lid. */
+.f { position: absolute; left: 0; top: 0; display: block; transform-origin: 0 0; backface-visibility: hidden; --jour: rgb(0 0 0 / 0);
+  background: linear-gradient(var(--jour), var(--jour)), var(--bois) 0 0 / 300px auto; }
+.s-av { width: 416px; height: 16px; transform: translate3d(-208px, -16px, 78px); --jour: rgb(0 0 0 / .12); }
+.s-ar { width: 416px; height: 16px; transform: translate3d(208px, -16px, -78px) rotateY(180deg); --jour: rgb(0 0 0 / .38); }
+.s-dr { width: 156px; height: 16px; transform: translate3d(208px, -16px, 78px) rotateY(90deg); --jour: rgb(0 0 0 / .26); }
+.s-ga { width: 156px; height: 16px; transform: translate3d(-208px, -16px, -78px) rotateY(-90deg); --jour: rgb(0 0 0 / .2); }
+.s-de { width: 416px; height: 156px; transform: translate3d(-208px, -16px, -78px) rotateX(90deg); --jour: rgb(255 255 255 / .08); }
+.fond { width: 390px; height: 130px; transform: translate3d(-195px, -19px, -65px) rotateX(90deg); background: var(--doublure); }
+
+/* Walls: each carries its lining, its top edge and its handles. Kit moves them apart. */
+.paroi { position: absolute; left: 0; top: 0; width: 0; height: 0; transition: transform .7s cubic-bezier(.3, 1.1, .5, 1); }
+.avant { transform: translate3d(-200px, -88px, calc(70px + 92px * var(--k))); --w: 400px; }
+.arriere { transform: translate3d(200px, -88px, calc(-70px - 92px * var(--k))) rotateY(180deg); --w: 400px; }
+.bout-d { transform: translate3d(calc(200px + 92px * var(--k)), -88px, 70px) rotateY(90deg); --w: 140px; }
+.bout-g { transform: translate3d(calc(-200px - 92px * var(--k)), -88px, -70px) rotateY(-90deg); --w: 140px; }
+.paroi .bois { width: var(--w); height: 72px; }
+.avant .bois { --jour: rgb(0 0 0 / .05); }
+.arriere .bois { --jour: rgb(0 0 0 / .32); }
+.bout-d .bois { --jour: rgb(0 0 0 / .22); }
+.bout-g .bois { --jour: rgb(0 0 0 / .14); }
+.paroi .doublure { width: var(--w); height: 69px; transform: translate3d(var(--w), 0, -5px) rotateY(180deg); background: var(--doublure); }
+.paroi .rive { width: var(--w); height: 5px; transform: translateZ(-5px) rotateX(90deg); --jour: rgb(255 255 255 / .22); }
+
+/* Six handles, three a side: 2 is the middle ones, 4 the ends, 6 all */
+.poignee { position: absolute; top: 20px; width: 46px; height: 28px; display: none; }
+.p1 { left: 58px; } .p2 { left: 177px; } .p3 { left: 296px; }
+.config:has(#n2:checked) .p2, .config:has(#n4:checked) .p1, .config:has(#n4:checked) .p3, .config:has(#n6:checked) .poignee { display: block; }
+.poignee i { position: absolute; display: block; }
+.platine { left: 0; top: 0; width: 46px; height: 13px; transform: translateZ(1px); background: linear-gradient(var(--metal2), var(--metal)); }
+.bras { top: 7px; width: 13px; height: 19px; transform-origin: 0 0; background: linear-gradient(var(--metal2), var(--metal)); }
+.bras.g { left: 5px; transform: translateZ(14px) rotateY(90deg); }
+.bras.d { left: 41px; transform: translateZ(14px) rotateY(90deg); }
+.barreau { left: 3px; top: 21px; width: 40px; height: 7px; border-radius: 3px; transform: translateZ(14px); background: linear-gradient(var(--metal2), var(--metal) 70%); }
+
+/* The lid: its origin is the hinge, along the top of the back wall. A lip, then four slopes and a top. */
+.couvercle { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-origin: 0 0; transition: transform .8s cubic-bezier(.3, 1.05, .5, 1);
+  transform: translate3d(0, calc(-88px - 150px * var(--k)), -70px) rotateX(var(--o)); }
+.l-av { width: 410px; height: 10px; transform: translate3d(-205px, -10px, 145px); --jour: rgb(0 0 0 / .02); }
+.l-ar { width: 410px; height: 10px; transform: translate3d(205px, -10px, -5px) rotateY(180deg); --jour: rgb(0 0 0 / .32); }
+.l-dr { width: 150px; height: 10px; transform: translate3d(205px, -10px, 145px) rotateY(90deg); --jour: rgb(0 0 0 / .2); }
+.l-ga { width: 150px; height: 10px; transform: translate3d(-205px, -10px, -5px) rotateY(-90deg); --jour: rgb(0 0 0 / .12); }
+.l-de { width: 410px; height: 150px; transform: translate3d(-205px, 0, 145px) rotateX(-90deg); background: var(--doublure); }
+.h-av, .h-ar { width: 410px; height: 38.42px; clip-path: polygon(30px 0, 380px 0, 100% 100%, 0 100%); }
+.h-dr, .h-ga { width: 150px; height: 38.42px; clip-path: polygon(30px 0, 120px 0, 100% 100%, 0 100%); }
+.h-av { transform: translate3d(-205px, -34px, 115px) rotateX(51.34deg); --jour: rgb(255 255 255 / .1); }
+.h-ar { transform: translate3d(205px, -34px, 25px) rotateY(180deg) rotateX(51.34deg); --jour: rgb(0 0 0 / .2); }
+.h-dr { transform: translate3d(175px, -34px, 145px) rotateY(90deg) rotateX(51.34deg); --jour: rgb(0 0 0 / .08); }
+.h-ga { transform: translate3d(-175px, -34px, -5px) rotateY(-90deg) rotateX(51.34deg); --jour: rgb(255 255 255 / .04); }
+.h-de { width: 350px; height: 90px; transform: translate3d(-175px, -34px, 25px) rotateX(90deg); --jour: rgb(255 255 255 / .18); }
+.plaque-laiton { display: var(--plaque); position: absolute; left: 0; top: 0; width: 140px; height: 34px; transform-origin: 0 0; backface-visibility: hidden; transform: translate3d(-70px, -35px, 53px) rotateX(90deg); border: 1px solid #7c5c12; background: linear-gradient(115deg, #caa23f, #f7e3a0 45%, #b98f2e); color: #4c3808; font: 700 11px/32px Georgia, serif; text-align: center; letter-spacing: .08em; }
+
+.au-doigt { display: none; }
+@media (hover: none) { .a-souris { display: none; } .au-doigt { display: inline; } }
+
+/* Views, under the coffin */
+.vues { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; }
+.vues label { padding: 7px 12px; background: var(--noir); color: var(--jaune); font-weight: 700; font-size: 14px; cursor: pointer; }
+.vues label:hover { background: #333; }
+.vues .ouvrir { margin-left: auto; background: var(--jaune); color: var(--noir); }
+.vues .ouvrir:hover { background: #ffe34d; }
+.ouvrir input { margin: 0 6px 0 0; accent-color: var(--rouge); }
+.ouvrir:has(input:focus-visible) { outline: 3px solid var(--rouge); outline-offset: 2px; }
+
+/* The options and the ticket */
+.options { display: grid; gap: 10px; align-content: start; grid-column: 2; grid-row: 1 / span 3; }
+.options fieldset { margin: 0; padding: 8px 12px 10px; background: #fff; border: 1px solid var(--trait); min-width: 0; }
+.options legend { padding: 0 6px; font: 900 13px/1.2 var(--titre); text-transform: uppercase; }
+.choix { display: flex; align-items: center; gap: 8px; padding: 5px 8px; font-size: 14px; cursor: pointer; }
+.choix input { flex: none; margin: 0; accent-color: var(--rouge); }
+.choix span { flex: 1; }
+.choix b:empty { display: none; }
+.choix:hover { background: #fffbe0; }
+.choix:has(:checked) { background: var(--jaune); font-weight: 700; }
+.choix:has(:focus-visible) { outline: 3px solid var(--noir); outline-offset: 1px; }
+.rang { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.ticket { position: relative; padding: 16px 18px; background: #fff; border: 1px solid var(--trait); border-top: 8px solid var(--noir); }
+.ticket { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; align-items: start; grid-column: 1; }
+.ticket > * { grid-column: 1; }
+.ticket .ajout, .ticket .apres { grid-column: 2; }
+.ticket .ajout { grid-row: 1 / span 2; }
+.ticket .apres { grid-row: 3 / span 4; }
+.ticket h2 { font-size: 18px; }
+.ticket p { margin: 6px 0; }
+.ticket .prixf { margin: 8px 0; font-size: 46px; }
+.ticket .note { color: #555; font-size: 13px; }
+.ticket .ajout { margin: 12px 0; padding: 13px; }
+.reste .barre { margin-right: 2px; }
+.pastille-m { color: var(--rouge); font-weight: 900; }
+.ticket .m-pin, .ticket .m-peuplier, .ticket .m-chene { display: none; }
+.config:has(#m-pin:checked) .ticket .m-pin, .config:has(#m-peuplier:checked) .ticket .m-peuplier, .config:has(#m-chene:checked) .ticket .m-chene { display: inline; }
+/* The total is summed by the browser: each .compte adds its choice, .total shows it. */
+.compte { position: absolute; width: 0; height: 0; visibility: hidden; }
+.c-p { counter-increment: total var(--p); }
+.c-i { counter-increment: total var(--i); }
+.c-q { counter-increment: total var(--q); }
+.c-k { counter-increment: total var(--c-k); }
+.c-g { counter-increment: total var(--g); }
+.total::after { content: counter(total) " €"; }
+
+@media (prefers-reduced-motion: reduce) {
+  .balance { animation: none; }
+  .plateau, .paroi, .couvercle { transition: none; }
+}
+@media (max-width: 1000px) {
+  .config { grid-template-columns: minmax(0, 1fr); }
+  .vitrine3d, .options, .ticket { grid-column: 1; grid-row: auto; }
+  .options { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .config { padding: 10px 16px 24px; }
+  .scene { height: 330px; }
+  .prix-scene { left: 8px; top: 8px; font-size: 24px; }
+  .camera { --s: .58; top: 70%; }
+  .scene .burst { right: 6px; top: 6px; width: 92px; height: 92px; font-size: 11px; }
+  .scene .burst b { font-size: 20px; }
+  .options, .ticket { grid-template-columns: minmax(0, 1fr); }
+  .ticket .ajout, .ticket .apres { grid-column: 1; grid-row: auto; }
+}

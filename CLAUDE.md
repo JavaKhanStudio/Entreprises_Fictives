@@ -26,6 +26,9 @@ python3 tools/check_badge.py [OUT]      # Gobelin's 3D badge: its sway, turn and
 python3 tools/check_badge_browsers.py OUT [--control flat|gold]   # the badge's pixels in Firefox against Chrome, no window on screen
 python3 tools/check_badge_safari.py --extract LOG OUT   # read a Safari run; the run itself is in its docstring (macOS runner)
 python3 tests/test_render_pages.py             # two render runs at once each prove their own tree
+python3 tools/check_configurateur.py [OUT]   # Au Dernier Prix's 3D coffin: turning, options, the total in pixels, which the renders freeze
+python3 tools/check_configurateur_browsers.py OUT [--control flat|counter|hollow]   # its pixels in Firefox against Chrome, no window on screen
+python3 tools/dernier_prix_bois.py      # the coffin's woods, computed
 python3 tools/check_pages.py [--render OUT]    # the served site: each page and local link answers 200, noindex and footer in the body
 python3 tools/check_courtepaille_egg.py [OUT]  # Courtepaille's counter looks the same with its hidden link
 python3 tools/check_racine.py [OUT]    # the root list's envelopes in Chrome and Firefox, which the renders freeze; --control flat must fail
