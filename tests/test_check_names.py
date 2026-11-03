@@ -66,6 +66,19 @@ class DomainsOf(unittest.TestCase):
         self.assertEqual(check_names.domains_of("a" * 64), [])
         self.assertEqual(check_names.domains_of("a" * 63)[0], "a" * 63 + ".com")
 
+    def test_a_ligature_is_spelled_out(self):
+        self.assertEqual(check_names.domains_of("Cœur de Lion")[0], "coeurdelion.com")
+        self.assertEqual(check_names.domains_of("ŒUVRE Æther")[0], "oeuvreaether.com")
+
+
+class Holding(unittest.TestCase):
+    def test_a_ligature_matches_its_spelling_both_ways(self):
+        self.assertEqual(check_names.holding("Cœur", ["Coeur"]), ["Coeur"])
+        self.assertEqual(check_names.holding("Coeur", ["CŒUR"]), ["CŒUR"])
+
+    def test_it_no_longer_matches_the_letters_left_after_a_drop(self):
+        self.assertEqual(check_names.holding("Cœur", ["Cur"]), [])
+
 
 class Run(unittest.TestCase):
     def test_ampersand_gets_its_verdict(self):

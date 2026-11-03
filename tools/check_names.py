@@ -100,9 +100,12 @@ def wikidata_hits(name):
             for item in answer["search"] if item.get("label", "").lower() == name.lower()]
 
 
+LIGATURES = str.maketrans({"œ": "oe", "Œ": "OE", "æ": "ae", "Æ": "AE"})  # NFKD does not split them
+
+
 def flat(text):
     """Lower case, no accents, single spaces: how two spellings of a name are compared."""
-    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    text = unicodedata.normalize("NFKD", text.translate(LIGATURES)).encode("ascii", "ignore").decode()
     return " ".join(text.casefold().split())
 
 
