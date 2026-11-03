@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """The root list's moving parts, which tools/render_pages.py freezes, in Chrome and Firefox.
 
-    python3 tools/check_racine.py [OUT] [--control flat]
+    python3 tools/check_racine.py [OUT] [--control flat|big]
 
 For each of the six cards: its picture is loaded, and resting it hides its letter. Hovering, then
 keyboard focus, swings the flap over and lifts the letter clear of the envelope, in front of the
 open flap: read from the pixels, since computed matrices come out the same with the 3D flattened
 (r59). On Chrome: a screen with no pointer opens the envelopes by itself, reduced motion stops all
-of it, no width overflows. OUT gets a rest, mid and open picture per browser.
+of it, no width overflows, and at no width does a word go under an envelope, at rest or with its
+card hovered. OUT gets a rest, mid and open picture per browser.
 
 --control flat flattens the 3D: the open flap then covers the letter, and this must fail.
+--control big puts back r82's scale(1.3) on hover: a word goes under the envelope, and this must fail.
 Needs Playwright, Chrome and its Firefox, which a student never does.
 """
 import io
@@ -21,9 +23,12 @@ from playwright.sync_api import sync_playwright
 
 PAGE = (Path(__file__).resolve().parent.parent / "index.html").as_uri()
 CARDS = ("merlin", "gobelin", "courtepaille", "inviolia", "dernier-prix", "source-eclat")
-WIDTHS = (320, 390, 600, 800, 1000, 1280, 1600, 1920)
+# 1007 and 1265 are 1024 and 1280 less a classic scrollbar: the widest overlaps of r82 stood there.
+WIDTHS = (320, 390, 600, 800, 1000, 1007, 1024, 1265, 1280, 1600, 1920)
 FLAT = ".plaque, .enveloppe, .rabat { transform-style: flat !important; }"
+BIG = ".cible > a:hover .enveloppe { transform: translateZ(5.5rem) rotate(0deg) scale(1.3); }"
 SETTLE_MS = 1300
+HOVER_SETTLE_MS = 750   # the envelope's transition is 0.55 s
 PAPER_AT_LEAST = 0.6    # share of paper where the letter stands, above the envelope
 
 PARTS = """c => {
@@ -34,6 +39,19 @@ PARTS = """c => {
   return {flap: new DOMMatrix(getComputedStyle(card.querySelector('.rabat')).transform).m22,
           letter: box('.lettre'), envelope: box('.poche'),
           picture: img.complete ? img.naturalWidth : 0, words: card.querySelector('h2').textContent};
+}"""
+
+# How far a line of the card's words passes the envelope's left edge, in px; negative is clear.
+OVER = """c => {
+  const k = document.querySelector('.cible.' + c), e = k.querySelector('.poche').getBoundingClientRect();
+  let worst = -1e9;
+  for (const s of ['h2', 'p']) {
+    const r = document.createRange(); r.selectNodeContents(k.querySelector('.texte ' + s));
+    for (const b of r.getClientRects())
+      if (b.bottom > e.top + 1 && b.top < e.bottom - 1) worst = Math.max(worst, b.right - e.left);
+  }
+  const t = k.querySelector('.texte').getBoundingClientRect(), p = k.querySelector('.plaque').getBoundingClientRect();
+  return {over: worst, above: p.top - t.top};
 }"""
 
 
@@ -100,7 +118,7 @@ def check_browser(browser, name, out, flat, problems):
     page.close()
 
 
-def check_chrome_only(browser, problems):
+def check_chrome_only(browser, css, problems):
     touch = browser.new_context(viewport={"width": 390, "height": 800}, has_touch=True, is_mobile=True)
     page = touch.new_page()
     page.goto(PAGE)
@@ -130,6 +148,8 @@ def check_chrome_only(browser, problems):
     for width in WIDTHS:
         page = browser.new_page(viewport={"width": width, "height": 800})
         page.goto(PAGE)
+        if css:
+            page.add_style_tag(content=css)
         page.wait_for_timeout(1400)
         over = page.evaluate("document.documentElement.scrollWidth - innerWidth")
         if over > 0:
@@ -142,15 +162,25 @@ def check_chrome_only(browser, problems):
             return a.right > b.left + 1 || t.top < p.top; }).length""")
         if hits:
             problems.append(f"at {width}: {hits} cards have words under the envelope or above the plate")
+        for card in CARDS:
+            page.locator(f".cible.{card} > a").scroll_into_view_if_needed()
+            page.hover(f".cible.{card} > a")
+            page.wait_for_timeout(HOVER_SETTLE_MS)
+            under = page.evaluate(OVER, card)["over"]
+            if under > 0:
+                problems.append(f"at {width}, {card} hovered: a word goes {under:.1f} px under the open envelope")
         page.close()
 
 
 def main(args):
-    flat = False
+    control = None
     if "--control" in args:
         at = args.index("--control")
-        flat = args[at + 1] == "flat"
+        control = args[at + 1]
+        if control not in ("flat", "big"):
+            sys.exit(f"--control flat or big, not {control}")
         del args[at:at + 2]
+    flat = control == "flat"
     out = Path(args[0]) if args else None
     if out:
         out.mkdir(parents=True, exist_ok=True)
@@ -159,7 +189,7 @@ def main(args):
         chrome = playwright.chromium.launch(channel="chrome")
         check_browser(chrome, "chrome", out, flat, problems)
         if not flat:
-            check_chrome_only(chrome, problems)
+            check_chrome_only(chrome, BIG if control == "big" else "", problems)
         chrome.close()
         firefox = playwright.firefox.launch()
         check_browser(firefox, "firefox", out, flat, problems)

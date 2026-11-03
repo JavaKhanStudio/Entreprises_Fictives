@@ -31,7 +31,7 @@ python3 tools/check_configurateur_browsers.py OUT [--control flat|counter|hollow
 python3 tools/dernier_prix_bois.py      # the coffin's woods, computed
 python3 tools/check_pages.py [--render OUT]    # the served site: each page and local link answers 200, noindex and footer in the body
 python3 tools/check_courtepaille_egg.py [OUT]  # Courtepaille's counter looks the same with its hidden link
-python3 tools/check_racine.py [OUT]    # the root list's envelopes in Chrome and Firefox, which the renders freeze; --control flat must fail
+python3 tools/check_racine.py [OUT]    # the root list's envelopes in Chrome and Firefox, which the renders freeze; no word under one, open or shut; --control flat and --control big must fail
 python3 tools/check_racine_safari.py --extract LOG OUT   # read a Safari run of the root list's envelopes; the run itself is in its docstring (macOS runner)
 python3 tests/test_check_racine_safari.py    # that tool's scripts and pixel read, in Chrome, before a macOS minute is spent
 python3 tools/check_source_eclat.py    # Source & Éclat: its countdown moving, which the renders freeze, and its numbers

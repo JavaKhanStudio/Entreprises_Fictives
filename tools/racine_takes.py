@@ -5,6 +5,9 @@ sooner. B: the envelope grows less on hover.
     python3 tools/racine_takes.py sweep          # how far each take's words go under the envelope
     python3 tools/racine_takes.py OUT            # take-*.png in OUT, for `atelier attach --stamp`
 
+Simon picked B: it is in index.css, and tools/check_racine.py now holds the read. "maintenant" is the
+page as it stood, at 1.3, so these pictures stay reproducible.
+
 A take is CSS put on top of the real index.html, opened over file://. The overlap is each line of a
 card's words, read with a Range, against the left edge of .poche, each card hovered in turn. Width
 1007 and 1265 are 1024 and 1280 less a classic scrollbar. Needs Playwright and Chrome, and Pillow.
@@ -15,25 +18,13 @@ from pathlib import Path
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
-PAGE = (Path(__file__).resolve().parent.parent / "index.html").as_uri()
-CARDS = ("merlin", "gobelin", "courtepaille", "inviolia", "dernier-prix", "source-eclat")
+from check_racine import CARDS, OVER, PAGE
+
 WIDTHS = (640, 800, 1000, 1007, 1024, 1265, 1280, 1600, 1920)
 HOVER = ".cible > a:hover .enveloppe { transform: translateZ(5.5rem) rotate(0deg) scale(%s); }"
-TAKES = {"maintenant": "", "A": ".texte { right: 9.5rem; }", "B": HOVER % 1.1}
+TAKES = {"maintenant": HOVER % 1.3, "A": HOVER % 1.3 + ".texte { right: 9.5rem; }", "B": HOVER % 1.1}
 SHOTS = ((1280, "courtepaille"), (1024, "merlin"))    # each the worst of its width as it stands
 BAND = 90       # plain, on top of each panel, where the stamp lands: it covers no word
-
-OVER = """c => {
-  const k = document.querySelector('.cible.' + c), e = k.querySelector('.poche').getBoundingClientRect();
-  let worst = -1e9;
-  for (const s of ['h2', 'p']) {
-    const r = document.createRange(); r.selectNodeContents(k.querySelector('.texte ' + s));
-    for (const b of r.getClientRects())
-      if (b.bottom > e.top + 1 && b.top < e.bottom - 1) worst = Math.max(worst, b.right - e.left);
-  }
-  const t = k.querySelector('.texte').getBoundingClientRect(), p = k.querySelector('.plaque').getBoundingClientRect();
-  return {over: worst, above: p.top - t.top};
-}"""
 
 
 def overlap(browser, css, widths=WIDTHS):
@@ -60,9 +51,9 @@ def overlap(browser, css, widths=WIDTHS):
 def sweep():
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(channel="chrome")
-        print("now", overlap(browser, ""))
+        print("as it stood", overlap(browser, HOVER % 1.3))
         for right in (8.5, 9, 9.5, 10):
-            print(f"text right {right}rem", overlap(browser, f".texte {{ right: {right}rem; }}"))
+            print(f"text right {right}rem", overlap(browser, HOVER % 1.3 + f".texte {{ right: {right}rem; }}"))
         for scale in (1.2, 1.15, 1.1, 1.05):
             print(f"hover scale {scale}", overlap(browser, HOVER % scale))
         browser.close()
