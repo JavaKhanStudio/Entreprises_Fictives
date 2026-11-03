@@ -2,6 +2,7 @@
 """Look at what tools/render_pages.py freezes on purpose: Au Dernier Prix's 3D coffin.
 
     python3 tools/check_configurateur.py [OUT_DIR]
+    python3 tools/check_configurateur.py --control tight   # the fit undone: exit 1 is its red, exit 2 it stayed green
 
 Over file://, in Chrome, at phone and desktop widths:
 - it sways, and stands still under reduced motion, where every choice below still works;
@@ -11,6 +12,8 @@ Over file://, in Chrome, at phone and desktop widths:
 - each option does what it says: the wood, the handles counted, the lining, the plate, the lid, the kit;
 - the total the browser sums is the right one, read as pixels: a counter is not in the DOM;
 - the page is no wider than its window, whatever is open, and the home's button leads here;
+- no plane passes the scene's edge at any angle or sway, whole or in kit, lid open or shut, each plane's
+  rect against the scene's, either side of each width band, with and without 15 px of scrollbar;
 - nothing is fetched after load, no failed request, no console error.
 
 What it reads is computed matrices, which stay right when the browser draws the 3D wrong: for what
@@ -51,6 +54,22 @@ FREEZE = """t => document.getAnimations().forEach(a => {
 })"""
 MATRIX = """s => { const m = new DOMMatrix(getComputedStyle(document.querySelector(s)).transform);
   return [m.m41, m.m42, m.m43, Math.round(Math.atan2(m.m23, m.m22) * 180 / Math.PI)]; }"""
+# Either side of each band of .camera's --kit, of each layout's edge, and Safari's 1007 and 1265.
+FIT_WIDTHS = (320, 359, 360, 373, 389, 390, 422, 423, 700, 701, 730, 731, 1000, 1001, 1007, 1030, 1084, 1085, 1265, 1280)
+# A media query counts the scrollbar and the layout does not: 15 px of it, on the same bands.
+SCROLLBAR = "body { margin-right: 15px !important; }"
+SWAYS = (-5, 0, 5)
+LEAST = """() => { const s = document.querySelector('.scene').getBoundingClientRect();
+  let least = [Infinity, ''];
+  for (const e of document.querySelectorAll('.paroi .f, .couvercle .f, .socle .f, .poignee i, .plaque-laiton')) {
+    if (!e.getClientRects().length) continue;
+    const r = e.getBoundingClientRect();
+    const m = Math.min(r.left - s.left, s.right - r.right, r.top - s.top, s.bottom - r.bottom);
+    if (m < least[0]) least = [m, e.parentElement.className + ' ' + e.className];
+  }
+  return least; }"""
+# The fit undone: the bug this holds, the kit at the camera's full size and the lid at its full lift.
+TIGHT = ".config { --leve: 150px !important; } .config:has(#k-oui:checked) .camera { --s: var(--max) !important; }"
 SHOWN = "s => [...document.querySelectorAll(s)].filter(e => getComputedStyle(e).display !== 'none').length"
 failures = []
 
@@ -151,6 +170,29 @@ def flash(browser, errors):
     context.close()
 
 
+def fit(browser, errors, css="", widths=FIT_WIDTHS, label=""):
+    """Everything stays inside the scene, in the state that takes the most room: six handles and the plate."""
+    for width in widths:
+        context, page = opened(browser, errors, width, reduced_motion="reduce")
+        page.add_style_tag(content=".balance { animation: none !important; }" + css)
+        choose(page, "n6", "q-oui")
+        for kit in ("k-non", "k-oui"):
+            choose(page, kit)
+            for lid in (False, True):
+                least = [float("inf"), "", 0, 0]
+                for sway in SWAYS:
+                    page.evaluate("d => { document.querySelector('.balance').style.transform = `rotateY(${d}deg)`; }", sway)
+                    for i, angle in enumerate(ANGLES):
+                        page.evaluate("i => { document.querySelector('#v' + i).checked = true; }", i)
+                        margin, plane = page.evaluate(LEAST)
+                        if margin < least[0]:
+                            least = [margin, plane, angle, sway]
+                check(least[0] >= 0, f"{width}{label}: {kit}, lid {'open' if lid else 'shut'}: nothing passes the scene's edge "
+                      f"(least {least[0]:.1f}px, {least[1]}, at {least[2]}, sway {least[3]})")
+                page.locator("label.ouvrir").click()
+        context.close()
+
+
 def tile(page, selector):
     return Image.open(io.BytesIO(page.locator(selector).screenshot())).convert("RGB")
 
@@ -223,6 +265,8 @@ def run(browser, out, errors, is_mobile=True):
         context.close()
 
     flash(browser, errors)
+    fit(browser, errors)
+    fit(browser, errors, css=SCROLLBAR, label=" with a scrollbar")
 
     context, page = opened(browser, errors, 1280)
     totals(page)
@@ -289,7 +333,22 @@ def run(browser, out, errors, is_mobile=True):
     context.close()
 
 
+def control():
+    """Undo the fit. The widths are those the ticket measured cut, and 1280 for the lid."""
+    errors = []
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(channel="chrome")
+        fit(browser, errors, css=TIGHT, widths=(360, 1007, 1280))
+        browser.close()
+    red = {f.split(":")[0] for f in failures if "passes the scene's edge" in f}
+    right = red == {"360", "1007", "1280"} and not errors
+    print(f"CONTROL tight: red at {sorted(red)}" if right else f"CONTROL tight: did NOT go red everywhere {sorted(red)} {errors[:2]}")
+    return 1 if right else 2
+
+
 def main():
+    if sys.argv[1:] == ["--control", "tight"]:
+        return control()
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else None
     if out:
         out.mkdir(parents=True, exist_ok=True)

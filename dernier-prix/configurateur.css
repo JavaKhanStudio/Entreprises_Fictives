@@ -9,7 +9,7 @@
    tools/check_configurateur_browsers.py. */
 .config { --a: -30deg; --k: 0; --o: 0deg; --bois: url(img/bois-pin.webp); --metal: #17171a; --metal2: #55565c;
   --doublure: linear-gradient(rgb(0 0 0 / .18), rgb(0 0 0 / .18)), url(img/bois-pin.webp);
-  --plaque: none; --p: 0; --i: 0; --q: 0; --c-k: 0; --g: 0;
+  --leve: 150px; --plaque: none; --p: 0; --i: 0; --q: 0; --c-k: 0; --g: 0;
   counter-reset: total 449;
   display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; padding: 10px 40px 30px; }
 .config:has(#m-peuplier:checked) { --bois: url(img/bois-peuplier.webp); --metal: #a97f22; --metal2: #f1d27a; counter-reset: total 519; }
@@ -26,6 +26,8 @@
 .config:has(#g-5:checked) { --g: 29; }
 .config:has(#g-10:checked) { --g: 49; }
 .config:has(#ouvert:checked) { --o: 104deg; }
+/* In kit the lid rises off the walls, less when it is open, or it stands out of the top of the scene. */
+.config:has(#ouvert:checked) { --leve: 40px; }
 
 /* The angle: what is chosen, then what the pointer is on, which wins. */
 .config:has(.z0 :checked) .plateau { --a: -180deg; }
@@ -80,7 +82,12 @@
 .z12 { left: calc(12 * 100% / 13); }
 
 .camera, .balance, .plateau, .socle, .paroi, .couvercle, .poignee { transform-style: preserve-3d; }
-.camera { --s: 1; position: absolute; left: 50%; top: 66%; width: 0; height: 0; z-index: 1; transform: rotateX(-21deg) scale3d(var(--s), var(--s), var(--s)); }
+.camera { --max: 1; --kit: 1; --s: var(--max); position: absolute; left: 50%; top: 66%; width: 0; height: 0; z-index: 1; transform: rotateX(-21deg) scale3d(var(--s), var(--s), var(--s)); transition: transform .7s cubic-bezier(.3, 1.1, .5, 1); }
+/* The spread walls measure 621 px at their widest at full size, so in kit the camera steps back on narrower
+   scenes: --kit, set under the media queries below, for each band's narrowest scene with 15 px of scrollbar.
+   Bands, not a formula: scale3d() takes no number built from a container's width, and Firefox then drops the
+   whole transform. */
+.config:has(#k-oui:checked) .camera { --s: var(--kit); }
 .balance, .plateau, .socle { position: absolute; left: 0; top: 0; width: 0; height: 0; }
 .balance { animation: balance3d 12s ease-in-out infinite alternate; }
 @keyframes balance3d { from { transform: rotateY(-5deg); } to { transform: rotateY(5deg); } }
@@ -127,7 +134,7 @@
 
 /* The lid: its origin is the hinge, along the top of the back wall. A lip, then four slopes and a top. */
 .couvercle { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-origin: 0 0; transition: transform .8s cubic-bezier(.3, 1.05, .5, 1);
-  transform: translate3d(0, calc(-88px - 150px * var(--k)), -70px) rotateX(var(--o)); }
+  transform: translate3d(0, calc(-88px - var(--leve) * var(--k)), -70px) rotateX(var(--o)); }
 .l-av { width: 410px; height: 10px; transform: translate3d(-205px, -10px, 145px); --jour: rgb(0 0 0 / .02); }
 .l-ar { width: 410px; height: 10px; transform: translate3d(205px, -10px, -5px) rotateY(180deg); --jour: rgb(0 0 0 / .32); }
 .l-dr { width: 150px; height: 10px; transform: translate3d(205px, -10px, 145px) rotateY(90deg); --jour: rgb(0 0 0 / .2); }
@@ -199,7 +206,13 @@
 @media (prefers-reduced-motion: reduce) {
   .balance { animation: none; }
   .ouvrir::after { animation: none; }
-  .plateau, .paroi, .couvercle { transition: none; }
+  .camera, .plateau, .paroi, .couvercle { transition: none; }
+}
+@media (min-width: 1001px) and (max-width: 1084px) {
+  .camera { --kit: .86; }
+}
+@media (max-width: 730px) {
+  .camera { --kit: .95; }
 }
 @media (max-width: 1000px) {
   .config { grid-template-columns: minmax(0, 1fr); }
@@ -210,9 +223,18 @@
   .config { padding: 10px 16px 24px; }
   .scene { height: 330px; }
   .prix-scene { left: 8px; top: 8px; font-size: 24px; }
-  .camera { --s: .58; top: 70%; }
+  .camera { --max: .58; --kit: .58; top: 70%; }
   .scene .burst { right: 6px; top: 6px; width: 92px; height: 92px; font-size: 11px; }
   .scene .burst b { font-size: 20px; }
   .options, .ticket { grid-template-columns: minmax(0, 1fr); }
   .ticket .ajout, .ticket .apres { grid-column: 1; grid-row: auto; }
+}
+@media (max-width: 422px) {
+  .camera { --kit: .53; }
+}
+@media (max-width: 389px) {
+  .camera { --kit: .49; }
+}
+@media (max-width: 359px) {
+  .camera { --max: .5; --kit: .42; }
 }

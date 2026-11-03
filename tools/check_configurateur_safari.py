@@ -488,12 +488,13 @@ def extract(log, out):
         print("NOT OK")
         return 1
 
+    steps = {}
     with sync_playwright() as playwright:
         chrome = playwright.chromium.launch(channel="chrome", args=["--hide-scrollbars"])
         print("reference: chrome", chrome.version)
         for asked in widths:
             client = metas[f"{asked}-ferme"]["client"]
-            ccb.frames(chrome, "chrome", client, out, "")
+            steps[client] = ccb.frames(chrome, "chrome", client, out, "")["step"]
             for name, (state, css) in MARKED.items():
                 combo, view, lid = STATES[state]
                 context, page = cc.opened(chrome, [], client)
@@ -513,7 +514,7 @@ def extract(log, out):
 
     for asked in widths:
         client = metas[f"{asked}-ferme"]["client"]
-        r = {"browser": "safari", "width": client, "errors": [],
+        r = {"browser": "safari", "width": client, "errors": [], "step": steps[client],
              "total_right": metas[f"{asked}-chene"].get("total_right", False)}
         for state in STATES:
             picture, empty = load(asked, state)

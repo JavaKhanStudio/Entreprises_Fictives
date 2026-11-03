@@ -44,6 +44,7 @@ CONTROLS = {
     "hollow": (".f { backface-visibility: visible !important; }", "drawn as in Chrome"),
 }
 LIMIT = 0.05  # of the coffin's box: the hollow lid measured 10 to 26 %, a right one under this
+CAMERA = "() => new DOMMatrix(getComputedStyle(document.querySelector('.camera')).transform).m11"
 SETTLE = "() => new Promise(d => requestAnimationFrame(() => requestAnimationFrame(d)))"
 HIDE = ".socle, .fond, .paroi, .couvercle { visibility: hidden !important; } .paroi *, .couvercle *, .socle * { visibility: hidden !important; }"
 # What each colour family is, in (r, g, b).
@@ -106,11 +107,13 @@ def frames(browser, name, width, out, css):
         empty = Image.open(io.BytesIO(page.locator(".scene").screenshot())).convert("RGB")
         hide.evaluate("e => e.remove()")
         mask = silhouette(picture, empty)
-        results[state] = {"box": box_of(mask), "oak": share(picture, mask, OAK), "gold": share(picture, mask, GOLD)}
+        results[state] = {"box": box_of(mask), "oak": share(picture, mask, OAK), "gold": share(picture, mask, GOLD),
+                          "camera": page.evaluate(CAMERA)}
         if state == "chene":
             results["total_right"] = cc.price_is(page, ".ticket .prixf", 833 + 72)
         context.close()
     results["errors"] = errors
+    results["step"] = results["kit"]["camera"] / results["ferme"]["camera"]
     return results
 
 
@@ -132,6 +135,7 @@ def judge(r, out):
     wide = {state: b[2] - b[0] for state, b in box.items()}
     high = {state: b[3] - b[1] for state, b in box.items()}
     scale = wide["face"] / 416  # the plinth is 416 px long, seen side on
+    step = r["step"]  # on a narrow scene the camera steps back for the kit, so whole and kit differ in size
     checks = [
         (f"side on is wider than end on ({wide['face']} against {wide['bout']} px)",
          wide["face"] > 2 * wide["bout"] > 0),
@@ -140,7 +144,7 @@ def judge(r, out):
         (f"the lid rises above the coffin (top {box['ouvert'][1]}, closed {box['ferme'][1]})",
          box["ferme"][1] - box["ouvert"][1] > 40 * scale),
         (f"the kit lifts the lid and spreads the walls ({wide['kit']}x{high['kit']} against {wide['ferme']}x{high['ferme']})",
-         high["kit"] > high["ferme"] + 80 * scale and wide["kit"] > wide["ferme"] + 40 * scale),
+         high["kit"] > (high["ferme"] + 80 * scale) * step and wide["kit"] > (wide["ferme"] + 40 * scale) * step),
         (f"oak with its handles ({r['chene']['oak']:.1%} oak, {r['chene']['gold']:.2%} gold)",
          r["chene"]["oak"] > 0.3 and r["chene"]["gold"] > 0.008),
         ("the oak's total is 905 €, in pixels", r["total_right"]),
