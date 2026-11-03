@@ -28,6 +28,7 @@ python3 tools/check_badge_safari.py --extract LOG OUT   # read a Safari run; the
 python3 tests/test_render_pages.py             # two render runs at once each prove their own tree
 python3 tools/check_pages.py [--render OUT]    # the served site: each page and local link answers 200, noindex and footer in the body
 python3 tools/check_courtepaille_egg.py [OUT]  # Courtepaille's counter looks the same with its hidden link
+python3 tools/check_source_eclat.py    # Source & Éclat: its countdown moving, which the renders freeze, and its numbers
 ```
 
 A new page starts as a copy of `shared/modele.html`: its footer is compared byte for byte.

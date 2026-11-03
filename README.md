@@ -20,6 +20,8 @@ Elles sont volontairement différentes, et le ton est une parodie assumée :
   âgés, papier.
 - **Inviolia** : éditeur de cybersécurité qui vend la peur. Accès administrateur de ses clients,
   faux courriels mensuels, niveau de menace toujours critique.
+- **Source & Éclat** : vente multiniveau, la cousine qui a trouvé une opportunité. Un message
+  transféré chaque lundi sans y changer une virgule, des RIB envoyés par message.
 
 ## Tout est inventé
 
