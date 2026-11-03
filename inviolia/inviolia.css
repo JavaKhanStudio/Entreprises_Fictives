@@ -178,3 +178,85 @@ td + td { color: #52e0ff; white-space: nowrap; }
 @media (max-width: 30rem) {
   .preuves { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* The camera that follows the scroll. inviolia.js sets html.vivant and each scene's --p; nothing here applies without it. */
+@view-transition { navigation: auto; }
+@keyframes arrivee { from { opacity: 0; transform: translateY(18px); } }
+@keyframes alarme { 50% { box-shadow: 0 0 18px 6px #ff8a94; } }
+
+@media screen {
+  .vivant .lu { position: fixed; z-index: 9; top: 0; left: 0; width: 100%; height: 3px; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none; }
+  .vivant .alerte i { animation: alarme 1.6s ease-in-out infinite; }
+  .vivant .hero-txt { animation: arrivee .8s ease-out both; }
+  .vivant .b1, .vivant .cta, .vivant .preuves > div, .vivant .valeurs > div, .vivant .boite { transition: box-shadow .2s, border-color .2s; }
+  .vivant .b1:hover, .vivant .cta:hover { box-shadow: 0 0 22px #00c2ff99; }
+
+  /* Hero: the camera pushes in on the mask. */
+  .vivant main { overflow-x: clip; }
+  .vivant .scene-hero { --q: clamp(0, calc(var(--p, 0) * 1.6), 1); position: relative; }
+  .vivant .scene-fin { position: absolute; right: 0; bottom: 0; left: 0; height: 1px; }
+  .vivant .hero-img { transform: scale(calc(1 + var(--q) * .3)); transform-origin: 49% 40%; will-change: transform; }
+
+  /* Everything else comes in from an angle and is face-on by the time the page rests. */
+  .vivant .preuves > div, .vivant .valeurs > div, .vivant .post, .vivant .boite, .vivant .frise li, .vivant .double figure, .vivant .clients, .vivant .colonnes > div, .vivant .article > *, .vivant .appel, .vivant .reponse, .vivant .livre {
+    --q: clamp(0, calc(var(--p, 1) * 1.6 - var(--i, 0) * .2), 1);
+    opacity: var(--q);
+  }
+  .vivant .frise li, .vivant .double figure, .vivant .clients, .vivant .colonnes > div, .vivant .article > *, .vivant .appel, .vivant .reponse, .vivant .livre { transform: translateY(calc((1 - var(--q)) * 44px)); }
+  .vivant .preuves > div, .vivant .valeurs > div, .vivant .boite { transform: perspective(900px) rotateY(calc((1 - var(--q)) * -38deg)) translateY(calc((1 - var(--q)) * 60px)); transform-origin: 0 50%; }
+  .vivant .post { transform: perspective(1100px) rotateX(calc((1 - var(--q)) * 22deg)) translateY(calc((1 - var(--q)) * 50px)); transform-origin: 50% 100%; }
+  .vivant .preuves > div:nth-child(2), .vivant .valeurs > div:nth-child(2), .vivant .boite:nth-child(2) { --i: 1; }
+  .vivant .preuves > div:nth-child(3), .vivant .valeurs > div:nth-child(3), .vivant .boite:nth-child(3) { --i: 2; }
+  .vivant .preuves > div:nth-child(4) { --i: 3; }
+  .vivant .preuves > div:hover, .vivant .valeurs > div:hover, .vivant .boite:hover { box-shadow: 0 0 26px #00c2ff44; }
+
+  /* The globe turns to face you, its feed comes up line by line. */
+  .vivant .carte { --q: clamp(0, calc(var(--p, 1) * 1.15), 1); perspective: 1400px; }
+  .vivant .carte img { opacity: calc(.15 + var(--q) * .85); transform: rotateY(calc((1 - var(--q)) * 42deg)) rotateZ(calc((1 - var(--q)) * -10deg)) scale(calc(.78 + var(--q) * .22)); transform-origin: 50% 50%; will-change: transform; }
+  .vivant .carte > div { transform: translateX(calc((1 - var(--q)) * 70px)); opacity: var(--q); }
+  .vivant .flux p { --r: clamp(0, calc(var(--q) * 3 - var(--i, 0) * .4), 1); opacity: var(--r); transform: translateX(calc((1 - var(--r)) * 18px)); }
+  .vivant .flux p:nth-child(2) { --i: 1; }
+  .vivant .flux p:nth-child(3) { --i: 2; }
+  .vivant .flux p:nth-child(4) { --i: 3; }
+  .vivant .flux p:nth-child(5) { --i: 4; }
+  .vivant .flux p:nth-child(6) { --i: 5; }
+
+  /* The quote lights up word by word. */
+  .vivant .mot { color: #71839c; transition: color .25s; }
+  .vivant .mot.allume { color: #fff; }
+
+  /* The company crosses its own quadrant. */
+  .vivant .quadrant-bloc { --q: clamp(0, calc(var(--p, 1) * 1.1), 1); --dx: -14rem; }
+  .vivant .quadrant .leader { z-index: 1; }
+  .vivant .quadrant .leader b { transform: translate(calc((1 - var(--q)) * var(--dx)), calc((1 - var(--q)) * 9rem)); }
+
+  /* A banner's picture drifts more slowly than the page. */
+  .vivant .bandeau img { transform: translateY(calc((var(--p, .5) - .5) * 12%)) scale(1.18); will-change: transform; }
+
+  /* An expert's card slides in; on a large window it stays beside the posts. */
+  .vivant .fiche { --q: clamp(0, calc(var(--p, 1) * 1.6), 1); opacity: var(--q); transform: translateX(calc((1 - var(--q)) * -40px)); }
+  .vivant .fil .post:nth-child(2) { --i: 1; }
+  .vivant .fil .post:nth-child(3) { --i: 2; }
+}
+
+@media screen and (max-width: 62rem) {
+  .vivant .quadrant-bloc { --dx: -7rem; }
+  .vivant .preuves > div, .vivant .valeurs > div, .vivant .boite { --i: 0; }
+  .vivant .fil .post { --i: 0; }
+}
+
+/* Pinned only where hero and figures fit one screen under the sticky header. */
+@media screen and (min-width: 62.01rem) and (min-height: 42rem) {
+  .vivant [data-stop] { scroll-margin-top: var(--haut, 6.6rem); }
+  .vivant .expert, .vivant [id] { scroll-margin-top: var(--haut, 6.6rem); }
+  .vivant .alerte { position: sticky; z-index: 6; top: 0; }
+  .vivant .haut { position: sticky; z-index: 5; top: var(--alerte, 2.2rem); background: #060b16d9; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+  .vivant .scene-hero { height: calc(170vh - var(--haut, 6.6rem)); height: calc(170svh - var(--haut, 6.6rem)); }
+  .vivant .cadre { position: sticky; top: var(--haut, 6.6rem); display: flex; flex-direction: column; height: calc(100vh - var(--haut, 6.6rem)); height: calc(100svh - var(--haut, 6.6rem)); }
+  .vivant .cadre .hero { flex: 1 1 auto; min-height: 0; }
+  .vivant .hero-img { transform: scale(calc(1 + var(--q) * .55)); }
+  .vivant .hero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 34% 62% at 69% 40%, transparent 55%, #060b16e6); opacity: var(--q); pointer-events: none; }
+  .vivant .hero-txt { z-index: 1; }
+  .vivant .hero h1 .suite { opacity: calc(.42 + var(--q) * .58); }
+  .vivant .fiche { position: sticky; top: calc(var(--haut, 6.6rem) + 1.5rem); align-self: start; }
+}

@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="base.css">
   <link rel="stylesheet" href="inviolia.css">
   <link rel="icon" href="img/icone.svg" type="image/svg+xml">
+  <script src="inviolia.js"></script>
 </head>
 <body>
   <div class="alerte"><span><i></i>NIVEAU DE MENACE ACTUEL : CRITIQUE</span><span>Cellule de crise 24/7 · Standard de 9 h à 17 h</span></div>
@@ -24,10 +25,11 @@
     <a class="cta" href="contact.html#pirate">Suis-je déjà piraté ?</a>
   </header>
   <main>
+    <div class="scene-hero" data-stop="start"><div class="cadre">
     <section class="hero">
       <img class="hero-img" src="img/pirate.webp" alt="Un pirate encapuchonné et masqué, devant son ordinateur portable, dans le noir" width="1216" height="832" fetchpriority="high">
       <div class="hero-txt">
-        <h1>Vous avez déjà été piratés. Vous ne le savez pas encore.</h1>
+        <h1>Vous avez déjà été piratés. <span class="suite">Vous ne le savez pas encore.</span></h1>
         <p>Inviolia protège 147 entreprises et collectivités avec Sentinelle Quantique™, sa plateforme Zero Trust de grade militaire, pilotée par l’IA.</p>
         <p class="btns"><a class="b1" href="contact.html#audit">Demander un audit gratuit</a><a class="b2" href="contact.html#livre-blanc">Télécharger le livre blanc</a></p>
       </div>
@@ -38,7 +40,8 @@
       <div><b>6 min</b>pour prendre la main sur tout votre parc</div>
       <div><b>2017</b>dernière intrusion détectée</div>
     </section>
-    <section class="carte">
+    </div><span class="scene-fin" data-stop="end"></span></div>
+    <section class="carte" data-stop="center">
       <img src="img/globe.webp" alt="La Terre vue de l’espace, ses continents cernés de rouge" width="800" height="800" loading="lazy">
       <div>
         <h2>Les cyberattaques, en temps réel</h2>
@@ -53,13 +56,13 @@
         </div>
       </div>
     </section>
-    <section class="preuves">
+    <section class="preuves" data-stop="center">
       <div><h3>Prise en main</h3><p>Pour démarrer, envoyez-nous vos accès administrateur par courriel, dans un ZIP chiffré. Le mot de passe suit dans un second courriel.</p></div>
       <div><h3>Culture sécurité</h3><p>Chaque mois, nos collaborateurs reçoivent un faux courriel de notre part. Qui clique est formé dans la semaine.</p></div>
       <div><h3>Certification</h3><p>ISO 27001 : en cours depuis 2019.</p></div>
       <div><h3>Zero Trust</h3><p>Aucun collaborateur n’entre sans son badge. Les badges sont à l’accueil.</p></div>
     </section>
-    <section class="parole">
+    <section class="parole" data-stop="center">
       <div>
         <blockquote>« La question n’est pas de savoir si vous serez attaqué, mais quand. Nous vous dirons quand. »</blockquote>
         <p class="cite">Jean-Marc Ganivet, Président-Fondateur et Évangéliste de la Menace. Vingt ans à la Défense.</p>
