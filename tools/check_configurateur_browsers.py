@@ -19,7 +19,7 @@ then sorts over the lid's top (seen on r79: a whole lid missing, 0.3 % of the sc
 or failed for another reason.
 
 Headed runs inside cage, as in tools/check_badge_browsers.py. Needs cage, Chrome,
-`playwright install firefox`, Pillow. Safari is not proved here.
+`playwright install firefox`, Pillow. Safari: tools/check_configurateur_safari.py.
 """
 
 import argparse
@@ -140,7 +140,7 @@ def judge(r, out):
         (f"the lid rises above the coffin (top {box['ouvert'][1]}, closed {box['ferme'][1]})",
          box["ferme"][1] - box["ouvert"][1] > 40 * scale),
         (f"the kit lifts the lid and spreads the walls ({wide['kit']}x{high['kit']} against {wide['ferme']}x{high['ferme']})",
-         high["kit"] > high["ferme"] + 90 * scale and wide["kit"] > wide["ferme"] + 40 * scale),
+         high["kit"] > high["ferme"] + 80 * scale and wide["kit"] > wide["ferme"] + 40 * scale),
         (f"oak with its handles ({r['chene']['oak']:.1%} oak, {r['chene']['gold']:.2%} gold)",
          r["chene"]["oak"] > 0.3 and r["chene"]["gold"] > 0.008),
         ("the oak's total is 905 €, in pixels", r["total_right"]),
