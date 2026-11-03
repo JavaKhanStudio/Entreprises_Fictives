@@ -24,7 +24,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 PUBLIC = "https://javakhanstudio.github.io/Entreprises_Fictives/"
-RENDERED = ("index.html", "merlin/index.html", "gobelin/index.html", "courtepaille/index.html", "inviolia/index.html", "source-eclat/index.html")
+RENDERED = ("index.html", "merlin/index.html", "gobelin/index.html", "courtepaille/index.html", "inviolia/index.html", "dernier-prix/index.html", "source-eclat/index.html")
 GENERATED = ("README.html", "CLAUDE.html")
 NOINDEX = re.compile(r'<meta\s+name="robots"\s+content="noindex"\s*/?>', re.I)
 FOOTER = re.compile(r"<footer\b.*?</footer>", re.I | re.S)

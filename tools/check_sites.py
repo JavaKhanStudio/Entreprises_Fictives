@@ -35,7 +35,7 @@ MODEL_PAGE = "shared/modele.html"
 # Safari over file:// loads nothing above the opened page's folder, so each site holds a copy.
 BASE_CSS = "shared/base.css"
 # The root index must link each of these once its index.html exists (check_index_links).
-COMPANIES = ("merlin", "gobelin", "courtepaille", "source-eclat")
+COMPANIES = ("merlin", "gobelin", "courtepaille", "inviolia", "dernier-prix", "source-eclat")
 FICTION_PHONE_ROOTS = ("019900", "026191", "035301", "046571", "053649", "063998")
 
 EM_DASH = "\u2014"

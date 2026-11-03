@@ -220,12 +220,12 @@ h2 { margin: 0 0 16px; padding-left: 12px; border-left: 8px solid #d4001a; font:
 <div class=fiche><span class=pastille>−20 %</span><img src="%RAW%/gerbe.png" alt=""><h3>Couronne Souvenir, 60 cm</h3><div class=etoiles>★★★★★ <small>4,8 (540 avis)</small></div><div class=prixf>59 €</div><span class=barre>74 €</span><span class=stock>Souvent achetée avec Repos Éco</span><div class=ajout>AJOUTER AU PANIER</div></div>
 <div class=offre><div><b>OFFRE COUPLE</b>Le second à −50 %.<br>Valable 5 ans.</div></div></div></section>
 <section class=deux><div class=bloc><h2>Avis de décès du jour</h2>
-<div class=mort><b>M. Raymond Tessonneau, 84 ans.</b> Cérémonie jeudi 5 novembre à 14 h 30, église de Saint-Ombrage. De la part de Jeanne, son épouse, de Claire et Hervé, ses enfants. Condoléances au domicile, 12 rue des Lilas, à partir de 18 h.</div>
+<div class=mort><b>M. Raymond Chabrerie, 84 ans.</b> Cérémonie jeudi 5 novembre à 14 h 30, église de Saint-Ombrage. De la part de Jeanne, son épouse, de Claire et Hervé, ses enfants. Condoléances au domicile, 12 rue des Lilas, à partir de 18 h.</div>
 <div class=mort><b>Mme Yvonne Piédalu, 91 ans.</b> Cérémonie vendredi 6 novembre à 10 h. De la part de son neveu Patrice, seul héritier.</div>
 <p style="margin:10px 0 0">Les familles reçoivent leur facture par courriel sous 48 h, en PDF, réglable par virement sous 8 jours : facturation@au-dernier-prix.example</p></div>
 <div class=bloc><h2>Ils ont choisi</h2>
 <div class=avis><span class=etoiles>★★★★★</span> « Très bon service, livré à l’heure. Je reviendrai. »<br><small>Mme L., 3e commande</small></div>
-<div class=avis><span class=etoiles>★★★★☆</span> « Bon rapport qualité-prix. Maman n’aurait pas aimé la couleur. »<br><small>Hervé T.</small></div>
+<div class=avis><span class=etoiles>★★★★☆</span> « Bon rapport qualité-prix. Maman n’aurait pas aimé la couleur. »<br><small>Sylvie M.</small></div>
 <div><b>Employé du mois :</b> Jordan, 41 cercueils.</div></div></section>
 <div class=fin>Carte Fidélité : la troisième cérémonie offerte. Parrainez un proche.</div>
 """
