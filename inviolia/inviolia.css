@@ -179,6 +179,8 @@ td + td { color: #52e0ff; white-space: nowrap; }
   .preuves { grid-template-columns: minmax(0, 1fr); }
 }
 
+.tirs { display: none; }
+
 /* The camera that follows the scroll. inviolia.js sets html.vivant and each scene's --p; nothing here applies without it. */
 @view-transition { navigation: auto; }
 @keyframes arrivee { from { opacity: 0; transform: translateY(18px); } }
@@ -212,7 +214,7 @@ td + td { color: #52e0ff; white-space: nowrap; }
 
   /* The globe turns to face you, its feed comes up line by line. */
   .vivant .carte { --q: clamp(0, calc(var(--p, 1) * 1.15), 1); perspective: 1400px; }
-  .vivant .carte img { opacity: calc(.15 + var(--q) * .85); transform: rotateY(calc((1 - var(--q)) * 42deg)) rotateZ(calc((1 - var(--q)) * -10deg)) scale(calc(.78 + var(--q) * .22)); transform-origin: 50% 50%; will-change: transform; }
+  .vivant .carte img, .vivant .carte .tirs { grid-area: 1 / 1; opacity: calc(.15 + var(--q) * .85); transform: rotateY(calc((1 - var(--q)) * 42deg)) rotateZ(calc((1 - var(--q)) * -10deg)) scale(calc(.78 + var(--q) * .22)); transform-origin: 50% 50%; will-change: transform; }
   .vivant .carte > div { transform: translateX(calc((1 - var(--q)) * 70px)); opacity: var(--q); }
   .vivant .flux p { --r: clamp(0, calc(var(--q) * 3 - var(--i, 0) * .4), 1); opacity: var(--r); transform: translateX(calc((1 - var(--r)) * 18px)); }
   .vivant .flux p:nth-child(2) { --i: 1; }
@@ -220,6 +222,12 @@ td + td { color: #52e0ff; white-space: nowrap; }
   .vivant .flux p:nth-child(4) { --i: 3; }
   .vivant .flux p:nth-child(5) { --i: 4; }
   .vivant .flux p:nth-child(6) { --i: 5; }
+
+  /* The live map: comets painted over the globe, the feed rolling, the counter's digits all one width. */
+  .vivant .tirs { display: block; width: 100%; aspect-ratio: 500 / 420; pointer-events: none; }
+  .vivant .chiffres b.rouge { font-variant-numeric: tabular-nums; }
+  .vivant .flux { display: flex; flex-direction: column; gap: .25rem; padding-block: 1rem; overflow: hidden; }  /* as tall as the still page's margins */
+  .vivant .flux p { margin: 0; }
 
   /* The quote lights up word by word. */
   .vivant .mot { color: #71839c; transition: color .25s; }

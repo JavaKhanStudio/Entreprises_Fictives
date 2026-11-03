@@ -35,7 +35,7 @@ python3 tools/check_racine.py [OUT]    # the root list's envelopes in Chrome and
 python3 tools/check_racine_safari.py --extract LOG OUT   # read a Safari run of the root list's envelopes; the run itself is in its docstring (macOS runner)
 python3 tests/test_check_racine_safari.py    # that tool's scripts and pixel read, in Chrome, before a macOS minute is spent
 python3 tools/check_source_eclat.py    # Source & Éclat: its countdown moving, which the renders freeze, and its numbers
-python3 tools/check_inviolia.py [OUT]  # Inviolia: the scroll camera and its stops, which the renders freeze, Chrome and Firefox
+python3 tools/check_inviolia.py [OUT]  # Inviolia: the scroll camera and its stops, which the renders freeze, Chrome and Firefox; also the live map (--live: only that)
 python3 tools/check_inviolia_safari.py # same way as check_trombone_safari: the camera in real Safari; no wheel, so not its stops
 ```
 

@@ -111,7 +111,136 @@
     setTimeout(function () { if (scrollY === y) plusTard(); }, 200);
   }
 
+  // The live map. No new word: the counter's digits change, the feed's lines are the HTML's own, shown
+  // in another order, and the comets are paint. Nothing runs while it is off screen.
+  function enVue(el, rappel) {
+    if (!window.IntersectionObserver) { rappel(true); return; }
+    new IntersectionObserver(function (e) { rappel(e[e.length - 1].isIntersecting); }).observe(el);
+  }
+
+  function compteur() {
+    var el = document.querySelector(".chiffres .rouge");
+    if (!el) return;
+    var n = parseInt(el.textContent.replace(/\D/g, ""), 10), parSeconde = n / 86400;  // what "aujourd'hui" says
+    var avant = performance.now(), vu = false;
+    enVue(el, function (oui) { vu = oui; });
+    setInterval(function () {
+      if (!vu || document.hidden) return;
+      var t = performance.now();  // off screen the attacks went on: it catches up on return
+      n += Math.round((t - avant) / 1000 * parSeconde * (0.4 + Math.random() * 1.2));
+      avant = t;
+      el.textContent = String(n).replace(/\B(?=(\d{3})+$)/g, " ");
+    }, 120);
+  }
+
+  // The DOM's order never changes, so the text reads the same at any moment: only CSS order does.
+  function flux() {
+    var boite = document.querySelector(".flux");
+    if (!boite || !boite.animate) return;
+    var tour = [].slice.call(boite.children), vu = false;
+    if (tour.length < 2) return;
+    enVue(boite, function (oui) { vu = oui; });
+    function range() { tour.forEach(function (p, i) { p.style.order = i; }); }
+    setInterval(function () {
+      if (!vu || document.hidden) return;
+      var sort = tour[0], pas = tour[1].offsetTop - sort.offsetTop;
+      sort.animate({ clipPath: ["inset(0)", "inset(0 0 100% 0)"] }, { duration: 160, easing: "ease-in" }).onfinish = function () {
+        tour.push(tour.shift());
+        range();
+        tour.forEach(function (p) {
+          p.animate({ translate: ["0 " + pas + "px", "0 0"] }, { duration: 420, easing: "cubic-bezier(.2, .7, .2, 1)" });
+        });
+      };
+    }, 1600);
+  }
+
+  // Where the painted globe has land, in its 800 px square, of which the 500 / 420 frame keeps y 64 to 736.
+  var TERRES = [[320, 230], [190, 340], [250, 390], [330, 500], [490, 510], [590, 190], [540, 340], [430, 680], [640, 320], [700, 250], [120, 300]];
+  function carte() {
+    var image = document.querySelector(".carte img");
+    if (!image) return;
+    var toile = document.createElement("canvas"), c = toile.getContext("2d");
+    if (!c) return;
+    toile.className = "tirs";
+    toile.setAttribute("aria-hidden", "true");
+    image.parentNode.insertBefore(toile, image.nextSibling);
+    var tirs = [], vu = false, encours = false;
+
+    function lieu() {
+      var t = TERRES[Math.floor(Math.random() * TERRES.length)];
+      return { x: t[0] / 800, y: (t[1] - 64) / 672 };
+    }
+    function tir(t) {
+      var a = lieu(), b = lieu();
+      while (Math.hypot(b.x - a.x, b.y - a.y) < 0.35) b = lieu();  // a long arc reads, a short one is a smudge
+      return { a: a, b: b, h: { x: (a.x + b.x) / 2, y: Math.min(a.y, b.y) - 0.22 }, t0: t + Math.random() * 1400, ms: 900 + Math.random() * 700 };
+    }
+    function point(s, k, l, h) {
+      var u = 1 - k;
+      return [(u * u * s.a.x + 2 * u * k * s.h.x + k * k * s.b.x) * l, (u * u * s.a.y + 2 * u * k * s.h.y + k * k * s.b.y) * h];
+    }
+    function peint(t) {
+      if (!vu || document.hidden) { encours = false; return; }
+      requestAnimationFrame(peint);
+      var dpr = Math.min(devicePixelRatio || 1, 2), l = Math.round(toile.clientWidth * dpr), h = Math.round(toile.clientHeight * dpr);
+      if (!l || !h) return;
+      if (toile.width !== l || toile.height !== h) { toile.width = l; toile.height = h; }
+      c.clearRect(0, 0, l, h);
+      c.lineCap = "round";
+      var e = l / 500;
+      tirs.forEach(function (s, i) {
+        var k = (t - s.t0) / s.ms;
+        if (k < 0) return;
+        var m = Math.min(k, 1), part = k < 1 ? 1 : Math.max(0, 1 - (k - 1) / 0.4);
+        // The arc it has drawn, then the comet: bright enough to read over the red land.
+        c.strokeStyle = "rgba(255, 170, 178, " + 0.8 * part + ")";
+        c.lineWidth = 1.6 * e;
+        c.beginPath();
+        for (var n = 0; n <= 24; n++) {
+          var v = point(s, m * n / 24, l, h);
+          if (n) c.lineTo(v[0], v[1]); else c.moveTo(v[0], v[1]);
+        }
+        c.stroke();
+        if (k < 1) {
+          for (n = 0; n < 12; n++) {
+            var d = k - (n + 1) * 0.025, f = k - n * 0.025;
+            if (d < 0) break;
+            var p = point(s, d, l, h), q = point(s, f, l, h);
+            c.strokeStyle = "rgba(255, 190, 196, " + (1 - n / 12) + ")";
+            c.lineWidth = (3.6 - n * 0.2) * e;
+            c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]); c.stroke();
+          }
+          var tete = point(s, k, l, h);
+          c.fillStyle = "#fff";
+          c.beginPath(); c.arc(tete[0], tete[1], 2.6 * e, 0, 6.3); c.fill();
+        }
+        if (k >= 1) {                      // blocked, every time
+          var r = (k - 1) / 0.4, o = point(s, 1, l, h);
+          c.strokeStyle = "rgba(57, 229, 140, " + Math.max(0, 1 - r) + ")";
+          c.lineWidth = 2 * e;
+          c.beginPath(); c.arc(o[0], o[1], (3 + r * 15) * e, 0, 6.3); c.stroke();
+        }
+        if (k > 1.4) tirs[i] = tir(t);
+      });
+    }
+    enVue(toile, function (oui) {
+      vu = oui;
+      if (!oui || encours) return;
+      encours = true;
+      var t = performance.now();
+      while (tirs.length < 7) tirs.push(tir(t));
+      tirs = tirs.map(function (s) { return t - s.t0 > s.ms * 1.4 ? tir(t) : s; });
+      requestAnimationFrame(peint);
+    });
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden && vu && !encours) { encours = true; requestAnimationFrame(peint); }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    compteur();
+    flux();
+    carte();
     var pose = document.querySelector(".scene-hero");
     if (pose) scenes.push({ el: pose, sorte: "pose" });
     document.querySelectorAll(".bandeau").forEach(function (el) { scenes.push({ el: el, sorte: "traverse" }); });
