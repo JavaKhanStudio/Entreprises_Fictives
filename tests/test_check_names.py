@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""A name that makes a bad domain gets a verdict, and the names after it still get theirs.
+"""A name that makes a bad domain gets a verdict, and the names after it still get theirs. A source
+that fails on the network is said to, and never ends the run with the exit code of a hit.
 
     python3 tests/test_check_names.py
 
@@ -46,13 +47,26 @@ def dropped(*_args, **_kwargs):
     raise http.client.RemoteDisconnected("Remote end closed connection without response")
 
 
-def run(*names, control=lambda: True):
+def known_only(name):
+    return ["known"] if name == check_names.KNOWN else []
+
+
+def down_on(*down):
+    """A Wikipedia or Wikidata that loses the network on these names, and answers as usual on others."""
+    def hits(name):
+        if name in down:
+            raise urllib.error.URLError("network is unreachable")
+        return known_only(name)
+    return hits
+
+
+def run(*names, control=lambda: True, wikipedia=known_only, wikidata=known_only):
     """main() on these names, without the network or the pauses: its exit code and what it printed."""
     out = io.StringIO()
     with (mock.patch.object(sys, "argv", ["check_names.py", "--no-web", "--domains", *names]),
           mock.patch.object(check_names, "fetch", fetching),
-          mock.patch.object(check_names, "wikipedia_hits", lambda name: ["known"] if name == check_names.KNOWN else []),
-          mock.patch.object(check_names, "wikidata_hits", lambda name: ["known"] if name == check_names.KNOWN else []),
+          mock.patch.object(check_names, "wikipedia_hits", wikipedia),
+          mock.patch.object(check_names, "wikidata_hits", wikidata),
           mock.patch.object(check_names, "public_control", lambda: dict.fromkeys(check_names.PUBLIC, lambda name: [])),
           mock.patch.object(check_names, "domain_control", control),
           mock.patch.object(check_names.time, "sleep", lambda seconds: None),
@@ -128,6 +142,41 @@ class Run(unittest.TestCase):
         with mock.patch.object(check_names, "fetch", fetch):
             self.assertEqual(check_names.domain_hits("Source & Éclat"),
                              (["rdap sourceeclat.fr is registered"], ["rdap sourceeclat.com"]))
+
+    def test_wikipedia_losing_the_network_at_the_control_exits_2(self):
+        code, out = run("Zorglaxe", wikipedia=down_on(check_names.KNOWN))
+        self.assertEqual(code, 2, out)
+        self.assertIn("Wikipedia or Wikidata failed the control", out)
+        self.assertNotIn("Zorglaxe:", out)
+
+    def test_wikidata_losing_the_network_on_the_nonsense_control_exits_2(self):
+        code, out = run("Zorglaxe", wikidata=down_on(check_names.NONSENSE))
+        self.assertEqual(code, 2, out)
+        self.assertIn("Wikipedia or Wikidata failed the control", out)
+
+    def test_wikipedia_losing_the_network_mid_run_is_unchecked_and_the_run_goes_on(self):
+        code, out = run("Panne Wiki", "Zorglaxe", wikipedia=down_on("Panne Wiki"))
+        self.assertEqual(code, 3, out)
+        self.assertRegex(out, r"(?m)^Panne Wiki: 0 hits.*unchecked on .*wikipedia")
+        self.assertRegex(out, r"(?m)^Zorglaxe: 0 hits")
+        self.assertNotRegex(out, r"(?m)^Zorglaxe:.*wikipedia")
+
+    def test_a_rate_limit_api_gave_up_on_is_unchecked_too(self):
+        def limited(name):
+            if name == "Panne Wiki":
+                raise RuntimeError("no search from the API")
+            return known_only(name)
+
+        code, out = run("Panne Wiki", wikidata=limited)
+        self.assertEqual(code, 3, out)
+        self.assertRegex(out, r"(?m)^Panne Wiki: 0 hits.*unchecked on .*wikidata")
+
+    def test_wikidata_down_keeps_what_wikipedia_found(self):
+        code, out = run("Panne Wiki", wikipedia=lambda name: known_only(name) + ["fr Panne Wiki"] * (name == "Panne Wiki"),
+                        wikidata=down_on("Panne Wiki"))
+        self.assertEqual(code, 1, out)
+        self.assertRegex(out, r"(?m)^Panne Wiki: 1 hits.*unchecked on .*wikidata")
+        self.assertIn("fr Panne Wiki", out)
 
 
 class Fetch(unittest.TestCase):

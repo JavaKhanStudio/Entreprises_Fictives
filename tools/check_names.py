@@ -27,8 +27,9 @@ domain RDAP will not answer on counts as unchecked, as does every domain when RD
 its control, and a name with no domain to make is said so.
 None of this is the open web: a small firm with a site and none of these still goes unseen, which
 is why --no-web can never exit 0.
-Exit 1 when a name has a hit, to read by eye; 2 when the APIs fail their control; 3 when no name
-has a hit but one went unchecked on the web, which is not a pass.
+Exit 1 when a name has a hit, to read by eye; 2 when the APIs fail their control, by a wrong answer
+or none; 3 when no name has a hit but one went unchecked, on the web or on a source that failed for
+that name, which is not a pass.
 Python stdlib. Needs the network. A student never runs this.
 """
 
@@ -50,6 +51,9 @@ WEB_KNOWN = "Odile Decq"
 NONSENSE = "Zorglaxe Vrumpfeldt"
 PAUSE = 6
 WEB_PAUSE = 20
+# A source failing, as opposed to answering: no network, a timeout, a rate limit api() gave up on, a
+# page that is not the JSON it should be. Uncaught, each would exit 1, which reads as a hit.
+SOURCE_FAILED = (OSError, RuntimeError, KeyError, ValueError)
 
 
 def fetch(url, headers):
@@ -164,7 +168,7 @@ def public_control():
     for source, (known, search) in PUBLIC.items():
         try:
             good, bad = holding(known, search(known)), holding(NONSENSE, search(NONSENSE))
-        except (OSError, RuntimeError, KeyError, ValueError) as error:
+        except SOURCE_FAILED as error:
             print(f"{source}: failed at the control ({error})")
             continue
         time.sleep(PAUSE)
@@ -246,8 +250,13 @@ def main():
     if not names:
         print(__doc__)
         return 2
-    if (not wikipedia_hits(KNOWN) or not wikidata_hits(KNOWN)
-            or wikipedia_hits(NONSENSE) or wikidata_hits(NONSENSE)):
+    try:
+        answering = (wikipedia_hits(KNOWN) and wikidata_hits(KNOWN)
+                     and not wikipedia_hits(NONSENSE) and not wikidata_hits(NONSENSE))
+    except SOURCE_FAILED as error:
+        print(f"Wikipedia or Wikidata failed the control, stopping ({error})")
+        return 2
+    if not answering:
         print("Wikipedia or Wikidata failed the control, stopping")
         return 2
     echo = None if no_web else web_control()
@@ -263,12 +272,17 @@ def main():
     taken = unchecked = 0
     for name in names:
         time.sleep(PAUSE)
-        hits = wikipedia_hits(name) + wikidata_hits(name)
+        hits = []
         missed = [source for source in PUBLIC if source not in usable]
+        for source, search in (("wikipedia", wikipedia_hits), ("wikidata", wikidata_hits)):
+            try:
+                hits += search(name)
+            except SOURCE_FAILED:
+                missed.append(source)
         for source, search in usable.items():
             try:
                 hits += [f"{source} {label[:100]}" for label in holding(name, search(name))]
-            except (OSError, RuntimeError, KeyError, ValueError):
+            except SOURCE_FAILED:
                 missed.append(source)
         if rdap_down:
             missed += ["rdap"] if domains_of(name) else []
