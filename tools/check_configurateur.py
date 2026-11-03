@@ -7,6 +7,7 @@ Over file://, in Chrome, at phone and desktop widths:
 - it sways, and stands still under reduced motion, where every choice below still works;
 - the pointer turns it, strip by strip, and leaving brings back the chosen angle; a click stays;
 - a real Tab and arrow keys turn it, a real finger too, the four view buttons go where they say;
+- the lid's checkbox flashes until first used, and not under reduced motion;
 - each option does what it says: the wood, the handles counted, the lining, the plate, the lid, the kit;
 - the total the browser sums is the right one, read as pixels: a counter is not in the DOM;
 - the page is no wider than its window, whatever is open, and the home's button leads here;
@@ -124,6 +125,32 @@ def options(page, settle=SETTLE):
     page.wait_for_timeout(settle)
 
 
+FLASH = """() => { const label = document.querySelector('label.ouvrir');
+  const running = document.getAnimations().filter(a => a.animationName === 'eclat').length;
+  return [running, getComputedStyle(label, '::after').opacity]; }"""
+
+
+def flash(browser, errors):
+    """The lid's checkbox flashes until it is first used, shut again or not; it can be seen, not only run."""
+    context, page = opened(browser, errors, 1280)
+    label = page.locator("label.ouvrir")
+    running, shown = page.evaluate(FLASH)
+    check(running == 1 and shown == "1", f"the lid's checkbox flashes before it is used ({running}, {shown})")
+    page.mouse.move(0, 0)
+    page.evaluate("t => document.getAnimations().forEach(a => { if (a.animationName === 'eclat') { a.pause(); a.currentTime = t; } })", 1650)
+    bright = tile(page, "label.ouvrir")
+    page.evaluate("t => document.getAnimations().forEach(a => { if (a.animationName === 'eclat') a.currentTime = t; })", 0)
+    dim = tile(page, "label.ouvrir")
+    check(ImageChops.difference(bright, dim).getbbox() is not None, "the flash changes pixels")
+    label.click()
+    page.wait_for_timeout(50)
+    check(page.evaluate(FLASH)[1] == "0", "using it stops the flash")
+    label.click()
+    page.wait_for_timeout(300)
+    check(page.evaluate(FLASH)[1] == "0", "shut again, it does not flash again")
+    context.close()
+
+
 def tile(page, selector):
     return Image.open(io.BytesIO(page.locator(selector).screenshot())).convert("RGB")
 
@@ -194,6 +221,8 @@ def run(browser, out, errors, is_mobile=True):
         if out:
             page.screenshot(path=out / f"page-{width}.png", full_page=True)
         context.close()
+
+    flash(browser, errors)
 
     context, page = opened(browser, errors, 1280)
     totals(page)

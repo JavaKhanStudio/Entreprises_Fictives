@@ -151,6 +151,12 @@
 .vues label:hover { background: #333; }
 .vues .ouvrir { margin-left: auto; background: var(--jaune); color: var(--noir); }
 .vues .ouvrir:hover { background: #ffe34d; }
+/* It flashes until it is first used, and never again: going back to unchecked, the opacity waits out a
+   delay of eleven days. So "never used" holds in CSS alone, until the page is reloaded. */
+.vues .ouvrir { position: relative; }
+.ouvrir::after { content: ""; position: absolute; inset: 0; pointer-events: none; animation: eclat 2.2s ease-in-out infinite; transition: opacity 0s 1000000s; }
+.ouvrir:has(input:checked)::after { opacity: 0; transition: none; }
+@keyframes eclat { 0%, 55%, 100% { background: rgb(255 255 255 / 0); box-shadow: 0 0 0 0 rgb(214 0 28 / 0); } 75% { background: rgb(255 255 255 / .5); box-shadow: 0 0 0 3px rgb(214 0 28 / .75); } }
 .ouvrir input { margin: 0 6px 0 0; accent-color: var(--rouge); }
 .ouvrir:has(input:focus-visible) { outline: 3px solid var(--rouge); outline-offset: 2px; }
 
@@ -192,6 +198,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .balance { animation: none; }
+  .ouvrir::after { animation: none; }
   .plateau, .paroi, .couvercle { transition: none; }
 }
 @media (max-width: 1000px) {
