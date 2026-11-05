@@ -7,7 +7,8 @@
 Over http, from a local server, safaridriver hovers each card with a real pointer: the flap's matrix,
 the letter's rise, the picture, then a screenshot. In the same run the first opened card again with
 the 3D flattened: the open flap then covers the letter, so --extract's read of the pixels has to tell
-the two apart or its green means nothing. A Safari window does not go down to 390, so the phone width
+the two apart or its green means nothing. A shot that comes back a blank window is taken again once, and
+the log says so; --extract refuses a black one by that name, not as a covered letter. A Safari window does not go down to 390, so the phone width
 is the page in a 390 px iframe, which its media queries read as the width.
 
 Over file://, which no driver may open, the way a student gets it: `open -a Safari` on a scratch copy
@@ -42,6 +43,10 @@ REPO = Path(__file__).resolve().parent.parent
 CARDS = ("merlin", "gobelin", "courtepaille", "inviolia", "dernier-prix", "source-eclat")
 META = "=====META"
 SETTLE = 1.7
+# r97: once a shot came back a black window, its JPEG 30 KB and no pixel above 16; a page's are 286 KB
+# and up, with white in them. Measured on Safari 26.6.2 on the runner.
+BLANK_JPEG_UNDER = 60_000
+BLACK_AT_MOST = 32
 FLAT = ".plaque, .enveloppe, .rabat { transform-style: flat !important; }"
 # A runner's Mac may ask for reduced motion: the envelope then opens at once, as it should, and there
 # is no swing to read. These beat the page's `*` rule by specificity.
@@ -145,7 +150,7 @@ def over_http(failed):
 
         def shot(name, state):
             print(f"{META} {name} {json.dumps(state)}", flush=True)
-            print_frame(name, small_jpeg(base64.b64decode(call("GET", f"{here}/screenshot")), 1400))
+            print_frame(name, steady_shot(name, lambda: small_jpeg(base64.b64decode(call("GET", f"{here}/screenshot")), 1400)))
 
         def hover(card):
             script(f"document.querySelector('.cible.{card}').scrollIntoView({{block: 'center'}});")
@@ -317,6 +322,17 @@ def on_the_mac():
     return 1 if failed else 0
 
 
+def steady_shot(name, take, wait=SETTLE):
+    """A shot, taken again once if it comes back a blank window. The log says so; a second blank
+    one is kept, for --extract to refuse."""
+    jpeg = take()
+    if len(jpeg) < BLANK_JPEG_UNDER:
+        print(f"{name}: a blank window, {len(jpeg)} bytes: shooting it again", flush=True)
+        time.sleep(wait)
+        jpeg = take()
+    return jpeg
+
+
 def extract(log, out):
     """Write the frames, and read the paper in them the way tools/check_racine.py does."""
     from PIL import Image
@@ -338,6 +354,9 @@ def extract(log, out):
     print(f"{wrote} frames in {out}")
     problems = []
     for key, state in metas.items():
+        if Image.open(out / f"safari-{key}.jpg").convert("L").getextrema()[1] <= BLACK_AT_MOST:
+            problems.append(f"{key}: a black window: the shot failed, this says nothing of the letter")
+            continue
         if key == "repos" or key.startswith("tel-"):     # the phone's rects are the iframe's: by eye
             print(key, {k: state[k] for k in ("flap", "hover", "wide", "reduced", "inner")})
             continue

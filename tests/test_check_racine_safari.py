@@ -6,6 +6,8 @@ pixels on a real open card and on a flattened one.
     python3 tests/test_check_racine_safari.py
 """
 import base64
+import contextlib
+import io
 import json
 import sys
 import tempfile
@@ -15,6 +17,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "tools"))
 
+from PIL import Image
 from playwright.sync_api import sync_playwright
 
 import check_racine
@@ -30,6 +33,41 @@ def as_function(source):
 def frame_lines(name, jpeg):
     text = base64.b64encode(jpeg).decode()
     return [f"{BEGIN} {name}", text, END]
+
+
+def black_jpeg():
+    """The frame of r97: the size it came back at, nothing above 16."""
+    buffer = io.BytesIO()
+    Image.new("RGB", (1400, 1037), (16, 16, 16)).save(buffer, "JPEG", quality=85)
+    return buffer.getvalue()
+
+
+def check_black_frames(lines, d, failures):
+    """--extract names a black window, open or flat, and never takes it for a read of the letter."""
+    for i, kind in enumerate(("ouvert", "plat")):
+        black = list(lines)
+        at = [n for n, l in enumerate(black) if l.startswith(f"{BEGIN} {kind}")][0]
+        black[at + 1] = base64.b64encode(black_jpeg()).decode()
+        log = Path(d) / f"black-{kind}"
+        log.write_text("\n".join(black) + "\n")
+        said = io.StringIO()
+        with contextlib.redirect_stdout(said):
+            verdict = tool.extract(log, Path(d) / f"out-black-{kind}")
+        if not verdict:
+            failures.append(f"--extract passed a black window as {kind}")
+        if "a black window" not in said.getvalue():
+            failures.append(f"--extract did not name the black {kind} window: {said.getvalue()}")
+
+
+def check_steady_shot(real, failures):
+    """A blank shot is taken once more, a good one never; the blank's size is the one r97 measured."""
+    black = black_jpeg()
+    for shots, want, takes, note in (([real], real, 1, False), ([black, real], real, 2, True), ([black, black], black, 2, True)):
+        left, said = list(shots), io.StringIO()
+        with contextlib.redirect_stdout(said):
+            got = tool.steady_shot("ouvert-merlin", lambda: left.pop(0), wait=0)
+        if got != want or len(shots) - len(left) != takes or ("shooting it again" in said.getvalue()) != note:
+            failures.append(f"steady_shot on {[len(s) for s in shots]}: {len(got)} bytes, {said.getvalue()!r}")
 
 
 def main():
@@ -97,6 +135,9 @@ def main():
                 lines.append(f"{tool.META} {name} {json.dumps(state)}")
                 lines += frame_lines(name, page.screenshot(type="jpeg", quality=85))
                 page.close()
+            check_black_frames(lines, d, failures)
+            real = base64.b64decode([lines[i + 1] for i, l in enumerate(lines) if l.startswith(f"{BEGIN} ouvert")][0])
+            check_steady_shot(real, failures)
             log = Path(d) / "log"
             log.write_text("\n".join(lines) + "\n")
             verdict = tool.extract(log, Path(d) / "out")
