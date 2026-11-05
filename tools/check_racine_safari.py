@@ -41,12 +41,12 @@ from check_trombone_safari import BEGIN, END, call, print_frame, reports, serve
 REPO = Path(__file__).resolve().parent.parent
 CARDS = ("merlin", "gobelin", "courtepaille", "inviolia", "dernier-prix", "source-eclat")
 META = "=====META"
-SETTLE = 1.4
+SETTLE = 1.7
 FLAT = ".plaque, .enveloppe, .rabat { transform-style: flat !important; }"
 # A runner's Mac may ask for reduced motion: the envelope then opens at once, as it should, and there
 # is no swing to read. These beat the page's `*` rule by specificity.
 MOVE = """.cible > a .rabat { transition: transform 0.45s ease-in-out !important; }
-.cible > a .lettre { transition: transform 0.5s ease 0.3s !important; }"""
+.cible > a .lettre { transition: transform 0.75s ease 0.45s !important; }"""
 
 PARTS = """
 const card = document.querySelector('.cible.' + arguments[0]);

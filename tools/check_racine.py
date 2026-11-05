@@ -27,7 +27,7 @@ CARDS = ("merlin", "gobelin", "courtepaille", "inviolia", "dernier-prix", "sourc
 WIDTHS = (320, 390, 600, 800, 1000, 1007, 1024, 1265, 1280, 1600, 1920)
 FLAT = ".plaque, .enveloppe, .rabat { transform-style: flat !important; }"
 BIG = ".cible > a:hover .enveloppe { transform: translateZ(5.5rem) rotate(0deg) scale(1.3); }"
-SETTLE_MS = 1300
+SETTLE_MS = 1500
 HOVER_SETTLE_MS = 750   # the envelope's transition is 0.55 s
 PAPER_AT_LEAST = 0.6    # share of paper where the letter stands, above the envelope
 

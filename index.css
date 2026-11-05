@@ -220,7 +220,8 @@ h1 {
   transform: translateZ(0.2rem);
 }
 
-/* Hinged on the envelope's top edge: two faces, manila outside and the lining inside. */
+/* Hinged on the envelope's top edge: two faces, manila outside and the lining inside. Their
+   triangles are masks: Chrome 156 draws a clip-path here wrong in mid-swing, the tip adrift (r95). */
 .rabat {
   position: absolute;
   inset: 0;
@@ -239,11 +240,13 @@ h1 {
 }
 .rabat::before {
   background: linear-gradient(#f2e0b8, var(--kraft) 40%, #cfb57e 66%);
-  clip-path: polygon(0 0, 100% 0, 50% 66%);
+  -webkit-mask: conic-gradient(at 50% 66%, #000 46.5deg, transparent 46.9deg 313.1deg, #000 313.5deg);
+  mask: conic-gradient(at 50% 66%, #000 46.5deg, transparent 46.9deg 313.1deg, #000 313.5deg);
 }
 .rabat::after {
   background: repeating-linear-gradient(45deg, var(--teinte) 0 3px, #1c1e26 3px 6px);
-  clip-path: polygon(50% 34%, 100% 100%, 0 100%);
+  -webkit-mask: conic-gradient(at 50% 34%, transparent 133.1deg, #000 133.5deg 226.5deg, transparent 226.9deg);
+  mask: conic-gradient(at 50% 34%, transparent 133.1deg, #000 133.5deg 226.5deg, transparent 226.9deg);
   transform: rotateX(180deg);
 }
 /* The seal, on the flap's point. */
@@ -268,7 +271,8 @@ h1 {
 .cible > a:hover .lettre,
 .cible > a:focus-visible .lettre {
   transform: translateZ(0.1rem) translateY(-56%);
-  transition: transform 0.5s var(--ressort) 0.3s;
+  /* Not before the flap has landed: until then it stands in front of the letter (r95). */
+  transition: transform 0.75s var(--ressort) 0.45s;
 }
 
 /* A screen with no pointer never hovers: each envelope opens by itself, in turn. */
@@ -287,9 +291,9 @@ h1 {
   32%, 100% { transform: translateZ(0.3rem) rotateX(0deg); }
 }
 @keyframes lettre-seule {
-  0%, 6% { transform: translateZ(0.1rem); }
-  12%, 22% { transform: translateZ(0.1rem) translateY(-56%); }
-  28%, 100% { transform: translateZ(0.1rem); }
+  0%, 8% { transform: translateZ(0.1rem); }
+  16%, 20% { transform: translateZ(0.1rem) translateY(-56%); }
+  26%, 100% { transform: translateZ(0.1rem); }
 }
 
 @media (max-width: 62rem) {
