@@ -287,13 +287,13 @@ h1 {
 }
 @keyframes rabat-seul {
   0%, 2% { transform: translateZ(0.3rem) rotateX(0deg); }
-  8%, 26% { transform: translateZ(0.05rem) rotateX(180deg); }
-  32%, 100% { transform: translateZ(0.3rem) rotateX(0deg); }
+  8%, 32% { transform: translateZ(0.05rem) rotateX(180deg); }
+  38%, 100% { transform: translateZ(0.3rem) rotateX(0deg); }
 }
 @keyframes lettre-seule {
   0%, 8% { transform: translateZ(0.1rem); }
-  16%, 20% { transform: translateZ(0.1rem) translateY(-56%); }
-  26%, 100% { transform: translateZ(0.1rem); }
+  16%, 26% { transform: translateZ(0.1rem) translateY(-56%); }
+  32%, 100% { transform: translateZ(0.1rem); }
 }
 
 @media (max-width: 62rem) {

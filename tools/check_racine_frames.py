@@ -7,7 +7,8 @@ Hovers a card, pauses every transition and seeks them together through time, ope
 in Chrome and Firefox, and through the loop a screen with no pointer gets, in Chrome. Each moment is
 shot three ways: as it is, with the flap hidden, with flap and letter hidden. It fails on:
 - flap over letter: a pixel the letter draws, once risen out of the pocket, that the flap changes;
-- flap adrift: the flap stands clear of the pocket but does not reach it at the hinge.
+- flap adrift: the flap stands clear of the pocket but does not reach it at the hinge;
+- a short read: on the loop, the letter holds at its full height for under 0.8 s (r99).
 OUT gets a contact sheet per browser and phase.
 
 --control early puts back the letter's start at 0.3 s: Firefox then draws the flap over it.
@@ -26,6 +27,7 @@ SCALE = 2
 OVER_AT_MOST = 60       # CSS px of letter: the flap's soft edge against the letter's shadow is about 15
 CLEAR_FROM = 10         # CSS px the flap stands above the pocket before its hinge is read
 HINGE_AT_LEAST = 0.5    # share of the middle of the hinge the flap must draw
+HOLD_AT_LEAST = 800     # ms the phone's letter stays up: it stood 0.9 s before r95, Simon's timing
 CONTROLS = {
     "early": ".cible > a:hover .lettre { transition: transform 0.75s var(--ressort) 0.3s !important; }",
     "clip": """.rabat::before { -webkit-mask: none !important; mask: none !important;
@@ -80,7 +82,7 @@ def read_moment(page, card):
 
 def walk(page, card, name, moments, problems, out):
     """One phase: the transitions are already running, each moment is sought and read."""
-    sheet = []
+    sheet, heights = [], []
     for moment in moments:
         page.evaluate(SEEK, moment)
         whole, over, stands, hinge = read_moment(page, card)
@@ -93,8 +95,10 @@ def walk(page, card, name, moments, problems, out):
             problems.append(f"{name} at {moment} ms: the flap stands {stands:.0f} px adrift, "
                             f"{hinge:.0%} of its hinge drawn")
         sheet.append((moment, whole, over))
+        heights.append(risen)
     if out:
         write_sheet(sheet, out / f"racine-images-{name}.png")
+    return heights
 
 
 def write_sheet(sheet, path):
@@ -145,7 +149,12 @@ def check_loop(browser, css, step, problems, out):
     if css:
         page.add_style_tag(content=css)
     page.wait_for_timeout(300)
-    walk(page, card, "chrome-boucle", range(150, 3000, max(step, 100)), problems, out)
+    every = max(step, 100)
+    heights = walk(page, card, "chrome-boucle", range(150, 3800, every), problems, out)
+    held = sum(height >= max(heights) - 1 for height in heights) * every
+    print(f"chrome-boucle: the letter holds at full height about {held} ms")
+    if held < HOLD_AT_LEAST:
+        problems.append(f"chrome-boucle: the letter holds at full height only about {held} ms")
     context.close()
 
 
