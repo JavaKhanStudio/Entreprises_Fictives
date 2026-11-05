@@ -43,7 +43,8 @@ class Stand(tool.Safari):
         self.top.goto(self.url, wait_until="load")
         self.at = self.top
         if narrow:
-            self.top.evaluate(as_function(tool.IN_FRAME.replace("done(f)", "done(true)")), [])
+            source = tool.IN_FRAME.replace("WIDTH", str(390 if narrow is True else narrow))
+            self.top.evaluate(as_function(source.replace("done(f)", "done(true)")), [])
             self.at = self.top.frames[1]
         if self.extra:
             self.at.add_style_tag(content=self.extra)
@@ -54,8 +55,14 @@ class Stand(tool.Safari):
     def move(self, origin, x=0, y=0):
         self.top.mouse.move(0, 0)
 
-    def hover(self, selector):
-        self.at.locator(selector).hover()
+    def place(self, x, y):
+        self.top.mouse.move(x, y)
+
+    def press(self):
+        self.top.mouse.down()
+
+    def lift(self):
+        self.top.mouse.up()
 
     def shot(self, selector):
         return base64.b64encode(self.at.locator(selector).screenshot()).decode()
@@ -71,6 +78,8 @@ def main():
         failures.append("STATES differ from tools/check_configurateur_browsers.py")
     if tool.HIDE != ccb.HIDE or tool.FLAT != ccb.CONTROLS["flat"][0] or tool.HOLLOW != ccb.CONTROLS["hollow"][0]:
         failures.append("HIDE, FLAT or HOLLOW differ from tools/check_configurateur_browsers.py")
+    if tool.PLANES not in cc.LEAST:
+        failures.append("the planes of FIT are not those of check_configurateur's LEAST")
     if tool.FREEZE_AT != 6000:
         failures.append("the sway is not frozen where check_configurateur_browsers freezes it")
     for combo, amount in tool.TOTALS:
@@ -95,6 +104,7 @@ def main():
             if name == "right":
                 tool.run_turn(stand, failed)
                 tool.run_totals(stand, failed)
+                tool.run_fit(stand, failed)
                 # The read must see a wrong total: a browser that stopped summing.
                 stand.open(False)
                 stand.script(tool.ADD_STYLE, ".compte { counter-increment: none !important; }")

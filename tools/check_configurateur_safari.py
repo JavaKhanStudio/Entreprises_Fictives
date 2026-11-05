@@ -7,7 +7,8 @@
 Over http, from a local server, safaridriver makes the choices with real clicks, freezes the sway at its
 middle and takes the window, then the same window with the coffin hidden, for the states of
 tools/check_configurateur_browsers.py, in a 1280 window and in a 390 iframe (a Safari window does not go
-down to 390; its media queries read the iframe). A real pointer turns the coffin strip by strip; the total
+down to 390; its media queries read the iframe). A real pointer presses and drags the coffin, the lid's
+checkbox flashes until used, the kit stays inside a 1007 window (frame fit-1007-kit, by eye); the total
 is compared, on the Mac, with the same box holding the amount as written text, both PNGs byte for byte.
 
 --extract then draws the same states in Chrome at the width Safari laid out (classic scrollbars take
@@ -53,9 +54,13 @@ STATES = {
     "ouvert": (["m-pin", "i-satin"], "Trois-quarts", True),
     "chene": (["m-chene", "n6"], "Trois-quarts", False),
     "kit": (["m-peuplier", "i-satin", "k-oui"], "Trois-quarts", False),
+    "ferme-occupe": (["m-pin", "o-homme"], "Trois-quarts", False),
+    "homme": (["m-pin", "i-satin", "o-homme"], "Trois-quarts", True),
+    "femme": (["m-pin", "i-satin", "o-femme"], "Trois-quarts", True),
+    "femme-kit": (["m-peuplier", "i-satin", "k-oui", "o-femme"], "Trois-quarts", False),
 }
 VIEWS = {"Face": ("v6", 0), "Trois-quarts": ("v5", -30), "Bout": ("v9", 90)}
-HIDE = ".socle, .fond, .paroi, .couvercle { visibility: hidden !important; } .paroi *, .couvercle *, .socle * { visibility: hidden !important; }"
+HIDE = ".socle, .fond, .paroi, .couvercle, .corps { visibility: hidden !important; } .paroi *, .couvercle *, .socle *, .corps * { visibility: hidden !important; }"
 FLAT = ".camera, .balance, .plateau, .socle, .paroi, .couvercle, .poignee, .h-de { transform-style: flat !important; }"
 HOLLOW = ".f { backface-visibility: visible !important; }"
 LID = ".h-de { background: #f0f !important; }"
@@ -64,11 +69,11 @@ LINING = ".fond, .doublure, .l-de { background: #0ff !important; }"
 MARKED = {"repere-dessus": ("ferme", LID), "repere-doublure": ("ouvert", LINING)}
 CONTROLS = {"plat-repere-dessus": ("ferme", LID + FLAT), "plat-ferme": ("ferme", FLAT),
             "creux-repere-dessus": ("ferme", LID + HOLLOW), "creux-ferme": ("ferme", HOLLOW)}
-RESETS = ("n0", "i-brut", "q-non", "k-non", "g-0", "m-pin")
+RESETS = ("n0", "i-brut", "o-non", "q-non", "k-non", "g-0", "m-pin")
 # Every option once at least; the full list is on Chrome and Firefox: a macOS minute counts ten times.
 TOTALS = [(["m-pin"], 449), (["m-peuplier"], 519), (["m-chene"], 833),
-          (["m-chene", "n6", "i-satin", "q-oui", "g-10"], 1068),
-          (["m-peuplier", "n6", "i-satin", "q-oui", "k-oui", "g-10"], 714),
+          (["m-chene", "n6", "i-satin", "o-homme", "q-oui", "g-10"], 1068),
+          (["m-peuplier", "n6", "i-satin", "o-femme", "q-oui", "k-oui", "g-10"], 714),
           (["m-pin", "n2", "i-poly", "k-oui", "g-5"], 501),
           (["m-chene", "n4", "i-poly", "q-oui", "k-oui", "g-5"], 934)]
 
@@ -78,7 +83,7 @@ const r = q('.scene').getBoundingClientRect();
 const m = new DOMMatrix(getComputedStyle(q('.plateau')).transform);
 return {scene: {x: r.x, y: r.y, w: r.width, h: r.height},
         angle: Math.round(Math.atan2(-m.m13, m.m11) * 180 / Math.PI),
-        hover: document.querySelectorAll('.z:hover').length, client: e.clientWidth,
+        client: e.clientWidth,
         top: [parent.innerWidth, parent.innerHeight], wide: e.scrollWidth - e.clientWidth, ratio: devicePixelRatio,
         reduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
         animations: document.getAnimations().length, agent: navigator.userAgent};
@@ -91,17 +96,34 @@ TO_SCENE = "document.querySelector('.scene').scrollIntoView({block: 'center'});"
 IN_FRAME = """
 const f = document.createElement('iframe');
 f.src = location.href;
-f.style.cssText = 'position:fixed;left:0;top:0;width:390px;height:800px;border:0;background:#fff;z-index:99999';
+f.style.cssText = 'position:fixed;left:0;top:0;width:WIDTHpx;height:800px;border:0;background:#fff;z-index:99999';
 document.body.appendChild(f);
 return new Promise(done => { f.onload = () => done(f); });
 """
+ECLAT = """const l = document.querySelector('label.ouvrir');
+return [document.getAnimations().filter(a => a.animationName === 'eclat').length, getComputedStyle(l, '::after').opacity];"""
+STILL = ".balance { animation: none !important; } .camera, .plateau, .paroi, .couvercle { transition: none !important; }"
+# tests/test_check_configurateur_safari.py holds its selector to tools/check_configurateur.py's LEAST.
+PLANES = ".paroi .f, .couvercle .f, .socle .f, .poignee i, .plaque-laiton"
+FIT = """const s = document.querySelector('.scene').getBoundingClientRect();
+let least = [Infinity, ''];
+for (let i = 0; i < 13; i++) {
+  document.querySelector('#v' + i).checked = true;
+  for (const e of document.querySelectorAll('PLANES')) {
+    if (!e.getClientRects().length) continue;
+    const r = e.getBoundingClientRect();
+    const m = Math.min(r.left - s.left, s.right - r.right, r.top - s.top, s.bottom - r.bottom);
+    if (m < least[0]) least = [m, e.parentElement.className + ' ' + e.className];
+  }
+}
+return least;""".replace("PLANES", PLANES)
 # A Mac that asks for reduced motion has no sway to read: this puts it back, for that read only.
 MOVE = ".balance { animation: balance3d 12s ease-in-out infinite alternate !important; }"
 
 # Goes first in <head>, to hear a stylesheet's error event. Each step clicks what a student clicks,
 # then reports; the Mac takes the screen on that report.
 STEP_MS = 7000
-STEPS = [("ferme", [], -30, 449), ("ouvert", ["i-satin", "ouvert"], -30, 538), ("kit", ["ouvert", "k-oui"], -30, 498),
+STEPS = [("ferme", [], -30, 449), ("ouvert", ["i-satin", "o-homme", "ouvert"], -30, 538), ("kit", ["ouvert", "k-oui"], -30, 498),
          ("bout", ["k-non", "v9"], 90, 538), ("chene", ["v5", "m-chene", "n6", "i-brut"], -30, 905)]
 SONDE = """<script>(function () {
   var failed = [], woods = {}, steps = STEPS, q = function (s) { return document.querySelector(s); };
@@ -124,7 +146,7 @@ SONDE = """<script>(function () {
     setTimeout(function () {
       q('.scene').scrollIntoView({block: 'center'});
       var e = document.documentElement;
-      send('NAME-load', {url: location.href, failed: failed, woods: woods, wide: e.scrollWidth - e.clientWidth, client: e.clientWidth,
+      send('NAME-load', {url: location.href, failed: failed, saisie: q('.scene').classList.contains('saisie'), woods: woods, wide: e.scrollWidth - e.clientWidth, client: e.clientWidth,
         sheets: [].map.call(document.querySelectorAll('link[rel=stylesheet]'), function (l) { return [l.getAttribute('href'), !!l.sheet]; }),
         reduced: matchMedia('(prefers-reduced-motion: reduce)').matches, agent: navigator.userAgent});
       step(0);
@@ -138,8 +160,6 @@ def as_expected(name, state, angle):
     problems = []
     if abs((state["angle"] - angle + 180) % 360 - 180) > 1:
         problems.append(f"{name}: at {state['angle']} degrees, not {angle}")
-    if state["hover"]:
-        problems.append(f"{name}: the pointer is still on a strip")
     if state["wide"] > 0:
         problems.append(f"{name}: the page is {state['wide']} px wider than its window")
     return problems
@@ -192,20 +212,65 @@ def run_turn(d, failed):
     if abs(a - b) < 0.1:
         failed.append(f"it does not sway ({a:.2f}, {b:.2f})")
     d.away()
-    for strip, angle in ((9, 90), (0, -180), (6, 0)):
-        d.hover(f".z{strip}")
-        time.sleep(0.8)
-        state = d.script(STATE)
-        print(f"strip {strip}: {state['angle']} degrees, hover {state['hover']}", flush=True)
-        if not state["hover"] or abs((state["angle"] - angle + 180) % 360 - 180) > 1:
-            failed.append(f"the pointer on strip {strip} gives {state['angle']}, not {angle}")
+    running = d.script(ECLAT)
+    print(f"flash, before use: {running}", flush=True)
+    if running[0] != 1 or running[1] != "1":
+        failed.append(f"the lid's checkbox does not flash before use ({running})")
+    scene = d.script(STATE)["scene"]
+    middle = round(scene["y"] + scene["h"] / 2)
+    at = lambda share: round(scene["x"] + scene["w"] * share)
+    d.place(at(1 / 26), middle)
+    d.place(at(25 / 26), middle)
+    time.sleep(0.8)
+    failed.extend(as_expected("the pointer alone", d.script(STATE), -30))
+    d.place(at(0.5), middle)
+    d.press()
+    failed.extend(as_expected("a press", d.script(STATE), -30))
+    d.place(at(0.5 + 4 / 12), middle)
+    state = d.script(STATE)
+    print(f"held, a third of the scene along: {state['angle']} degrees", flush=True)
+    failed.extend(as_expected("the drag", state, 90))
+    d.lift()
+    d.place(at(0.1), middle)
+    time.sleep(0.8)
+    failed.extend(as_expected("after the release", d.script(STATE), 90))
+    d.place(at(0.8), middle)
+    d.press()
+    d.lift()
+    time.sleep(0.8)
+    failed.extend(as_expected("a click without a drag", d.script(STATE), 90))
+    a = d.script(SWAY)
+    time.sleep(0.7)
+    if abs(a - d.script(SWAY)) > 0.001:
+        failed.append("the first press did not stop the sway")
+    d.click("label[for=v5]")
     d.away()
     time.sleep(0.8)
-    failed.extend(as_expected("leaving", d.script(STATE), -30))
-    d.click(".z10")
+    failed.extend(as_expected("the view already chosen, after a drag", d.script(STATE), -30))
+    d.click("label.ouvrir")
+    time.sleep(0.2)
+    running = d.script(ECLAT)
+    print(f"flash, after use: {running}", flush=True)
+    if running[1] != "0":
+        failed.append(f"using the lid's checkbox does not stop its flash ({running})")
+
+
+def run_fit(d, failed):
+    """r93, the kit against the scene's edge, in a 1007 window: planes' rects at each angle, and a frame."""
+    d.open(1007)
+    d.script(ADD_STYLE, STILL)
+    d.pick(["n6", "q-oui", "k-oui"])
+    for lid in ("shut", "open"):
+        least = d.script(FIT)
+        print(f"1007, kit, lid {lid}: least {least[0]:.1f} px, {least[1]}", flush=True)
+        if least[0] < 0:
+            failed.append(f"1007, kit, lid {lid}: {least[1]} passes the scene's edge by {-least[0]:.1f} px")
+        d.click("label.ouvrir")
+    d.script("document.querySelector('#v5').checked = true;")
+    d.script(TO_SCENE)
     d.away()
-    time.sleep(0.8)
-    failed.extend(as_expected("a click on strip 10", d.script(STATE), 120))
+    time.sleep(SETTLE)
+    d.frame("fit-1007-kit", d.script(STATE))
 
 
 def run_totals(d, failed):
@@ -238,7 +303,7 @@ class Safari:
         time.sleep(0.8)
         self.narrow = narrow
         if narrow:
-            frame = self.script(IN_FRAME)
+            frame = self.script(IN_FRAME.replace("WIDTH", str(390 if narrow is True else narrow)))
             self.script(FREEZE, FREEZE_AT)    # the page around the iframe sways in the window's shot too
             call("POST", f"{self.here}/frame", {"id": frame})
             time.sleep(0.8)
@@ -269,9 +334,18 @@ class Safari:
         self.move("viewport", 6, 6)
         self.move("viewport")
 
-    def hover(self, selector):
-        key, value = self.element(selector)
-        self.move({key: value})
+    def place(self, x, y):
+        self.move("viewport", x, y)
+
+    def button(self, kind):
+        call("POST", f"{self.here}/actions", {"actions": [{"type": "pointer", "id": "m", "parameters": {"pointerType": "mouse"},
+             "actions": [{"type": kind, "button": 0}]}]})
+
+    def press(self):
+        self.button("pointerDown")
+
+    def lift(self):
+        self.button("pointerUp")
 
     def shot(self, selector):
         """Good for text only. An element's shot flattens the 3D (seen on Safari 26.6, the screen capture
@@ -315,6 +389,7 @@ def over_http(failed):
         d = Safari(here, serve())
         run_turn(d, failed)
         run_totals(d, failed)
+        run_fit(d, failed)
         run_states(d, lambda line: print(line, flush=True), failed)
         call("DELETE", here)
     finally:
@@ -352,6 +427,8 @@ def load_problems(load):
     if not load:
         return ["file://: the page reported nothing"]
     problems = []
+    if not load.get("saisie"):
+        problems.append("file://: configurateur.js did not run")
     if load["failed"]:
         problems.append(f"file://: refused {load['failed']}")
     unapplied = [href for href, sheet in load["sheets"] if not sheet]

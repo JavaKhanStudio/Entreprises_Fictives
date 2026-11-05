@@ -1,24 +1,17 @@
 #!/usr/bin/env python3
-"""The takes of r89: a dead body in Au Dernier Prix's 3D coffin, man or woman, put on top of the real page.
+"""Write the dead body of Au Dernier Prix's 3D coffin, man and woman, into the page, between its markers.
 
-    python3 tools/dernier_prix_corps_takes.py OUT     # take-*.png in OUT, for `atelier attach --stamp`
+    python3 tools/dernier_prix_corps.py      # rewrites the two bodies in dernier-prix/configurateur.html
 
-Not on the site: students see nothing of this until Simon has said yes, since the body is spicy. Boxes
-of six planes, placed like the coffin's own (x along it, y down, z towards the viewer), showing from
+Boxes of six planes, placed like the coffin's own (x along it, y down, z towards the viewer), showing from
 their outside only. It lies high, near the walls' top, or the near wall hides it from this camera; in
-kit it comes down onto the floor. Shut, it is hidden, or hairlines of it show at the planes' seams (598 px
-measured). Prints whether the closed coffin still hides it. Needs Playwright,
-Chrome, Pillow.
+kit it comes down onto the floor (dernier-prix/configurateur.css, .corps). Shut, it is hidden there, or
+hairlines of it show at the planes' seams (598 px measured).
 """
-import sys
+import re
 from pathlib import Path
 
-from PIL import Image, ImageChops
-from playwright.sync_api import sync_playwright
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import check_configurateur as cc  # noqa: E402
-
+PAGE = Path(__file__).resolve().parent.parent / "dernier-prix/configurateur.html"
 SKIN, HAIR_M, HAIR_F, SHOE = "#d9cfc4", "#8b8b86", "#6d5a48", "#141414"
 SUIT, DRESS, SHIRT, TIE = "#23262e", "#4a2233", "#ece9e2", "#6b1420"
 
@@ -68,52 +61,14 @@ def woman():
                     box(134, 162, -24, -6, -78, -52, SHOE), box(134, 162, 6, 24, -78, -52, SHOE)))
 
 
-CSS = """.corps { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d;
-  transform: translateY(calc(33px * var(--k))); visibility: hidden; transition: transform .7s cubic-bezier(.3, 1.1, .5, 1), visibility 0s .8s; }
-.config:has(#ouvert:checked) .corps, .config:has(#k-oui:checked) .corps { visibility: visible; transition: transform .7s cubic-bezier(.3, 1.1, .5, 1), visibility 0s; }"""
-ADD = "html => { const c = document.createElement('div'); c.className = 'corps'; c.innerHTML = html; document.querySelector('.plateau').appendChild(c); }"
-TAKES = {"homme": (man, ["m-pin", "i-satin"], "Trois-quarts", True), "femme": (woman, ["m-pin", "i-satin"], "Trois-quarts", True),
-         "homme-chene-brut": (man, ["m-chene", "i-brut"], "Face", True), "femme-kit": (woman, ["m-chene", "i-satin", "k-oui"], "Trois-quarts", False)}
-
-
-def shoot(page, name, out):
-    page.mouse.move(0, 0)
-    page.evaluate(cc.FREEZE, 6000)
-    page.wait_for_timeout(cc.SETTLE)
-    path = out / f"take-{name}.png"
-    page.locator(".scene").screenshot(path=path)
-    return Image.open(path).convert("RGB")
-
-
 def main():
-    out = Path(sys.argv[1])
-    out.mkdir(parents=True, exist_ok=True)
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(channel="chrome")
-        for name, (who, combo, view, lid) in TAKES.items():
-            context, page = cc.opened(browser, [], 1280)
-            page.add_style_tag(content=CSS)
-            page.evaluate(ADD, who())
-            cc.choose(page, *combo)
-            page.locator(".vues label", has_text=view).click()
-            if lid:
-                page.locator("label.ouvrir").click()
-            shoot(page, name, out)
-            context.close()
-        # Shut, with or without a body: not one pixel may differ.
-        pictures = []
-        for who in (man, None):
-            context, page = cc.opened(browser, [], 1280)
-            page.add_style_tag(content=CSS)
-            if who:
-                page.evaluate(ADD, who())
-            pictures.append(shoot(page, "ferme", out))
-            context.close()
-        browser.close()
-    print("closed, the body shows:", ImageChops.difference(*pictures).getbbox())
-    (out / "take-ferme.png").unlink()
-    return 0
+    html = PAGE.read_text(encoding="utf-8")
+    bodies = "".join(f'              <div class="corps {name}">{who()}</div>\n' for name, who in (("homme", man), ("femme", woman)))
+    html, count = re.subn(r"( *<!-- corps -->\n).*?( *<!-- /corps -->\n)", lambda m: m[1] + bodies + m[2], html, flags=re.S)
+    if count != 1:
+        raise SystemExit("the page's corps markers are not there once")
+    PAGE.write_text(html, encoding="utf-8")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

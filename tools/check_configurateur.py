@@ -5,9 +5,10 @@
     python3 tools/check_configurateur.py --control tight   # the fit undone: exit 1 is its red, exit 2 it stayed green
 
 Over file://, in Chrome, at phone and desktop widths:
-- it sways, and stands still under reduced motion, where every choice below still works;
-- the pointer turns it, strip by strip, and leaving brings back the chosen angle; a click stays;
-- a real Tab and arrow keys turn it, a real finger too, the four view buttons go where they say;
+- it sways until the first press, and stands still under reduced motion, where every choice below still works;
+- a pointer alone turns nothing; press and drag turns it, a release stops it there, a click does not move it;
+- a real Tab and arrow keys turn it, a real finger drags it, the four view buttons go where they say;
+- the occupant: none at first, man or woman as chosen, hidden shut down to the pixel, seen open or in kit;
 - the lid's checkbox flashes until first used, and not under reduced motion;
 - each option does what it says: the wood, the handles counted, the lining, the plate, the lid, the kit;
 - the total the browser sums is the right one, read as pixels: a counter is not in the DOM;
@@ -36,7 +37,7 @@ ANGLES = list(range(-180, 181, 30))
 SETTLE = 950  # ms, the longest transition (.couvercle) and a margin
 MODELS = {"m-pin": 449, "m-peuplier": 519, "m-chene": 833}
 ADDS = {"n0": 0, "n2": 24, "n4": 48, "n6": 72, "i-brut": 0, "i-poly": 39, "i-satin": 89,
-        "q-non": 0, "q-oui": 25, "k-non": 0, "k-oui": -40, "g-0": 0, "g-5": 29, "g-10": 49}
+        "o-non": 0, "o-homme": 0, "o-femme": 0, "q-non": 0, "q-oui": 25, "k-non": 0, "k-oui": -40, "g-0": 0, "g-5": 29, "g-10": 49}
 # Each option alone, then the extremes and a few in between.
 TOTALS = [[m] for m in MODELS] + [["m-pin", a] for a in ADDS] + [
     ["m-chene", "n6", "i-satin", "q-oui", "g-10"],
@@ -144,6 +145,94 @@ def options(page, settle=SETTLE):
     page.wait_for_timeout(settle)
 
 
+def grip(page, x, y):
+    page.mouse.move(x, y)
+    page.mouse.down()
+
+
+def turning(page, width, box):
+    """Nothing without a press; then the drag, its stop, and a click that moves nothing."""
+    middle = box["y"] + box["height"] / 2
+    at = lambda share: box["x"] + box["width"] * share
+    for i in (0, 3, 9, 12):
+        page.mouse.move(at((i + 0.5) / 13), middle)
+        page.wait_for_timeout(200)
+        check(same_angle(page.evaluate(ANGLE), -30), f"{width}: the pointer alone on strip {i} does not turn it")
+    grip(page, at(0.5), middle)
+    check(same_angle(page.evaluate(ANGLE), -30), f"{width}: a press alone does not turn it")
+    page.mouse.move(at(0.5 + 1 / 12), middle)
+    check(same_angle(page.evaluate(ANGLE), 0), f"{width}: dragging a twelfth of the scene turns it 30 degrees")
+    page.mouse.move(at(0.5 + 4 / 12), middle)
+    check(same_angle(page.evaluate(ANGLE), 90), f"{width}: it follows the drag to 90")
+    page.mouse.up()
+    page.mouse.move(at(0.1), middle)
+    page.wait_for_timeout(650)
+    check(same_angle(page.evaluate(ANGLE), 90), f"{width}: the release stops it there, wherever the pointer goes")
+    page.mouse.click(at(0.8), middle)
+    page.wait_for_timeout(650)
+    check(same_angle(page.evaluate(ANGLE), 90), f"{width}: a click without a drag does not move it")
+    grip(page, at(0.1), middle)
+    page.mouse.move(at(0.1 + 5 / 12), middle)
+    page.mouse.up()
+    found = page.evaluate(ANGLE)  # a narrow scene: over this long a drag, a pixel and its border are 2 degrees
+    check(abs((found + 120 + 180) % 360 - 180) <= 2, f"{width}: a drag past the back goes on round ({found})")
+    # The radio still says three quarters: choosing it again must bring the coffin back.
+    page.locator(".vues label", has_text="Trois-quarts").click()
+    page.mouse.move(0, 0)
+    page.wait_for_timeout(650)
+    check(same_angle(page.evaluate(ANGLE), -30), f"{width}: the view already chosen takes it back after a drag")
+
+
+def sway_stops(browser, errors):
+    context, page = opened(browser, errors, 1280)
+    box = page.locator(".scene").bounding_box()
+    grip(page, box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+    page.mouse.up()
+    page.wait_for_timeout(100)    # a pause is pending until the next frame
+    a = page.evaluate(SWAY)
+    page.wait_for_timeout(700)
+    check(a == page.evaluate(SWAY), "the first press stops the sway")
+    context.close()
+
+
+def still_scene(page):
+    page.mouse.move(0, 0)
+    page.evaluate(FREEZE, 6000)
+    page.wait_for_timeout(SETTLE)
+    return tile(page, ".scene")
+
+
+VISIBLE = "s => { const e = document.querySelector(s); return getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility === 'visible'; }"
+
+
+def occupant(browser, errors):
+    context, page = opened(browser, errors, 1280)
+    alone = still_scene(page)
+    check(page.evaluate(SHOWN, ".corps") == 0, "occupant: none at first")
+    choose(page, "o-homme")
+    check(page.evaluate(SHOWN, ".homme") == 1 and page.evaluate(SHOWN, ".femme") == 0, "occupant: the man is the man")
+    check(not page.evaluate(VISIBLE, ".homme"), "occupant: hidden while the lid is shut")
+    check(ImageChops.difference(alone, still_scene(page)).getbbox() is None, "occupant: shut, not one pixel of him shows")
+    page.locator("label.ouvrir").click()
+    page.mouse.move(0, 0)
+    page.wait_for_timeout(SETTLE)
+    check(page.evaluate(VISIBLE, ".homme"), "occupant: the lid open, he shows")
+    man = still_scene(page)
+    choose(page, "o-femme")
+    check(page.evaluate(SHOWN, ".homme") == 0 and page.evaluate(VISIBLE, ".femme"), "occupant: the woman takes his place")
+    woman = still_scene(page)
+    choose(page, "o-non")
+    check(page.evaluate(SHOWN, ".corps") == 0, "occupant: none again")
+    empty = still_scene(page)
+    check(ImageChops.difference(man, empty).getbbox() is not None and ImageChops.difference(man, woman).getbbox() is not None,
+          "occupant: man, woman and nobody draw three different coffins")
+    page.locator("label.ouvrir").click()
+    choose(page, "o-homme", "k-oui")
+    page.wait_for_timeout(SETTLE)
+    check(page.evaluate(VISIBLE, ".homme"), "occupant: in kit, shut or not, he shows")
+    context.close()
+
+
 FLASH = """() => { const label = document.querySelector('label.ouvrir');
   const running = document.getAnimations().filter(a => a.animationName === 'eclat').length;
   return [running, getComputedStyle(label, '::after').opacity]; }"""
@@ -212,7 +301,7 @@ def price_is(page, selector, amount):
 
 
 def totals(page):
-    resets = ("n0", "i-brut", "q-non", "k-non", "g-0", "m-pin")
+    resets = ("n0", "i-brut", "o-non", "q-non", "k-non", "g-0", "m-pin")
     for combo in TOTALS:
         choose(page, *resets)
         choose(page, *combo)
@@ -237,20 +326,7 @@ def run(browser, out, errors, is_mobile=True):
         page.evaluate(FREEZE, 6000)
         check(same_angle(page.evaluate(ANGLE), -30), f"{width}: it starts at three quarters")
 
-        box = page.locator(".scene").bounding_box()
-        hover = list(enumerate(ANGLES)) if width == 1280 else list(enumerate(ANGLES))[::4]
-        for i, angle in hover:
-            page.mouse.move(box["x"] + box["width"] * (i + 0.5) / 13, box["y"] + box["height"] / 2)
-            page.wait_for_timeout(650)
-            found = page.evaluate(ANGLE)
-            check(same_angle(found, angle), f"{width}: the pointer on strip {i} turns it to {angle} ({found})")
-        page.mouse.move(0, 0)
-        page.wait_for_timeout(650)
-        check(same_angle(page.evaluate(ANGLE), -30), f"{width}: leaving brings the chosen angle back")
-        page.mouse.click(box["x"] + box["width"] * 10.5 / 13, box["y"] + box["height"] / 2)
-        page.mouse.move(0, 0)
-        page.wait_for_timeout(650)
-        check(same_angle(page.evaluate(ANGLE), 120), f"{width}: a click stays when the pointer leaves")
+        turning(page, width, page.locator(".scene").bounding_box())
         for label, angle in (("Face", 0), ("Trois-quarts", -30), ("Bout", 90), ("Dos", 180)):
             page.locator(".vues label", has_text=label).click()
             page.mouse.move(0, 0)
@@ -264,6 +340,8 @@ def run(browser, out, errors, is_mobile=True):
             page.screenshot(path=out / f"page-{width}.png", full_page=True)
         context.close()
 
+    sway_stops(browser, errors)
+    occupant(browser, errors)
     flash(browser, errors)
     fit(browser, errors)
     fit(browser, errors, css=SCROLLBAR, label=" with a scrollbar")
@@ -287,9 +365,10 @@ def run(browser, out, errors, is_mobile=True):
     check(page.evaluate("document.getAnimations().length") == 0, "reduced motion: nothing runs")
     check(abs(page.evaluate(SWAY)) < 0.01 and same_angle(page.evaluate(ANGLE), -30), "reduced motion: stands still at three quarters")
     box = page.locator(".scene").bounding_box()
-    page.mouse.move(box["x"] + box["width"] * 9.5 / 13, box["y"] + box["height"] / 2)
-    page.wait_for_timeout(50)
-    check(same_angle(page.evaluate(ANGLE), 90), "reduced motion: the pointer still turns it, at once")
+    grip(page, box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+    page.mouse.move(box["x"] + box["width"] * (0.5 + 4 / 12), box["y"] + box["height"] / 2)
+    page.mouse.up()
+    check(same_angle(page.evaluate(ANGLE), 90), "reduced motion: a drag still turns it")
     page.mouse.move(0, 0)
     options(page, settle=50)
     context.close()
@@ -299,7 +378,29 @@ def run(browser, out, errors, is_mobile=True):
     box = page.locator(".scene").bounding_box()
     page.locator(".scene").tap(position={"x": box["width"] * 3.5 / 13, "y": box["height"] / 2})
     page.wait_for_timeout(650)
-    check(same_angle(page.evaluate(ANGLE), -90), "phone: a tap on a strip turns it")
+    check(same_angle(page.evaluate(ANGLE), -30), "phone: a tap does not move it")
+    if is_mobile:    # the finger itself, which only Chrome's protocol sends
+        page.locator(".scene").scroll_into_view_if_needed()
+        box = page.locator(".scene").bounding_box()
+        cdp = context.new_cdp_session(page)
+        finger = lambda kind, x, y: cdp.send("Input.dispatchTouchEvent", {"type": kind, "touchPoints": [] if kind == "touchEnd" else [{"x": x, "y": y}]})
+        y = box["y"] + box["height"] / 2
+        finger("touchStart", box["x"] + box["width"] / 2, y)
+        for share in (1, 2, 3, 4):
+            finger("touchMove", box["x"] + box["width"] * (0.5 + share / 12), y)
+        page.wait_for_timeout(100)
+        check(same_angle(page.evaluate(ANGLE), 90), "phone: a finger's drag turns it")
+        finger("touchEnd", 0, 0)
+        page.wait_for_timeout(650)
+        check(same_angle(page.evaluate(ANGLE), 90), "phone: lifting the finger stops it there")
+        before = page.evaluate("scrollY")
+        x = box["x"] + box["width"] / 2
+        finger("touchStart", x, y)
+        for move in (10, 40, 80, 120):
+            finger("touchMove", x, y - move)
+        finger("touchEnd", 0, 0)
+        page.wait_for_timeout(400)
+        check(page.evaluate("scrollY") > before and same_angle(page.evaluate(ANGLE), 90), "phone: a finger going up still scrolls the page")
     if is_mobile:
         check(page.locator(".au-doigt").is_visible() and not page.locator(".a-souris").is_visible(),
               "phone: it says touch, not mouse")
@@ -307,6 +408,10 @@ def run(browser, out, errors, is_mobile=True):
     check(page.evaluate(SHOWN, ".poignee") == 4, "phone: a tap chooses an option")
     context.close()
     context, page = opened(browser, errors, 1280)
+    box = page.locator(".scene").bounding_box()
+    grip(page, box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+    page.mouse.move(box["x"] + box["width"] * (0.5 + 4 / 12), box["y"] + box["height"] / 2)
+    page.mouse.up()
     for _ in range(40):
         page.keyboard.press("Tab")
         if page.evaluate("document.activeElement.name === 'vue'"):

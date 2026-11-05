@@ -5,17 +5,19 @@
 
 tools/check_configurateur.py reads computed matrices, and those read the same with the 3D
 flattened: only pixels say what a browser drew. So at 1280 and 390, headed, in Chrome and
-Playwright's Firefox, this freezes the coffin in six states and reads each picture:
+Playwright's Firefox, this freezes the coffin in its states and reads each picture:
 - each picture is compared with the same frame with the coffin hidden, which gives its silhouette;
 - side on, it is much wider than end on, and end on, from above, its length still shows;
 - open, its top is above the closed one; in kit, the silhouette is taller and wider;
 - oak with six handles: dark wood and gold inside the silhouette, and the total drawn right;
+- the occupant: shut, not a pixel of it; open or in kit, it changes the picture, man unlike woman;
 - Firefox differs from Chrome by no more than fonts and antialiasing do.
 Then it runs every check of check_configurateur.py in Firefox.
 
 --control breaks the page in Firefox only and must go red on the read it names: flat removes
 preserve-3d, counter stops the browser summing, hollow draws the faces turned away, which Firefox
-then sorts over the lid's top (seen on r79: a whole lid missing, 0.3 % of the scene). Exit 1 is that red; exit 2 means it stayed green
+then sorts over the lid's top (seen on r79: a whole lid missing, 0.3 % of the scene), nobody drops the
+occupant, seams draws it shut, whose edges show between the planes. Exit 1 is that red; exit 2 means it stayed green
 or failed for another reason.
 
 Headed runs inside cage, as in tools/check_badge_browsers.py. Needs cage, Chrome,
@@ -42,11 +44,13 @@ CONTROLS = {
              "seen from above"),
     "counter": (".compte { counter-increment: none !important; }", "the oak's total"),
     "hollow": (".f { backface-visibility: visible !important; }", "drawn as in Chrome"),
+    "nobody": (".corps { display: none !important; }", "the occupant shows"),
+    "seams": (".corps { visibility: visible !important; }", "shut, nothing of the occupant"),
 }
 LIMIT = 0.05  # of the coffin's box: the hollow lid measured 10 to 26 %, a right one under this
 CAMERA = "() => new DOMMatrix(getComputedStyle(document.querySelector('.camera')).transform).m11"
 SETTLE = "() => new Promise(d => requestAnimationFrame(() => requestAnimationFrame(d)))"
-HIDE = ".socle, .fond, .paroi, .couvercle { visibility: hidden !important; } .paroi *, .couvercle *, .socle * { visibility: hidden !important; }"
+HIDE = ".socle, .fond, .paroi, .couvercle, .corps { visibility: hidden !important; } .paroi *, .couvercle *, .socle *, .corps * { visibility: hidden !important; }"
 # What each colour family is, in (r, g, b).
 OAK = lambda r, g, b: 30 < r < 150 and g < 75 and b < 60 and r > 1.5 * g
 GOLD = lambda r, g, b: r > 150 and g > 110 and 30 < b < 170 and r - b > 60
@@ -58,6 +62,10 @@ STATES = {
     "ouvert": (["m-pin", "i-satin"], "Trois-quarts", True),
     "chene": (["m-chene", "n6"], "Trois-quarts", False),
     "kit": (["m-peuplier", "i-satin", "k-oui"], "Trois-quarts", False),
+    "ferme-occupe": (["m-pin", "o-homme"], "Trois-quarts", False),
+    "homme": (["m-pin", "i-satin", "o-homme"], "Trois-quarts", True),
+    "femme": (["m-pin", "i-satin", "o-femme"], "Trois-quarts", True),
+    "femme-kit": (["m-peuplier", "i-satin", "k-oui", "o-femme"], "Trois-quarts", False),
 }
 
 
@@ -129,6 +137,16 @@ def apart(out, width, state, box):
     return sum(d.histogram()[25:]) / (d.width * d.height)
 
 
+def changed(out, browser, width, state, other, box, level=40):
+    """The share of the coffin's box where two states of one browser differ, by more than level."""
+    if box[2] <= box[0] or box[3] <= box[1]:
+        return 0.0
+    a = Image.open(out / f"{browser}-{width}-{state}.png").convert("RGB").crop(box)
+    b = Image.open(out / f"{browser}-{width}-{other}.png").convert("RGB").crop(box)
+    d = ImageChops.difference(a, b).convert("L")
+    return sum(d.histogram()[level:]) / (d.width * d.height)
+
+
 def judge(r, out):
     """(what, ok) for one browser at one width."""
     box = {state: r[state]["box"] for state in STATES}
@@ -149,6 +167,16 @@ def judge(r, out):
          r["chene"]["oak"] > 0.3 and r["chene"]["gold"] > 0.008),
         ("the oak's total is 905 €, in pixels", r["total_right"]),
         ("no page error", not r["errors"]),
+    ]
+    apart_of = lambda state, other: changed(out, r["browser"], r["width"], state, other, box["ouvert"] if state != "femme-kit" else box["kit"])
+    # The seams are faint: drawn shut, 276 px over 8 and 2 over 40.
+    shut = changed(out, r["browser"], r["width"], "ferme-occupe", "ferme", box["ouvert"], level=8)
+    man, woman, kit_body, unlike = (apart_of("homme", "ouvert"), apart_of("femme", "ouvert"),
+                                          apart_of("femme-kit", "kit"), apart_of("homme", "femme"))
+    checks += [
+        (f"shut, nothing of the occupant shows ({shut:.2%} of the box changed)", shut < 0.001),
+        (f"the occupant shows, open ({man:.1%} man, {woman:.1%} woman) and in kit ({kit_body:.1%})", min(man, woman, kit_body) > 0.02),
+        (f"the man is not the woman ({unlike:.1%})", unlike > 0.01),
     ]
     if r["browser"] == "firefox":
         for state in STATES:
