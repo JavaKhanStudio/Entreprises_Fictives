@@ -6,6 +6,7 @@
 
 [tags.shared]
 label = "Skeleton & gate"
+visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "What all the sites share: shared/, the root index, the footer, the check gate"
 context = """
 FILES: index.html + index.css (the root list of the companies; its words name no count, Simon on r10, so a company can be added; a card shows a picture its own site ships, plus merlin/img/vignette.webp from tools/racine_images.py, and a manila envelope that opens on hover, CSS only, Simon on r77; after touching it run python3 tools/check_racine.py OUT, in Chrome and Firefox, because render_pages.py freezes it; a change to its timings or its flap also runs python3 tools/check_racine_frames.py OUT, which seeks every moment of the swing (r95: Chrome 156 draws a clip-path on the swinging flap adrift, so its triangles are masks, and the letter starts only once the flap has landed); real Safari, over file:// and http, is python3 tools/check_racine_safari.py on a macOS runner (r81, its docstring), which ten-times-priced minutes keep for a change of the 3D, the clip-paths and masks or where the pictures live; a new company also needs its name in CARDS there and in that tool, its --teinte and --cadre in index.css), shared/base.css (what every page shares, no company's look), shared/modele.html (the page every site starts from, and the reference footer), tools/check_sites.py (the gate), tests/test_check_sites.py (each refusal proved), tools/render_pages.py (the browser's view).
@@ -20,6 +21,7 @@ OPEN: double-click must work, so links are relative and name their file (merlin/
 
 [tags.merlin]
 label = "Papeterie Merlin"
+visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of Papeterie Merlin, in merlin/"
 context = """
 FILES: 7 pages in merlin/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact), merlin/merlin.css, merlin/merlin.js, merlin/base.css (a copy, see RULE in #shared). Domain: papeterie-merlin.example.
@@ -34,6 +36,7 @@ MOTION: tools/render_pages.py renders under reduced motion, so its pictures show
 
 [tags.gobelin]
 label = "Gobelin Hurlant"
+visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the indie game studio Gobelin Hurlant, in gobelin/"
 context = """
 FILES: 8 pages in gobelin/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact, connexion-discord), gobelin/gobelin.css, gobelin/base.css (a copy, see RULE in #shared). Domain: gobelin-hurlant.example. gobelin/connexion-discord.html is the trap page: it leaves the fiction on purpose (Simon, r3).
@@ -47,6 +50,7 @@ CLUES: the list is in r3's done note (atelier show r3 --full), never in this rep
 
 [tags.courtepaille]
 label = "Etude Courtepaille"
+visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the notary's office Etude Courtepaille, in courtepaille/"
 context = """
 FILES: 7 pages in courtepaille/ (index, a-propos, equipe, organigramme, recrutement, communique, contact), courtepaille/courtepaille.css, courtepaille/base.css (a copy, see RULE in #shared). Domain: etude-courtepaille.example.
@@ -58,6 +62,7 @@ DATES: no year in the plot, it runs as a yearly habit (Simon, r4). The pages agr
 
 [tags.inviolia]
 label = "Inviolia"
+visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the cybersecurity vendor Inviolia, in inviolia/"
 context = """
 FILES: 7 pages in inviolia/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact), inviolia/inviolia.css, inviolia/inviolia.js, inviolia/base.css (a copy, see RULE in #shared). Domain: inviolia.example.
@@ -72,6 +77,7 @@ CLUES: the list is in r75's done note (atelier show r75 --full), never in this r
 
 [tags.source-eclat]
 label = "Source & Eclat"
+visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the multi-level marketing firm Source & Eclat, in source-eclat/"
 context = """
 FILES: 7 pages in source-eclat/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact), source-eclat/source-eclat.css, source-eclat/source-eclat.js, source-eclat/base.css (a copy, see RULE in #shared). Domain: source-et-eclat.example.
@@ -87,6 +93,7 @@ CLUES: the list is in r76's done note (atelier show r76 --full), never in this r
 
 [tags.dernier-prix]
 label = "Au Dernier Prix"
+visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the hard-discount funeral home Au Dernier Prix, in dernier-prix/"
 context = """
 FILES: 8 pages in dernier-prix/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact, configurateur), dernier-prix/dernier-prix.css, dernier-prix/configurateur.css (that page only), dernier-prix/base.css (a copy, see RULE in #shared). Domain: au-dernier-prix.example.
