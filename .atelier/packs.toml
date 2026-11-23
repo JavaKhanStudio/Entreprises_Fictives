@@ -17,6 +17,7 @@ HEALTH: atelier quality audits the paths in lighthouse_paths of projects/entrepr
 RULE: what two sites share lives ONCE, in shared/. One exception, shared/base.css: real Safari over file:// refuses what is above the opened page's folder (r61, tools/check_trombone_safari.py --file-probe), so each company holds a copy as <company>/base.css and its pages link base.css. Change shared/base.css, then copy it to the three: the gate refuses a copy that differs (base-copy) and any load going up a folder (above-folder). Their look does not: each company has its own CSS on top. HTML has no include, so the footer is copied verbatim from shared/modele.html into each page and the gate compares bytes. To change its words, change every page in the same commit.
 ICON: each page links its tab icon in its head: <company>/img/icone.svg, icon.svg for the root (Simon on r19). A page without one logs a 404 on /favicon.ico and Best Practices drops to 96. To change an icon, read it at 16 px with python3 tools/icon_takes.py --shipped OUT_DIR.
 OPEN: double-click must work, so links are relative and name their file (merlin/index.html, never merlin/: over file:// a folder opens a listing). A page tested only through http.server can hide a broken file:// path: render_pages.py tests both.
+THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
 """
 
 [tags.merlin]
@@ -32,6 +33,7 @@ LOOK: Simon on r2: more real, more professional, and the company would vibe-code
 SCRIPT: merlin/merlin.js is the one JS of the sites: the WebGL clip with no library, counters, reveals. A classic script, because file:// refuses modules. Every word stays in the HTML, and merlin/img/trombone-3d.svg shows without WebGL or JS. The clip is a tube swept along the same path as merlin/img/trombone.svg.
 NO GPU: where WebGL's renderer names software, sansGpu() in merlin/merlin.js draws the clip without antialiasing, at 1x pixels and 30 frames a second (Simon on r55). Lighthouse's Chrome is such a machine, so its Merlin score measures this path, not what a student with a GPU sees. That score follows the machine's load: 99 to 100 at a load average near 25, 68 to 81 above 60, so read uptime before calling it a regression. check_trombone.py proves the cheap path, check_trombone_browsers.py the full one.
 MOTION: tools/render_pages.py renders under reduced motion, so its pictures show the clip standing still. python3 tools/check_trombone.py checks what moves, the two fallbacks, and overflow at 8 widths. Run it when merlin.js or merlin.css changes.
+THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
 """
 
 [tags.gobelin]
@@ -46,6 +48,7 @@ DATES: the plot's dates stay as they are after 13 Nov 2026, though students then
 PICTURES: the .webp in gobelin/img/ come from tools/gobelin_images.py. make paints into ~/.cache/gobelin-images with the local ComfyUI, which whoever runs it starts (nice -n 15 python main.py in ~/ComfyUI) and stops after the batch. ship resizes that cache into gobelin/img/ and needs no ComfyUI. The model's lettering is always false: what must be read is pasted on by ship.
 BADGE: the 3D badge on gobelin/a-propos.html is CSS only, in gobelin/gobelin.css. After touching it, run python3 tools/check_badge.py and python3 tools/check_badge_browsers.py OUT: check_badge.py alone cannot see 3D, its matrices read the same with the 3D flattened (r59). Firefox paints nothing for background-clip: text on the element that carries the 3D transform, so the gold of .crunch sits on its inner span. Safari: tools/check_badge_safari.py.
 CLUES: the list is in r3's done note (atelier show r3 --full), never in this repo.
+THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
 """
 
 [tags.courtepaille]
@@ -58,6 +61,7 @@ NEW PAGE: copy shared/modele.html to courtepaille/, then add courtepaille.css af
 SURFACE: large property transfers, elderly clients, paper first, a website that looks its age. Simon kept the name (2026-11-02) though Courtepaille is also a restaurant chain: the site says nothing of restaurants.
 PICTURES: the portraits and the seal are SVG. The home page's photograph is courtepaille/img/facade-photo.jpg, painted and aged by tools/courtepaille_images.py, deliberately small and poor (Simon, r68). The counter's number on index.html links img/facade.svg with no look of a link: an easter egg, not a leftover.
 DATES: no year in the plot, it runs as a yearly habit (Simon, r4). The pages agree on: 16 novembre au 4 décembre, grandes ventes signed the troisième vendredi de décembre at 15 h, pli RIB three weeks before, funds the Friday before, successor the premier lundi de janvier. A duration never sits beside its start year (41 ans, no 1985). The footer reads "Dernière mise à jour : 2 novembre 2026 (la précédente datait de 2009)": Simon took back his flat 2009 on r86, so leave the bracket. No page says neveu: the surname says it. No real notary's name, checked by search: the public directory is https://www.notaires.fr/fr/directory.
+THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
 """
 
 [tags.inviolia]
@@ -73,6 +77,7 @@ PICTURES: the .webp in inviolia/img/ come from tools/inviolia_images.py: make pa
 MOTION: inviolia/inviolia.js (a classic script in the head) sets html.vivant and each block's --p from the scroll; inviolia.css moves things only under .vivant, so without the script or under reduced motion the page stands still and every word is in the HTML. Stops are hand hooks, data-stop in the pages (Simon on r75, the gentle locking of ficelle-site r67). Render pictures freeze all this: python3 tools/check_inviolia.py [OUT] proves it in Chrome and Firefox, tools/check_inviolia_safari.py on a macOS runner. LIVE MAP (r78, r90): the same script climbs the counter at the rate its words give (4 812 336 a day), rolls the feed by CSS order, and paints neon comets on a canvas over the globe, Simon's pick on r90; none of it runs off screen. The line that leaves comes back as a new one: its clock later than the last, its target and attack both from the HTML's own lines, its pair not on screen, so the page's six lines are all the words the feed can use. tools/inviolia_live_takes.py holds the takes he chose from. The counter and the feed's clock start at the written values on each load.
 DATES: staff posts run from September to November 2026, the press release is 20 October 2026, and the migration it announces is 11 to 15 January 2027. Pages agree on 147 clients, 8 staff, 2017, 212 podcast episodes.
 CLUES: the list is in r75's done note (atelier show r75 --full), never in this repo.
+THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
 """
 
 [tags.source-eclat]
@@ -89,6 +94,7 @@ SCRIPT: source-eclat/source-eclat.js only moves the countdown of the top band; i
 PICTURES: the .webp in source-eclat/img/ come from tools/source_eclat_images.py. make paints into ~/.cache/source-eclat-images with the local ComfyUI (see #gobelin's PICTURES), ship resizes into source-eclat/img/. plage and eau are the mock-up's, from ~/.cache/new-site-takes; Marie-Ange's portrait is cropped out of plage, so one face. The model's lettering is false, so no picture holds text to read.
 NUMBERS: the pages agree: 1+3+14+61+412+8679 = 9 170 Ambassadors, and the ladder's monthly incomes multiply out to the 5,8 M euros of commissions a year (a-propos, communique). Change one, change them all. The chain's hours on organigramme.html are the hours in Christelle's and Didier's posts.
 CLUES: the list is in r76's done note (atelier show r76 --full), never in this repo.
+THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
 """
 
 [tags.dernier-prix]
@@ -106,6 +112,7 @@ PICTURES: bois-*.webp are computed by tools/dernier_prix_bois.py. The other .web
 STILL: no JS, the page stands still. AJOUTER AU PANIER and Mon panier go to the empty cart on the home page, which collects nothing; the search box is a link. Only configurateur.html moves, in CSS but for configurateur.js, the press and drag that turns the coffin (r89: a pointer alone turns nothing, a release stops it): Configurer en 3D opens it. Its choices are radios outside any form, its total is summed by CSS counters. The occupant's planes are written into the page by tools/dernier_prix_corps.py. Prove a change with tools/check_configurateur.py and tools/check_configurateur_browsers.py, real Safari with tools/check_configurateur_safari.py: each plane shows from its outside only (backface-visibility), or Firefox sorts a turned-away face over the lid. Prices there are the home page's.
 DATES: the notices are dated for the week of 2 November 2026 (Thursday 5, Friday 6, Saturday 7). Pages agree on: press release 2 November, Didier at the salon and the new bank 16 November, Black Friday 27 November, Toussaint offer to 30 November, invoice job from 4 January to 26 March. Also on 1952, 14 staff, 1 140 families in 2025, 8 days and 10 %, 48 h, 5 000 euros, 6 400 cards, 2 300 contracts, the reference FAC-2026-xxxxx.
 CLUES: the list is in r77's note of 2026-11-03 02:30 (atelier show r77 --full), never in this repo.
+THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
 """
 [tags.hosting]
 label = "Hosting"
