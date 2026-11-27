@@ -40,53 +40,67 @@ return {y: scrollY, wide: document.documentElement.scrollWidth - innerWidth, viv
 """
 
 
+def script(here, source):
+    return call("POST", f"{here}/execute/sync", {"script": source, "args": []}, timeout=30)
+
+
+def take(here, failed, name, y):
+    """Scroll to y, print the state and the frame into the log: a page wider than its window or with
+    no html.vivant goes into failed."""
+    script(here, f"scrollTo(0, {y})")
+    time.sleep(1.0)  # past the glide: it may rest on a stop nearby
+    state = script(here, STATE)
+    print(f"{name} {json.dumps(state)}", flush=True)
+    print_frame(name, small_jpeg(base64.b64decode(call("GET", f"{here}/screenshot")), 1400))
+    if state["wide"] > 0:
+        failed.append(f"{name}: {state['wide']} px sideways")
+    if not state["vivant"]:
+        failed.append(f"{name}: no html.vivant")
+    return state
+
+
+def home(here, port, failed):
+    """The home at its key positions: the camera wide at the top, pushed in and held at the end of
+    its course, then the globe, the cards and the end, where nothing stays faded."""
+    call("POST", f"{here}/url", {"url": f"http://127.0.0.1:{port}/inviolia/index.html"})
+    time.sleep(2)
+    start = take(here, failed, "home-top", 0)
+    if abs(start["scale"] - 1) > .01:
+        failed.append(f"camera starts at {start['scale']}")
+    course = script(here, "return document.querySelector('.scene-hero').offsetHeight - document.querySelector('.cadre').offsetHeight")
+    end = take(here, failed, "home-pinned-end", course)
+    if abs(end["scale"] - 1.55) > .01:
+        failed.append(f"camera ends at {end['scale']}")
+    if abs(end["cadre"] - end["bar"]) > 2:
+        failed.append(f"hero not held: {end['cadre']} against {end['bar']}")
+    last = script(here, "return document.documentElement.scrollHeight - innerHeight")
+    take(here, failed, "home-globe", course + (last - course) // 3)
+    take(here, failed, "home-cards", course + 2 * (last - course) // 3)
+    if take(here, failed, "home-end", last)["faded"]:
+        failed.append("home: faded at the end")
+
+
+def swept(here, port, failed, one):
+    """Another page at its top, middle and end, where nothing stays faded."""
+    call("POST", f"{here}/url", {"url": f"http://127.0.0.1:{port}/inviolia/{one}.html"})
+    time.sleep(2)
+    last = script(here, "return document.documentElement.scrollHeight - innerHeight")
+    take(here, failed, f"{one}-top", 0)
+    take(here, failed, f"{one}-middle", last // 2)
+    if take(here, failed, f"{one}-end", last)["faded"]:
+        failed.append(f"{one}: faded at the end")
+
+
 def on_the_mac():
     print(subprocess.run(["sw_vers"], capture_output=True, text=True, check=False).stdout)
     subprocess.run(["defaults", "write", "com.apple.universalaccess", "reduceMotion", "-bool", "false"], check=False)
     failed = []
     with safari_session() as here:
         port = serve()
-
-        def script(source):
-            return call("POST", f"{here}/execute/sync", {"script": source, "args": []}, timeout=30)
-
-        def take(name, y):
-            script(f"scrollTo(0, {y})")
-            time.sleep(1.0)  # past the glide: it may rest on a stop nearby
-            state = script(STATE)
-            print(f"{name} {json.dumps(state)}", flush=True)
-            print_frame(name, small_jpeg(base64.b64decode(call("GET", f"{here}/screenshot")), 1400))
-            if state["wide"] > 0:
-                failed.append(f"{name}: {state['wide']} px sideways")
-            if not state["vivant"]:
-                failed.append(f"{name}: no html.vivant")
-            return state
-
         call("POST", f"{here}/window/rect", {"width": 1280, "height": 900, "x": 0, "y": 0})
-        call("POST", f"{here}/url", {"url": f"http://127.0.0.1:{port}/inviolia/index.html"})
-        time.sleep(2)
-        start = take("home-top", 0)
-        if abs(start["scale"] - 1) > .01:
-            failed.append(f"camera starts at {start['scale']}")
-        course = script("return document.querySelector('.scene-hero').offsetHeight - document.querySelector('.cadre').offsetHeight")
-        end = take("home-pinned-end", course)
-        if abs(end["scale"] - 1.55) > .01:
-            failed.append(f"camera ends at {end['scale']}")
-        if abs(end["cadre"] - end["bar"]) > 2:
-            failed.append(f"hero not held: {end['cadre']} against {end['bar']}")
-        last = script("return document.documentElement.scrollHeight - innerHeight")
-        take("home-globe", course + (last - course) // 3)
-        take("home-cards", course + 2 * (last - course) // 3)
-        if take("home-end", last)["faded"]:
-            failed.append("home: faded at the end")
+        home(here, port, failed)
         for one in ("a-propos", "equipe"):
-            call("POST", f"{here}/url", {"url": f"http://127.0.0.1:{port}/inviolia/{one}.html"})
-            time.sleep(2)
-            last = script("return document.documentElement.scrollHeight - innerHeight")
-            take(f"{one}-top", 0)
-            take(f"{one}-middle", last // 2)
-            if take(f"{one}-end", last)["faded"]:
-                failed.append(f"{one}: faded at the end")
+            swept(here, port, failed, one)
     print("FAILED: " + "; ".join(failed) if failed else "OK")
     return 1 if failed else 0
 
