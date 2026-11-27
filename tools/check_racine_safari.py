@@ -224,58 +224,90 @@ def scratch_page(port, name, force=False):
     return html.replace("<head>", head, 1)
 
 
+def load_problems(load):
+    """What the scratch page's load report says is wrong over file://."""
+    problems = []
+    if load["failed"]:
+        problems.append(f"file://: refused {load['failed']}")
+    unread = [src for src, width in load["images"] if not width]
+    if unread:
+        problems.append(f"file://: pictures not loaded: {unread}")
+    unapplied = [href for href, sheet in load["sheets"] if not sheet]
+    if unapplied:
+        problems.append(f"file://: stylesheets not applied: {unapplied}")
+    if load["wide"] > 0:
+        problems.append(f"file://: {load['wide']} px wider than its window")
+    print(f"file://: {len(load['images']) - len(unread)} of {len(load['images'])} pictures loaded", flush=True)
+    return problems
+
+
+def file_load(scratch, port, failed):
+    """The scratch page opened in Safari, and what it loaded; None if it never reported."""
+    scratch.write_text(scratch_page(port, "file"), encoding="utf-8")
+    subprocess.run(["open", "-a", "Safari", str(scratch)], check=True)
+    load = wait_for("file-load")
+    print("REPORT file-load", json.dumps(load), flush=True)
+    if not load:
+        failed.append("file://: the page reported nothing")
+        screen("file-rien")
+        return None
+    failed.extend(load_problems(load))
+    return load
+
+
+def file_rest(failed):
+    """The envelope shut before the pointer comes."""
+    time.sleep(SETTLE)
+    screen("file-repos")
+    rest = wait_for("file-state")
+    print("REPORT file rest", json.dumps(rest), flush=True)
+    if not rest or rest["flap"] < 0.9:
+        failed.append(f"file://: not closed at rest: {rest}")
+
+
+def file_hover(centre):
+    """A real mouse on the card; the page's last state report, and whether it saw :hover."""
+    try:
+        move_mouse(*centre)
+    except OSError as e:
+        print("the mouse could not be moved:", e, flush=True)
+    reports.pop("file-state", None)
+    hovered = wait_for("file-state", 5, lambda said: said["hover"])
+    time.sleep(SETTLE)
+    said = reports.get("file-state")
+    print("REPORT file hover", json.dumps(said), flush=True)
+    return said, bool(hovered and hovered["hover"])
+
+
+def file_forced(forced, port):
+    """The runner's mouse never reached the page: the same rules on a class, in a second page."""
+    print("file://: this runner's mouse never reached the page: the same rules on a class", flush=True)
+    forced.write_text(scratch_page(port, "force", force=True), encoding="utf-8")
+    subprocess.run(["open", "-a", "Safari", str(forced)], check=True)
+    wait_for("force-load")
+    time.sleep(SETTLE + 1)
+    said = wait_for("force-state")
+    print("REPORT force", json.dumps(said), flush=True)
+    screen("file-ouvert-force")
+    return said
+
+
 def over_file(failed):
     """Double-clicked, as a student does."""
     port = serve()
     scratch = REPO / "_sonde_racine.html"
     forced = REPO / "_sonde_racine_force.html"
     try:
-        scratch.write_text(scratch_page(port, "file"), encoding="utf-8")
-        subprocess.run(["open", "-a", "Safari", str(scratch)], check=True)
-        load = wait_for("file-load")
-        print("REPORT file-load", json.dumps(load), flush=True)
+        load = file_load(scratch, port, failed)
         if not load:
-            failed.append("file://: the page reported nothing")
-            screen("file-rien")
             return
-        if load["failed"]:
-            failed.append(f"file://: refused {load['failed']}")
-        unread = [src for src, width in load["images"] if not width]
-        if unread:
-            failed.append(f"file://: pictures not loaded: {unread}")
-        unapplied = [href for href, sheet in load["sheets"] if not sheet]
-        if unapplied:
-            failed.append(f"file://: stylesheets not applied: {unapplied}")
-        if load["wide"] > 0:
-            failed.append(f"file://: {load['wide']} px wider than its window")
-        print(f"file://: {len(load['images']) - len(unread)} of {len(load['images'])} pictures loaded", flush=True)
-        time.sleep(SETTLE)
-        screen("file-repos")
-        rest = wait_for("file-state")
-        print("REPORT file rest", json.dumps(rest), flush=True)
-        if not rest or rest["flap"] < 0.9:
-            failed.append(f"file://: not closed at rest: {rest}")
-        try:
-            move_mouse(*load["centre"])
-        except OSError as e:
-            print("the mouse could not be moved:", e, flush=True)
-        reports.pop("file-state", None)
-        hovered = wait_for("file-state", 5, lambda said: said["hover"])
-        time.sleep(SETTLE)
-        said = reports.get("file-state")
-        print("REPORT file hover", json.dumps(said), flush=True)
-        if hovered and hovered["hover"]:
+        file_rest(failed)
+        said, hovered = file_hover(load["centre"])
+        if hovered:
             print("file://: a real mouse hovers the card", flush=True)
             screen("file-ouvert")
         else:
-            print("file://: this runner's mouse never reached the page: the same rules on a class", flush=True)
-            forced.write_text(scratch_page(port, "force", force=True), encoding="utf-8")
-            subprocess.run(["open", "-a", "Safari", str(forced)], check=True)
-            wait_for("force-load")
-            time.sleep(SETTLE + 1)
-            said = wait_for("force-state")
-            print("REPORT force", json.dumps(said), flush=True)
-            screen("file-ouvert-force")
+            said = file_forced(forced, port)
         if not said or said["flap"] > -0.9 or said["risen"] < 20:
             failed.append(f"file://: the envelope did not open: {said}")
     finally:

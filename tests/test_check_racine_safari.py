@@ -88,6 +88,11 @@ def main():
             load = tool.wait_for("t-load", 8)
             if not load or load["failed"] or not all(w for _, w in load["images"]) or len(load["images"]) != pictures:
                 failures.append(f"file:// beacon: {load}")
+            # The verdict the Mac draws from that report: none on a good load, one on a refused picture.
+            if load and tool.load_problems(load):
+                failures.append(f"load_problems on a good load: {tool.load_problems(load)}")
+            if load and not tool.load_problems({**load, "images": [*load["images"], ["img/absent.webp", 0]]}):
+                failures.append("load_problems let an unloaded picture through")
             if not tool.wait_for("t-state", 4) or reports["t-state"]["hover"] or reports["t-state"]["flap"] < 0.9:
                 failures.append(f"rest over file://: {reports.get('t-state')}")
             # The centre it reports is where the card is: playwright's window has no chrome, so inner = outer.
