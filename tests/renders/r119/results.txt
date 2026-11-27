@@ -1,0 +1,6 @@
+r119: check_configurateur.py after splitting run(), 2026-11-27
+check_configurateur.py: exit 0, 0 failure(s); its 203 OK/FAIL lines, sorted, are identical to the version before the split (same run, same machine)
+check_configurateur_browsers.py: exit 0 ALL OK
+--control flat: exit 1 CONTROL flat: red on the read it names
+--control counter: exit 1 CONTROL counter: red on the read it names
+--control hollow: exit 1 CONTROL hollow: red on the read it names

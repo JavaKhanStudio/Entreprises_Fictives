@@ -313,8 +313,8 @@ def totals(page):
     check(not price_is(page, ".ticket .prixf", 450), "the read tells 449 € from 450 €")
 
 
-def run(browser, out, errors, is_mobile=True):
-    """Every check below, in one browser. Firefox refuses is_mobile; has_touch alone taps there."""
+def widths(browser, out, errors):
+    """At each width: the sway, the start, a drag, the view buttons, no overflow; the options at two."""
     for width in WIDTHS:
         context, page = opened(browser, errors, width)
         page.locator(".scene").scroll_into_view_if_needed()
@@ -340,16 +340,9 @@ def run(browser, out, errors, is_mobile=True):
             page.screenshot(path=out / f"page-{width}.png", full_page=True)
         context.close()
 
-    sway_stops(browser, errors)
-    occupant(browser, errors)
-    flash(browser, errors)
-    fit(browser, errors)
-    fit(browser, errors, css=SCROLLBAR, label=" with a scrollbar")
 
-    context, page = opened(browser, errors, 1280)
-    totals(page)
-    context.close()
-
+def sends_nothing(browser, errors):
+    """Choosing everything fetches nothing but the woods."""
     context, page = opened(browser, errors, 1280)
     seen = []
     page.on("request", lambda r: seen.append(r.url))
@@ -360,7 +353,9 @@ def run(browser, out, errors, is_mobile=True):
     check(not fetched, f"choosing sends nothing and asks for nothing but its woods {fetched[:3]}")
     context.close()
 
-    # Reduced motion: stands still, jumps at once, and every choice still works.
+
+def reduced_motion(browser, errors):
+    """Reduced motion: stands still, jumps at once, and every choice still works."""
     context, page = opened(browser, errors, 1280, reduced_motion="reduce")
     check(page.evaluate("document.getAnimations().length") == 0, "reduced motion: nothing runs")
     check(abs(page.evaluate(SWAY)) < 0.01 and same_angle(page.evaluate(ANGLE), -30), "reduced motion: stands still at three quarters")
@@ -373,7 +368,9 @@ def run(browser, out, errors, is_mobile=True):
     options(page, settle=50)
     context.close()
 
-    # A real finger and a real Tab key: nothing above proves either.
+
+def phone(browser, errors, is_mobile):
+    """A real finger: nothing in widths() proves it. Chrome alone sends the finger itself."""
     context, page = opened(browser, errors, 390, has_touch=True, **({"is_mobile": True} if is_mobile else {}))
     box = page.locator(".scene").bounding_box()
     page.locator(".scene").tap(position={"x": box["width"] * 3.5 / 13, "y": box["height"] / 2})
@@ -407,6 +404,10 @@ def run(browser, out, errors, is_mobile=True):
     page.locator("label:has(#n4)").tap()
     check(page.evaluate(SHOWN, ".poignee") == 4, "phone: a tap chooses an option")
     context.close()
+
+
+def keyboard(browser, errors):
+    """A real Tab key: it reaches the coffin, an arrow turns it, Space opens the lid."""
     context, page = opened(browser, errors, 1280)
     box = page.locator(".scene").bounding_box()
     grip(page, box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
@@ -431,11 +432,32 @@ def run(browser, out, errors, is_mobile=True):
     check(page.evaluate(MATRIX, ".couvercle")[3] > 100, "keyboard: Space opens the lid")
     context.close()
 
+
+def home_button(browser, errors):
+    """The home page's button opens the configurator."""
     context, page = opened(browser, errors, 1280, url=HOME)
     page.locator(".go.c", has_text="Configurer en 3D").click()
     page.wait_for_load_state("load")
     check(page.url.endswith("dernier-prix/configurateur.html"), "the home's button opens the configurator")
     context.close()
+
+
+def run(browser, out, errors, is_mobile=True):
+    """Every check above, in one browser. Firefox refuses is_mobile; has_touch alone taps there."""
+    widths(browser, out, errors)
+    sway_stops(browser, errors)
+    occupant(browser, errors)
+    flash(browser, errors)
+    fit(browser, errors)
+    fit(browser, errors, css=SCROLLBAR, label=" with a scrollbar")
+    context, page = opened(browser, errors, 1280)
+    totals(page)
+    context.close()
+    sends_nothing(browser, errors)
+    reduced_motion(browser, errors)
+    phone(browser, errors, is_mobile)
+    keyboard(browser, errors)
+    home_button(browser, errors)
 
 
 def control():
