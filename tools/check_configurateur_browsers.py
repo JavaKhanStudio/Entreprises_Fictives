@@ -24,11 +24,8 @@ Headed runs inside cage, as in tools/check_badge_browsers.py. Needs cage, Chrome
 `playwright install firefox`, Pillow. Safari: tools/check_configurateur_safari.py.
 """
 
-import argparse
 import io
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
 
@@ -36,6 +33,7 @@ from PIL import Image, ImageChops
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cage_run
 import check_configurateur as cc
 
 WIDTHS = (1280, 390)
@@ -218,49 +216,7 @@ def inside(out, results_file, control):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("out")
-    parser.add_argument("--control", choices=CONTROLS)
-    parser.add_argument("--card", default="renderD128")
-    parser.add_argument("--inside", help=argparse.SUPPRESS)
-    args = parser.parse_args()
-    out = Path(args.out).resolve()
-    if args.inside:
-        inside(out, Path(args.inside), args.control)
-        return 0
-    out.mkdir(parents=True, exist_ok=True)
-    results_file = out / "results.json"
-    results_file.unlink(missing_ok=True)
-    env = {**os.environ, "WLR_BACKENDS": "headless", "WLR_RENDER_DRM_DEVICE": f"/dev/dri/{args.card}",
-           "WLR_LIBINPUT_NO_DEVICES": "1", "XDG_CURRENT_DESKTOP": "cage", "WLR_LOG": "error"}
-    env.pop("DISPLAY", None)
-    env.pop("WAYLAND_DISPLAY", None)
-    command = ["cage", "--", sys.executable, __file__, str(out), "--inside", str(results_file)]
-    if args.control:
-        command += ["--control", args.control]
-    subprocess.run(command, env=env, timeout=570, check=False)
-    if not results_file.exists():
-        print("FAILED: the run inside cage left no results")
-        return 2 if args.control else 1
-    found = json.loads(results_file.read_text())
-    failed = list(found["behaviour"])
-    for r in found["frames"]:
-        label = f"{r['browser']} at {r['width']}"
-        for what, ok in judge(r, out):
-            print(f"{'OK  ' if ok else 'FAIL'} {label}: {what}")
-            if not ok:
-                failed.append(f"{label}: {what}")
-    for what in found["behaviour"]:
-        print(f"FAIL firefox behaviour: {what}")
-    sheets(out)
-    if args.control:
-        named = CONTROLS[args.control][1]
-        chrome_red = [f for f in failed if f.startswith("chrome")]
-        right = any(f.startswith("firefox") and named in f for f in failed) and not chrome_red
-        print(f"CONTROL {args.control}: " + ("red on the read it names" if right else f"did NOT go red on {named!r}"))
-        return 1 if right else 2
-    print("FAILED" if failed else "ALL OK")
-    return 1 if failed else 0
+    return cage_run.control_main(__doc__, CONTROLS, inside, judge, sheets, timeout=570)
 
 
 if __name__ == "__main__":

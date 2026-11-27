@@ -16,13 +16,14 @@ and renders on the card named. Needs cage, Chrome, `playwright install firefox`.
 
 import io
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
 
 from PIL import Image
 from playwright.sync_api import sync_playwright
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cage_run
 
 REPO = Path(__file__).resolve().parent.parent
 HOME = (REPO / "merlin/index.html").as_uri()
@@ -154,17 +155,10 @@ def main():
     card = sys.argv[2] if len(sys.argv) > 2 else "renderD128"
     out.mkdir(parents=True, exist_ok=True)
     results_file = out / "results.json"
-    results_file.unlink(missing_ok=True)
-    env = {**os.environ, "WLR_BACKENDS": "headless", "WLR_RENDER_DRM_DEVICE": f"/dev/dri/{card}",
-           "WLR_LIBINPUT_NO_DEVICES": "1", "XDG_CURRENT_DESKTOP": "cage"}
-    env.pop("DISPLAY", None)
-    env.pop("WAYLAND_DISPLAY", None)
-    subprocess.run(["cage", "--", sys.executable, __file__, "--inside", str(out), str(results_file)],
-                   env=env, timeout=420, check=False)
-    if not results_file.exists():
-        print("FAILED: the run inside cage left no results")
+    found = cage_run.run([__file__, "--inside", out, results_file], results_file, card, timeout=420)
+    if found is None:
         return 1
-    failed = verdict(json.loads(results_file.read_text()))
+    failed = verdict(found)
     print("FAILED" if failed else "ALL OK")
     return 1 if failed else 0
 

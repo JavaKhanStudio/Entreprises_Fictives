@@ -1,0 +1,9 @@
+r114: the three browsers tools after the cage_run.py move, 2026-11-27, on renderD128
+badge: exit 0 ALL OK
+badge --control flat: exit 1 CONTROL flat: red on the read it names
+badge --control gold: exit 1 CONTROL gold: red on the read it names
+conf: exit 0 ALL OK
+conf --control flat: exit 1 CONTROL flat: red on the read it names
+conf --control counter: exit 1 CONTROL counter: red on the read it names
+conf --control hollow: exit 1 CONTROL hollow: red on the read it names
+trombone: exit 0 ALL OK
