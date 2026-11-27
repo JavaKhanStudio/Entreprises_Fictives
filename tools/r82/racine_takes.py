@@ -2,8 +2,8 @@
 """The takes of r82: how the root list's open envelope stops covering a word. A: the words stop
 sooner. B: the envelope grows less on hover.
 
-    python3 tools/racine_takes.py sweep          # how far each take's words go under the envelope
-    python3 tools/racine_takes.py OUT            # take-*.png in OUT, for `atelier attach --stamp`
+    python3 tools/r82/racine_takes.py sweep          # how far each take's words go under the envelope
+    python3 tools/r82/racine_takes.py OUT            # take-*.png in OUT, for `atelier attach --stamp`
 
 Simon picked B: it is in index.css, and tools/check_racine.py now holds the read. "maintenant" is the
 page as it stood, at 1.3, so these pictures stay reproducible.
@@ -18,6 +18,7 @@ from pathlib import Path
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from check_racine import CARDS, OVER, PAGE
 
 WIDTHS = (640, 800, 1000, 1007, 1024, 1265, 1280, 1600, 1920)

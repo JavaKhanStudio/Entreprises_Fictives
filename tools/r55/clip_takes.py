@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The takes of r55: what to do about the Merlin paperclip's cost where there is no GPU.
 
-    python3 tools/clip_takes.py OUT_DIR [--lighthouse]
+    python3 tools/r55/clip_takes.py OUT_DIR [--lighthouse]
 
 Simon picked B: merlin/merlin.js now holds it. Works on `git archive` of TAKEN_FROM, the commit
 before his pick, in a temporary folder, never on the checkout. Each take is a patch of its merlin/merlin.js. Writes OUT_DIR/clip.png, one equal column per take, for
@@ -20,7 +20,7 @@ from pathlib import Path
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parents[2]
 SERVE = Path.home() / "Documents/GitHub/atelier/tools/serve_static.py"
 TAKEN_FROM = "c03c509"
 # What tools/check_trombone.py launches, and the renderer Lighthouse's Chrome ends up with.

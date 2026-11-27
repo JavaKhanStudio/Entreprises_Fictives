@@ -17,6 +17,7 @@ python3 -m http.server 8802             # then http://127.0.0.1:8802/
 python3 tools/check_sites.py            # the gate: must pass before any push (needs dig and DNS)
 python3 tests/test_check_sites.py       # each refusal of the gate, on scratch pages
 python3 tests/test_check_names.py       # tools/check_names.py --domains on names that make bad domains, no network
+python3 tools/check_registry.py "Nom"  # an invented name against the French company and commune registers (network)
 python3 tools/render_pages.py OUT index.html   # both file:// and http, 1280 and 390, pictures in OUT
 python3 tools/check_trombone.py [OUT]   # Merlin's moving parts, which the renders freeze
 python3 tools/check_trombone_browsers.py OUT   # the clip in Firefox and headed Chrome, real card, no window on screen

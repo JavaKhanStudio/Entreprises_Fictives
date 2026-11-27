@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The takes of r10: the short description under each company on the root index.
 
-    python3 tools/index_takes.py OUT_DIR
+    python3 tools/r10/index_takes.py OUT_DIR
 
 Works on `git archive HEAD` in a temporary folder, never on the checkout. Each take is applied
 to index.html and must pass the gate. Pictures land in OUT_DIR at 1100 wide and 390 wide, with
@@ -18,7 +18,7 @@ from pathlib import Path
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "tools"))
 import check_sites
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The takes of r64: where the caption of Merlin's clip goes, none covering the clip.
 
-    python3 tools/astuce_takes.py OUT_DIR
+    python3 tools/r64/astuce_takes.py OUT_DIR
 
 Works on `git archive` of TAKEN_FROM in a temporary folder, never on the checkout: each take is CSS
 added to its merlin/merlin.css. Writes OUT_DIR/astuce-A.png and so on, the hero alone at 1280, under
@@ -20,7 +20,7 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parents[2]
 TAKEN_FROM = "6bca51d"
 SOFTWARE_GL = ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
 TAKES = {
