@@ -244,61 +244,82 @@ def web_control():
     return echo
 
 
-def main():
-    names = [arg for arg in sys.argv[1:] if arg not in ("--no-web", "--domains")]
-    no_web, domains = "--no-web" in sys.argv, "--domains" in sys.argv
-    if not names:
-        print(__doc__)
-        return 2
+def controls(no_web, domains):
+    """(web echo, usable public sources, rdap down) once every source passed its control; None
+    when Wikipedia, Wikidata or RDAP failed theirs, after saying so."""
     try:
         answering = (wikipedia_hits(KNOWN) and wikidata_hits(KNOWN)
                      and not wikipedia_hits(NONSENSE) and not wikidata_hits(NONSENSE))
     except SOURCE_FAILED as error:
         print(f"Wikipedia or Wikidata failed the control, stopping ({error})")
-        return 2
+        return None
     if not answering:
         print("Wikipedia or Wikidata failed the control, stopping")
-        return 2
+        return None
     echo = None if no_web else web_control()
     usable = public_control()
     rdap_down = False
     try:
         if domains and not domain_control():
             print("RDAP failed the control, stopping")
-            return 2
+            return None
     except OSError as error:
         print(f"rdap: failed at the control ({error})")
         rdap_down = True
+    return echo, usable, rdap_down
+
+
+def source_hits(name, usable):
+    """(hits, sources that did not answer) from the encyclopedias and the public sources."""
+    hits = []
+    missed = [source for source in PUBLIC if source not in usable]
+    for source, search in (("wikipedia", wikipedia_hits), ("wikidata", wikidata_hits)):
+        try:
+            hits += search(name)
+        except SOURCE_FAILED:
+            missed.append(source)
+    for source, search in usable.items():
+        try:
+            hits += [f"{source} {label[:100]}" for label in holding(name, search(name))]
+        except SOURCE_FAILED:
+            missed.append(source)
+    return hits, missed
+
+
+def web_hits(name, echo, no_web):
+    """(hits past the page's echo, the web's word for the report line)."""
+    if echo is None:
+        return [], "web: skipped by --no-web" if no_web else "web: skipped, control failed"
+    time.sleep(WEB_PAUSE)
+    try:
+        extra = web_mentions(name)[echo:]
+    except urllib.error.URLError as error:
+        return [], f"web: refused ({error})"
+    return [f"web ...{bit}..." for bit in extra[:3]], f"web: {len(extra)} mentions"
+
+
+def main():
+    names = [arg for arg in sys.argv[1:] if arg not in ("--no-web", "--domains")]
+    no_web, domains = "--no-web" in sys.argv, "--domains" in sys.argv
+    if not names:
+        print(__doc__)
+        return 2
+    passed = controls(no_web, domains)
+    if passed is None:
+        return 2
+    echo, usable, rdap_down = passed
     taken = unchecked = 0
     for name in names:
         time.sleep(PAUSE)
-        hits = []
-        missed = [source for source in PUBLIC if source not in usable]
-        for source, search in (("wikipedia", wikipedia_hits), ("wikidata", wikidata_hits)):
-            try:
-                hits += search(name)
-            except SOURCE_FAILED:
-                missed.append(source)
-        for source, search in usable.items():
-            try:
-                hits += [f"{source} {label[:100]}" for label in holding(name, search(name))]
-            except SOURCE_FAILED:
-                missed.append(source)
+        hits, missed = source_hits(name, usable)
         if rdap_down:
             missed += ["rdap"] if domains_of(name) else []
         elif domains:
             found, unanswered = domain_hits(name)
             hits += found
             missed += unanswered
-        web = "web: skipped by --no-web" if no_web else "web: skipped, control failed"
-        if echo is not None:
-            time.sleep(WEB_PAUSE)
-            try:
-                extra = web_mentions(name)[echo:]
-                hits += [f"web ...{bit}..." for bit in extra[:3]]
-                web = f"web: {len(extra)} mentions"
-            except urllib.error.URLError as error:
-                web = f"web: refused ({error})"
+        found, web = web_hits(name, echo, no_web)
+        hits += found
         unchecked += not web.endswith("mentions") or bool(missed)
         web += f", unchecked on {', '.join(missed)}" if missed else ""
         web += ", cannot be a domain" if domains and not domains_of(name) else ""
@@ -307,7 +328,6 @@ def main():
             print(f"    {line}", flush=True)
         taken += bool(hits)
     return 1 if taken else 3 if unchecked else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -78,12 +78,8 @@ def check_open(page, card, how, problems):
         problems.append(f"{card}, {how}: {share:.0%} paper where the letter stands: something is over it")
 
 
-def check_browser(browser, name, out, flat, problems):
-    page = browser.new_page(viewport={"width": 1280, "height": 1000})
-    page.goto(PAGE)
-    if flat:
-        page.add_style_tag(content=FLAT)
-    page.wait_for_timeout(SETTLE_MS + 500)
+def check_rest(page, name, problems):
+    """Each card at rest: its picture loaded, its name written, its envelope shut."""
     for card in CARDS:
         rest = page.evaluate(PARTS, card)
         if not rest["picture"]:
@@ -92,8 +88,10 @@ def check_browser(browser, name, out, flat, problems):
             problems.append(f"{name} {card}: no name on the card")
         if rest["flap"] < 0.9 or rest["letter"]["y"] < rest["envelope"]["y"] - 1:
             problems.append(f"{name} {card}: not closed at rest")
-    if out:
-        page.screenshot(path=out / f"racine-{name}-repos.png")
+
+
+def check_hover(page, name, out, problems):
+    """Each card hovered in turn opens; inviolia's flap is caught part-way, to see it swing."""
     for card in CARDS:
         page.locator(f".cible.{card} > a").scroll_into_view_if_needed()
         page.hover(f".cible.{card} > a")
@@ -109,6 +107,18 @@ def check_browser(browser, name, out, flat, problems):
         check_open(page, card, f"{name} hover", problems)
         if out and card == "inviolia":
             page.screenshot(path=out / f"racine-{name}-ouvert.png")
+
+
+def check_browser(browser, name, out, flat, problems):
+    page = browser.new_page(viewport={"width": 1280, "height": 1000})
+    page.goto(PAGE)
+    if flat:
+        page.add_style_tag(content=FLAT)
+    page.wait_for_timeout(SETTLE_MS + 500)
+    check_rest(page, name, problems)
+    if out:
+        page.screenshot(path=out / f"racine-{name}-repos.png")
+    check_hover(page, name, out, problems)
     page.mouse.move(0, 0)
     page.wait_for_timeout(SETTLE_MS)
     page.evaluate("window.scrollTo(0, 0)")
@@ -118,7 +128,8 @@ def check_browser(browser, name, out, flat, problems):
     page.close()
 
 
-def check_chrome_only(browser, css, problems):
+def check_touch(browser, problems):
+    """A screen with no pointer opens the first envelope by itself."""
     touch = browser.new_context(viewport={"width": 390, "height": 800}, has_touch=True, is_mobile=True)
     page = touch.new_page()
     page.goto(PAGE)
@@ -133,6 +144,9 @@ def check_chrome_only(browser, css, problems):
         problems.append(f"no pointer: the first flap never opened by itself, lowest m22 {min(seen):.2f}")
     touch.close()
 
+
+def check_still(browser, problems):
+    """Reduced motion: nothing animates, at rest or hovered, and hovering still opens."""
     still = browser.new_context(viewport={"width": 1280, "height": 1000}, reduced_motion="reduce")
     page = still.new_page()
     page.goto(PAGE)
@@ -145,6 +159,9 @@ def check_chrome_only(browser, css, problems):
         problems.append("reduced motion: the envelope does not open on hover")
     still.close()
 
+
+def check_widths(browser, css, problems):
+    """At every width: no overflow, and no word under an envelope, at rest or its card hovered."""
     for width in WIDTHS:
         page = browser.new_page(viewport={"width": width, "height": 800})
         page.goto(PAGE)
@@ -170,6 +187,12 @@ def check_chrome_only(browser, css, problems):
             if under > 0:
                 problems.append(f"at {width}, {card} hovered: a word goes {under:.1f} px under the open envelope")
         page.close()
+
+
+def check_chrome_only(browser, css, problems):
+    check_touch(browser, problems)
+    check_still(browser, problems)
+    check_widths(browser, css, problems)
 
 
 def main(args):

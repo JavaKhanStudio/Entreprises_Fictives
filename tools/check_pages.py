@@ -90,15 +90,9 @@ def render(base, out):
     return problems
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--base", default=PUBLIC)
-    parser.add_argument("--render", type=Path)
-    args = parser.parse_args()
-    base = args.base.rstrip("/") + "/"
-
-    listed = subprocess.run(["git", "ls-files", "*.html"], cwd=REPO, check=True,
-                            capture_output=True, text=True).stdout.split()
+def page_problems(listed, base):
+    """(problems, local targets linked) of each page git knows: it answers 200, says noindex and
+    carries the model page's footer."""
     footer = FOOTER.search(COMMENT.sub("", (REPO / "shared/modele.html").read_text("utf-8"))).group()
     problems, linked = [], set()
     for path in listed:
@@ -113,6 +107,13 @@ def main():
         if footer not in body:
             problems.append(f"footer differs: {url}")
         linked |= local_targets(url, body, base)
+    return problems, linked
+
+
+def link_problems(linked, base):
+    """Each linked target that leaves the site, is a folder or does not answer 200, and each
+    generated page that answers when it should be 404."""
+    problems = []
     for url in sorted(linked):
         if url.startswith("OUTSIDE "):
             problems.append(f"leaves the site: {url[8:]}")
@@ -123,6 +124,20 @@ def main():
     for path in GENERATED:
         if (status := fetch(base + path)[0]) != 404:
             problems.append(f"{status} where a generated page should be 404: {base + path}")
+    return problems
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--base", default=PUBLIC)
+    parser.add_argument("--render", type=Path)
+    args = parser.parse_args()
+    base = args.base.rstrip("/") + "/"
+
+    listed = subprocess.run(["git", "ls-files", "*.html"], cwd=REPO, check=True,
+                            capture_output=True, text=True).stdout.split()
+    problems, linked = page_problems(listed, base)
+    problems += link_problems(linked, base)
     if args.render:
         problems += render(base, args.render)
 
@@ -132,7 +147,6 @@ def main():
         return 1
     print(f"OK: {len(listed)} pages and {len(linked)} local targets under {base}")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
