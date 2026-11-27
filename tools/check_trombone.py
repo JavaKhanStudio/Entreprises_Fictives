@@ -17,7 +17,6 @@ With OUT_DIR, leaves frames of the turning clip there, caption included, at 1280
 """
 
 import io
-import re
 import sys
 from pathlib import Path
 
@@ -44,12 +43,6 @@ def opened(browser, errors, width=1280, **options):
     page.on("console", lambda m: m.type == "error" and errors.append(m.text))
     page.goto(HOME, wait_until="load")
     return context, page
-
-
-def text_of(path):
-    html = path.read_text(encoding="utf-8")
-    words = re.sub(r"<[^>]+>", " ", html[html.index("<main>"):html.index("</main>")])
-    return " ".join(re.sub(r"\s+", " ", words).split())
 
 
 def whole_at_every_angle(browser, width):
@@ -124,6 +117,67 @@ def frames_of_the_turn(browser, width, out, errors):
     context.close()
 
 
+def turns_and_counts(browser, errors):
+    """The clip shows and turns; scrolled down, the counters end on their numbers and sections rise."""
+    context, page = opened(browser, errors)
+    clip = page.locator("#trombone")
+    check(clip.is_visible() and not page.locator("#trombone-repli").is_visible(),
+          "with WebGL the canvas shows and the drawn clip does not")
+    check(page.locator(".astuce").is_visible(), "the caption shows")
+    frames = []
+    for i in range(6):
+        page.wait_for_timeout(900)
+        frames.append(clip.screenshot())
+    check(len(set(frames)) == len(frames), f"the clip turns: {len(set(frames))} of 6 frames differ")
+    page.mouse.wheel(0, 5000)
+    page.wait_for_timeout(2200)
+    shown = page.evaluate("[...document.querySelectorAll('.chiffres strong')].map(e => e.textContent)")
+    check(shown == ["1987", "23", "1", "12"], f"the counters end on the HTML's numbers: {shown}")
+    hidden = page.evaluate("[...document.querySelectorAll('.monte')].filter(e => getComputedStyle(e).opacity !== '1' && e.getBoundingClientRect().bottom < innerHeight * .9 && e.getBoundingClientRect().bottom > 0).length")
+    check(hidden == 0, "a section scrolled to is visible")
+    context.close()
+
+
+def still_under_reduced_motion(browser, errors):
+    """Reduced motion stops the clip, a drag still turns it, and no section waits to rise."""
+    context, page = opened(browser, errors, reduced_motion="reduce")
+    clip = page.locator("#trombone")
+    page.wait_for_timeout(300)
+    first = clip.screenshot()
+    page.wait_for_timeout(1200)
+    check(first == clip.screenshot(), "under reduced motion the clip stands still")
+    box = clip.bounding_box()
+    page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+    page.mouse.down()
+    page.mouse.move(box["x"] + box["width"] / 2 + 120, box["y"] + box["height"] / 2, steps=4)
+    page.mouse.up()
+    page.wait_for_timeout(150)
+    check(first != clip.screenshot(), "dragging turns it, even stopped")
+    check(page.evaluate("document.querySelectorAll('.monte').length") == 0,
+          "under reduced motion no section waits to rise")
+    context.close()
+
+
+def drawn_clip_shows(browser, errors, without):
+    context, page = opened(browser, errors, **({"java_script_enabled": False} if without == "JavaScript" else {}))
+    check(page.locator("#trombone-repli").is_visible() and not page.locator("#trombone").is_visible(),
+          f"without {without} the drawn clip shows")
+    context.close()
+
+
+def no_page_overflows(browser):
+    for path in PAGES:
+        for width in WIDTHS:
+            context = browser.new_context(viewport={"width": width, "height": 800}, reduced_motion="reduce")
+            page = context.new_page()
+            page.goto(path.as_uri(), wait_until="load")
+            over = page.evaluate("document.documentElement.scrollWidth - innerWidth")
+            if over > 0:
+                check(False, f"{path.name} at {width}: {over}px wider than the window")
+            context.close()
+    check(True, f"overflow looked at: {len(PAGES)} pages at {len(WIDTHS)} widths")
+
+
 def main():
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else None
     if out:
@@ -131,70 +185,18 @@ def main():
     errors = []
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(channel="chrome", args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"])
-
         cheap_without_a_gpu(browser, errors)
-        context, page = opened(browser, errors)
-        clip = page.locator("#trombone")
-        check(clip.is_visible() and not page.locator("#trombone-repli").is_visible(),
-              "with WebGL the canvas shows and the drawn clip does not")
-        check(page.locator(".astuce").is_visible(), "the caption shows")
-        frames = []
-        for i in range(6):
-            page.wait_for_timeout(900)
-            frames.append(clip.screenshot())
-        check(len(set(frames)) == len(frames), f"the clip turns: {len(set(frames))} of 6 frames differ")
-        page.mouse.wheel(0, 5000)
-        page.wait_for_timeout(2200)
-        shown = page.evaluate("[...document.querySelectorAll('.chiffres strong')].map(e => e.textContent)")
-        check(shown == ["1987", "23", "1", "12"], f"the counters end on the HTML's numbers: {shown}")
-        hidden = page.evaluate("[...document.querySelectorAll('.monte')].filter(e => getComputedStyle(e).opacity !== '1' && e.getBoundingClientRect().bottom < innerHeight * .9 && e.getBoundingClientRect().bottom > 0).length")
-        check(hidden == 0, "a section scrolled to is visible")
-        context.close()
-
-        context, page = opened(browser, errors, reduced_motion="reduce")
-        clip = page.locator("#trombone")
-        page.wait_for_timeout(300)
-        first = clip.screenshot()
-        page.wait_for_timeout(1200)
-        check(first == clip.screenshot(), "under reduced motion the clip stands still")
-        box = clip.bounding_box()
-        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
-        page.mouse.down()
-        page.mouse.move(box["x"] + box["width"] / 2 + 120, box["y"] + box["height"] / 2, steps=4)
-        page.mouse.up()
-        page.wait_for_timeout(150)
-        check(first != clip.screenshot(), "dragging turns it, even stopped")
-        check(page.evaluate("document.querySelectorAll('.monte').length") == 0,
-              "under reduced motion no section waits to rise")
-        context.close()
-
+        turns_and_counts(browser, errors)
+        still_under_reduced_motion(browser, errors)
         for width in (1280, 390):
             whole_at_every_angle(browser, width)
             if out:
                 frames_of_the_turn(browser, width, out, errors)
-
-        context, page = opened(browser, errors, java_script_enabled=False)
-        check(page.locator("#trombone-repli").is_visible() and not page.locator("#trombone").is_visible(),
-              "without JavaScript the drawn clip shows")
-        context.close()
-
+        drawn_clip_shows(browser, errors, "JavaScript")
         no_gl = playwright.chromium.launch(channel="chrome", args=["--disable-gpu", "--disable-webgl", "--disable-webgl2", "--disable-3d-apis"])
-        context, page = opened(no_gl, errors)
-        check(page.locator("#trombone-repli").is_visible() and not page.locator("#trombone").is_visible(),
-              "without WebGL the drawn clip shows")
-        context.close()
+        drawn_clip_shows(no_gl, errors, "WebGL")
         no_gl.close()
-
-        for path in PAGES:
-            for width in WIDTHS:
-                context = browser.new_context(viewport={"width": width, "height": 800}, reduced_motion="reduce")
-                page = context.new_page()
-                page.goto(path.as_uri(), wait_until="load")
-                over = page.evaluate("document.documentElement.scrollWidth - innerWidth")
-                if over > 0:
-                    check(False, f"{path.name} at {width}: {over}px wider than the window")
-                context.close()
-        check(True, f"overflow looked at: {len(PAGES)} pages at {len(WIDTHS)} widths")
+        no_page_overflows(browser)
         browser.close()
     check(not errors, f"no page error or console error {errors[:3] if errors else ''}")
     print("FAILED" if failures else "ALL OK")

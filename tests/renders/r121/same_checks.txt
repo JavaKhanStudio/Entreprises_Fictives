@@ -1,0 +1,4 @@
+r121: check_trombone.py and check_badge.py split into named checks.
+Both run before and after: the same check lines in the same order (diffed with every number
+masked), all OK; check_badge_browsers.py (which calls check_badge.run) ALL OK in Firefox.
+The pictures they leave in OUT are not committed.
