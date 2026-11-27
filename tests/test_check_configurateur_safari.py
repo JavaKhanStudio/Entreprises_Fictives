@@ -6,6 +6,8 @@ log and on one whose lid is really missing.
     python3 tests/test_check_configurateur_safari.py
 """
 import base64
+import contextlib
+import io
 import shutil
 import sys
 import tempfile
@@ -138,12 +140,41 @@ def check_file_probe(browser, port, failures):
         scratch.unlink(missing_ok=True)
 
 
+def faded_marker(right, d):
+    """The right log with the lid's top in its marker frames a fifth wood-brown, its outline kept:
+    the silhouettes and the controls are those of the right page, so only the marker count can refuse it."""
+    from PIL import Image
+    lines = right.read_text().splitlines()
+    for at, line in enumerate(lines):
+        if not line.startswith(BEGIN) or not line.endswith("-repere-dessus") or line.split()[-1].count("-") != 2:
+            continue
+        picture = Image.open(io.BytesIO(base64.b64decode(lines[at + 1]))).convert("RGB")
+        pixels = picture.load()
+        magenta = [(x, y) for y in range(picture.height) for x in range(picture.width) if tool.is_magenta(*pixels[x, y])]
+        left, right_edge = min(x for x, _ in magenta), max(x for x, _ in magenta)
+        cut = right_edge - (right_edge - left) // 5
+        for x, y in magenta:
+            if x >= cut:
+                pixels[x, y] = (150, 100, 60)
+        buffer = io.BytesIO()
+        picture.save(buffer, "JPEG", quality=80)
+        lines[at + 1] = base64.b64encode(buffer.getvalue()).decode()
+    log = Path(d) / "faded"
+    log.write_text("\n".join(lines) + "\n")
+    return log
+
+
 def check_extract(logs, d, failures):
-    """The pixel read: the right log passes, the lidless one fails."""
+    """The pixel read: the right log passes, the lidless one fails, and the faded marker fails by its count."""
     if tool.extract(logs["right"], Path(d) / "right-out"):
         failures.append("--extract refused the right page")
     if not tool.extract(logs["lidless"], Path(d) / "lidless-out"):
         failures.append("--extract passed a lid with no top")
+    said = io.StringIO()
+    with contextlib.redirect_stdout(said):
+        verdict = tool.extract(faded_marker(logs["right"], d), Path(d) / "faded-out")
+    if not verdict or not any(l.startswith("FAILED: safari at") and " repere-dessus:" in l for l in said.getvalue().splitlines()):
+        failures.append("--extract passed a lid's top a fifth of which is not drawn")
 
 
 def main():

@@ -148,6 +148,15 @@ def check_extract(lines, d, failures):
     log.write_text("\n".join(swapped) + "\n")
     if not tool.extract(log, Path(d) / "out2"):
         failures.append("--extract passed a flattened picture as open")
+    # The open read on its own: the open card's frame is the flat one's picture, and no flat control
+    # is in the log, so only "something is over it" can refuse it.
+    alone = lines[:opened + 1] + [lines[flat + 1], END]
+    log.write_text("\n".join(alone) + "\n")
+    said = io.StringIO()
+    with contextlib.redirect_stdout(said):
+        verdict = tool.extract(log, Path(d) / "out3")
+    if not verdict or "something is over it" not in said.getvalue():
+        failures.append(f"--extract passed an open card with no paper under its letter: {said.getvalue()}")
 
 
 def main():
