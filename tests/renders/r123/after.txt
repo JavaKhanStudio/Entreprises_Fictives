@@ -30,4 +30,36 @@ check_configurateur_safari / none: pass
     FAILED: safari at 390: face is drawn as in Chrome (15.8% of its box far apart)
     FAILED: safari at 390: bout is drawn as in Chrome (28.3% of its box far apart)
     FAILED: safari at 390: chene is drawn as in Chrome (12.6% of its box far apart)
-[44 more lines]
+    FAILED: safari at 390: ferme-occupe is drawn as in Chrome (11.4% of its box far apart)
+    FAILED: safari at 390: repere-dessus: 0 px of the marker against Chrome's 4224
+check_configurateur_safari / a total read as right always: FAIL
+    FAILED: safari at 1280: the oak's total is 905 €, in pixels
+    FAILED: safari at 390: the oak's total is 905 €, in pixels
+    FAILED: safari at 1280: the oak's total is 905 €, in pixels
+    FAILED: safari at 1280: ferme is drawn as in Chrome (11.8% of its box far apart)
+    FAILED: safari at 1280: face is drawn as in Chrome (17.0% of its box far apart)
+    FAILED: safari at 1280: bout is drawn as in Chrome (26.0% of its box far apart)
+    FAILED: safari at 1280: chene is drawn as in Chrome (12.3% of its box far apart)
+    FAILED: safari at 1280: ferme-occupe is drawn as in Chrome (11.8% of its box far apart)
+    FAILED: safari at 1280: repere-dessus: 0 px of the marker against Chrome's 13117
+    FAILED: safari at 390: the oak's total is 905 €, in pixels
+    FAILED: safari at 390: ferme is drawn as in Chrome (11.4% of its box far apart)
+    FAILED: safari at 390: face is drawn as in Chrome (15.8% of its box far apart)
+    FAILED: safari at 390: bout is drawn as in Chrome (28.3% of its box far apart)
+    FAILED: safari at 390: chene is drawn as in Chrome (12.6% of its box far apart)
+    FAILED: safari at 390: ferme-occupe is drawn as in Chrome (11.4% of its box far apart)
+    FAILED: safari at 390: repere-dessus: 0 px of the marker against Chrome's 4224
+    FAILED: the total's read passed a browser that does not sum
+    FAILED: the flow on a right page: ['the read cannot tell 449 € from 450 €']
+    FAILED: --extract refused the right page
+check_configurateur_safari / the lid's marker not counted: pass
+    FAILED: safari at 1280: ferme is drawn as in Chrome (11.8% of its box far apart)
+    FAILED: safari at 1280: face is drawn as in Chrome (17.0% of its box far apart)
+    FAILED: safari at 1280: bout is drawn as in Chrome (26.0% of its box far apart)
+    FAILED: safari at 1280: chene is drawn as in Chrome (12.3% of its box far apart)
+    FAILED: safari at 1280: ferme-occupe is drawn as in Chrome (11.8% of its box far apart)
+    FAILED: safari at 390: ferme is drawn as in Chrome (11.4% of its box far apart)
+    FAILED: safari at 390: face is drawn as in Chrome (15.8% of its box far apart)
+    FAILED: safari at 390: bout is drawn as in Chrome (28.3% of its box far apart)
+    FAILED: safari at 390: chene is drawn as in Chrome (12.6% of its box far apart)
+    FAILED: safari at 390: ferme-occupe is drawn as in Chrome (11.4% of its box far apart)
