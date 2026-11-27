@@ -1,0 +1,33 @@
+check_racine_safari / none: pass
+    FAILED: ouvert-inviolia: 1% paper where the letter stands: something is over it
+    FAILED: plat-inviolia: the flat control still reads 88% paper: this read proves nothing
+check_racine_safari / an unloaded picture let through: FAIL
+    FAILED: ouvert-inviolia: 1% paper where the letter stands: something is over it
+    FAILED: plat-inviolia: the flat control still reads 88% paper: this read proves nothing
+    FAILED: load_problems let an unloaded picture through
+check_racine_safari / a blank shot never retaken: FAIL
+    FAILED: ouvert-inviolia: 1% paper where the letter stands: something is over it
+    FAILED: plat-inviolia: the flat control still reads 88% paper: this read proves nothing
+    FAILED: steady_shot on [23507, 187783]: 23507 bytes, ''
+    FAILED: steady_shot on [23507, 23507]: 23507 bytes, ''
+check_racine_safari / a black window not named: FAIL
+    FAILED: ouvert-inviolia: 1% paper where the letter stands: something is over it
+    FAILED: plat-inviolia: the flat control still reads 88% paper: this read proves nothing
+    FAILED: --extract did not name the black ouvert window: 2 frames in /tmp/tmpbzey5fnq/out-black-ouvert
+    FAILED: ouvert-inviolia: 0% paper where the letter stands: something is over it
+    FAILED: --extract passed a black window as plat
+    FAILED: --extract did not name the black plat window: 2 frames in /tmp/tmpbzey5fnq/out-black-plat
+check_racine_safari / paper under the letter not read: pass
+    FAILED: plat-inviolia: the flat control still reads 88% paper: this read proves nothing
+check_configurateur_safari / none: pass
+    FAILED: safari at 1280: ferme is drawn as in Chrome (11.8% of its box far apart)
+    FAILED: safari at 1280: face is drawn as in Chrome (17.0% of its box far apart)
+    FAILED: safari at 1280: bout is drawn as in Chrome (26.0% of its box far apart)
+    FAILED: safari at 1280: chene is drawn as in Chrome (12.3% of its box far apart)
+    FAILED: safari at 1280: ferme-occupe is drawn as in Chrome (11.8% of its box far apart)
+    FAILED: safari at 1280: repere-dessus: 0 px of the marker against Chrome's 13117
+    FAILED: safari at 390: ferme is drawn as in Chrome (11.4% of its box far apart)
+    FAILED: safari at 390: face is drawn as in Chrome (15.8% of its box far apart)
+    FAILED: safari at 390: bout is drawn as in Chrome (28.3% of its box far apart)
+    FAILED: safari at 390: chene is drawn as in Chrome (12.6% of its box far apart)
+[44 more lines]

@@ -70,93 +70,103 @@ def check_steady_shot(real, failures):
             failures.append(f"steady_shot on {[len(s) for s in shots]}: {len(got)} bytes, {said.getvalue()!r}")
 
 
+def check_file_beacon(browser, port, scratch, failures):
+    """Over file://: the beacon comes back, says the pictures loaded, and the card opens under a mouse."""
+    pictures = (REPO / "index.html").read_text(encoding="utf-8").count("<img")
+    scratch.write_text(tool.scratch_page(port, "t"), encoding="utf-8")
+    page = browser.new_page(viewport={"width": 1280, "height": 900})
+    page.goto(scratch.as_uri())
+    load = tool.wait_for("t-load", 8)
+    if not load or load["failed"] or not all(w for _, w in load["images"]) or len(load["images"]) != pictures:
+        failures.append(f"file:// beacon: {load}")
+    # The verdict the Mac draws from that report: none on a good load, one on a refused picture.
+    if load and tool.load_problems(load):
+        failures.append(f"load_problems on a good load: {tool.load_problems(load)}")
+    if load and not tool.load_problems({**load, "images": [*load["images"], ["img/absent.webp", 0]]}):
+        failures.append("load_problems let an unloaded picture through")
+    if not tool.wait_for("t-state", 4) or reports["t-state"]["hover"] or reports["t-state"]["flap"] < 0.9:
+        failures.append(f"rest over file://: {reports.get('t-state')}")
+    # The centre it reports is where the card is: playwright's window has no chrome, so inner = outer.
+    page.mouse.move(*load["centre"])
+    time.sleep(tool.SETTLE)
+    reports.pop("t-state", None)
+    said = tool.wait_for("t-state", 4)
+    if not said or not said["hover"] or said["flap"] > -0.9 or said["risen"] < 20:
+        failures.append(f"a mouse on the reported centre: {said}")
+    page.close()
+
+
+def check_forced(browser, port, forced, failures):
+    """The forced page opens with no pointer."""
+    forced.write_text(tool.scratch_page(port, "f", force=True), encoding="utf-8")
+    page = browser.new_page(viewport={"width": 1280, "height": 900})
+    page.goto(forced.as_uri())
+    time.sleep(1.5 + tool.SETTLE)
+    said = tool.wait_for("f-state", 4)
+    if not said or said["hover"] or not said["force"] or said["flap"] > -0.9 or said["risen"] < 20:
+        failures.append(f"forced open: {said}")
+    page.close()
+
+
+def card_log(browser, port, flat, failures):
+    """The driver's scripts on one card, open or flattened: its META line and its frame."""
+    page = browser.new_page(viewport={"width": 1280, "height": 900})
+    page.goto(f"http://127.0.0.1:{port}/index.html")
+    time.sleep(1.5)
+    if flat:
+        page.evaluate(as_function(tool.ADD_STYLE), [tool.FLAT])
+    card = "inviolia"
+    page.evaluate(f"document.querySelector('.cible.{card}').scrollIntoView({{block: 'center'}})")
+    if not flat:
+        page.evaluate(as_function(tool.WATCH), [card])
+    page.hover(f".cible.{card} > a")
+    time.sleep(tool.SETTLE)
+    state = page.evaluate(as_function(tool.PARTS), [card])
+    if not flat:
+        problems = tool.open_problems(card, state)
+        if problems:
+            failures.append(f"open_problems on an open card: {problems}")
+        swing = page.evaluate("window.__swing")
+        if not any(-0.8 < v < 0.8 for v in swing):
+            failures.append(f"the watch saw no part-way frame: {swing[:20]}")
+    name = f"{'plat' if flat else 'ouvert'}-{card}"
+    lines = [f"{tool.META} {name} {json.dumps(state)}", *frame_lines(name, page.screenshot(type="jpeg", quality=85))]
+    page.close()
+    return lines
+
+
+def check_extract(lines, d, failures):
+    """The pixel read: a real open card and a real flat one pass; a flat control that reads as open fails."""
+    log = Path(d) / "log"
+    log.write_text("\n".join(lines) + "\n")
+    if tool.extract(log, Path(d) / "out"):
+        failures.append("--extract refused a real open card and a real flat one")
+    swapped = list(lines)
+    opened = next(i for i, l in enumerate(swapped) if l.startswith(f"{BEGIN} ouvert"))
+    flat = next(i for i, l in enumerate(swapped) if l.startswith(f"{BEGIN} plat"))
+    swapped[opened + 1], swapped[flat + 1] = swapped[flat + 1], swapped[opened + 1]
+    log.write_text("\n".join(swapped) + "\n")
+    if not tool.extract(log, Path(d) / "out2"):
+        failures.append("--extract passed a flattened picture as open")
+
+
 def main():
     failures = []
     if tool.CARDS != check_racine.CARDS:
         failures.append(f"CARDS differ from tools/check_racine.py: {tool.CARDS}")
-    pictures = (REPO / "index.html").read_text(encoding="utf-8").count("<img")
     port = serve()
     with sync_playwright() as playwright, tempfile.TemporaryDirectory() as d:
         browser = playwright.chromium.launch(channel="chrome")
         scratch = REPO / "_sonde_test.html"
         forced = REPO / "_sonde_test_force.html"
         try:
-            # Over file://: the beacon comes back, and says the pictures loaded.
-            scratch.write_text(tool.scratch_page(port, "t"), encoding="utf-8")
-            page = browser.new_page(viewport={"width": 1280, "height": 900})
-            page.goto(scratch.as_uri())
-            load = tool.wait_for("t-load", 8)
-            if not load or load["failed"] or not all(w for _, w in load["images"]) or len(load["images"]) != pictures:
-                failures.append(f"file:// beacon: {load}")
-            # The verdict the Mac draws from that report: none on a good load, one on a refused picture.
-            if load and tool.load_problems(load):
-                failures.append(f"load_problems on a good load: {tool.load_problems(load)}")
-            if load and not tool.load_problems({**load, "images": [*load["images"], ["img/absent.webp", 0]]}):
-                failures.append("load_problems let an unloaded picture through")
-            if not tool.wait_for("t-state", 4) or reports["t-state"]["hover"] or reports["t-state"]["flap"] < 0.9:
-                failures.append(f"rest over file://: {reports.get('t-state')}")
-            # The centre it reports is where the card is: playwright's window has no chrome, so inner = outer.
-            page.mouse.move(*load["centre"])
-            time.sleep(tool.SETTLE)
-            reports.pop("t-state", None)
-            said = tool.wait_for("t-state", 4)
-            if not said or not said["hover"] or said["flap"] > -0.9 or said["risen"] < 20:
-                failures.append(f"a mouse on the reported centre: {said}")
-            page.close()
-
-            # The forced page opens with no pointer.
-            forced.write_text(tool.scratch_page(port, "f", force=True), encoding="utf-8")
-            page = browser.new_page(viewport={"width": 1280, "height": 900})
-            page.goto(forced.as_uri())
-            time.sleep(1.5 + tool.SETTLE)
-            said = tool.wait_for("f-state", 4)
-            if not said or said["hover"] or not said["force"] or said["flap"] > -0.9 or said["risen"] < 20:
-                failures.append(f"forced open: {said}")
-            page.close()
-
-            # The driver's scripts, and the pixel read: open passes, flat must not.
-            lines = []
-            for flat in (False, True):
-                page = browser.new_page(viewport={"width": 1280, "height": 900})
-                page.goto(f"http://127.0.0.1:{port}/index.html")
-                time.sleep(1.5)
-                if flat:
-                    page.evaluate(as_function(tool.ADD_STYLE), [tool.FLAT])
-                card = "inviolia"
-                page.evaluate(f"document.querySelector('.cible.{card}').scrollIntoView({{block: 'center'}})")
-                if not flat:
-                    page.evaluate(as_function(tool.WATCH), [card])
-                page.hover(f".cible.{card} > a")
-                time.sleep(tool.SETTLE)
-                state = page.evaluate(as_function(tool.PARTS), [card])
-                if not flat:
-                    problems = tool.open_problems(card, state)
-                    if problems:
-                        failures.append(f"open_problems on an open card: {problems}")
-                    swing = page.evaluate("window.__swing")
-                    if not any(-0.8 < v < 0.8 for v in swing):
-                        failures.append(f"the watch saw no part-way frame: {swing[:20]}")
-                name = f"{'plat' if flat else 'ouvert'}-{card}"
-                lines.append(f"{tool.META} {name} {json.dumps(state)}")
-                lines += frame_lines(name, page.screenshot(type="jpeg", quality=85))
-                page.close()
+            check_file_beacon(browser, port, scratch, failures)
+            check_forced(browser, port, forced, failures)
+            lines = card_log(browser, port, False, failures) + card_log(browser, port, True, failures)
             check_black_frames(lines, d, failures)
             real = base64.b64decode(next(lines[i + 1] for i, l in enumerate(lines) if l.startswith(f"{BEGIN} ouvert")))
             check_steady_shot(real, failures)
-            log = Path(d) / "log"
-            log.write_text("\n".join(lines) + "\n")
-            verdict = tool.extract(log, Path(d) / "out")
-            if verdict:
-                failures.append("--extract refused a real open card and a real flat one")
-
-            # A flat control that reads as open must fail the extract.
-            swapped = list(lines)
-            opened = next(i for i, l in enumerate(swapped) if l.startswith(f"{BEGIN} ouvert"))
-            flat = next(i for i, l in enumerate(swapped) if l.startswith(f"{BEGIN} plat"))
-            swapped[opened + 1], swapped[flat + 1] = swapped[flat + 1], swapped[opened + 1]
-            log.write_text("\n".join(swapped) + "\n")
-            if not tool.extract(log, Path(d) / "out2"):
-                failures.append("--extract passed a flattened picture as open")
+            check_extract(lines, d, failures)
         finally:
             scratch.unlink(missing_ok=True)
             forced.unlink(missing_ok=True)

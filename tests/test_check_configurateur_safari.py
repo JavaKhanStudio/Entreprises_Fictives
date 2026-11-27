@@ -72,8 +72,8 @@ class Stand(tool.Safari):
         self.lines += [f"{BEGIN} {name}", text, END]
 
 
-def main():
-    failures = []
+def check_constants(failures):
+    """What the tool shares with check_configurateur and its browsers check, and the page's views."""
     if tool.STATES != ccb.STATES:
         failures.append("STATES differ from tools/check_configurateur_browsers.py")
     if tool.HIDE != ccb.HIDE or tool.FLAT != ccb.CONTROLS["flat"][0] or tool.HOLLOW != ccb.CONTROLS["hollow"][0]:
@@ -88,62 +88,78 @@ def main():
     if {i for combo, _ in tool.TOTALS for i in combo} | set(tool.RESETS) != set(cc.MODELS) | set(cc.ADDS):
         failures.append("TOTALS leaves an option untried")
     html = (REPO / tool.PAGE).read_text(encoding="utf-8")
-    for view, (radio, angle) in tool.VIEWS.items():
+    for view, (radio, _angle) in tool.VIEWS.items():
         if f'<label for="{radio}">{view}</label>' not in html or f'id="{radio}"' not in html:
             failures.append(f"the view {view} is not on {radio}")
 
-    port = serve()
-    logs = {}
-    d = tempfile.mkdtemp()
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(channel="chrome", args=["--hide-scrollbars"])
-        # The flow, in Chrome: must pass. A lid with no top: must be caught.
-        for name, extra in (("right", ""), ("lidless", ".h-de { visibility: hidden !important; }")):
-            lines, failed = [], []
-            stand = Stand(browser, port, lines, extra)
-            if name == "right":
-                tool.run_turn(stand, failed)
-                tool.run_totals(stand, failed)
-                tool.run_fit(stand, failed)
-                # The read must see a wrong total: a browser that stopped summing.
-                stand.open(False)
-                stand.script(tool.ADD_STYLE, ".compte { counter-increment: none !important; }")
-                stand.pick(["n6"])
-                if stand.price_is(".ticket .prixf", 449 + 72):
-                    failures.append("the total's read passed a browser that does not sum")
-            tool.run_states(stand, lines.append, failed)
-            stand.top.close()
-            if name == "right" and failed:
-                failures.append(f"the flow on a right page: {failed}")
-            logs[name] = Path(d) / name
-            logs[name].write_text("\n".join(lines) + "\n")
 
-        # Over file://: the beacon comes back and the steps do what they say.
-        scratch = REPO / "dernier-prix/_sonde_test.html"
-        try:
-            scratch.write_text(tool.scratch_page(port, "t"), encoding="utf-8")
-            page = browser.new_page(viewport={"width": 1280, "height": 900})
-            page.goto(scratch.as_uri())
-            load = tool.wait_for("t-load", 8)
-            failures.extend(tool.load_problems(load))
-            expected = {"ferme": ("pin", 0, 0, 0), "ouvert": ("pin", 104, 0, 0), "kit": ("pin", 0, 92, 0),
-                        "bout": ("pin", 0, 0, 0), "chene": ("chene", 0, 0, 6)}
-            for name, _, angle, _ in tool.STEPS:
-                said = tool.wait_for(f"t-{name}", 12)
-                failures.extend(tool.step_problems(name, angle, said))
-                wood, lid, kit, handles = expected[name]
-                if not said or wood not in said["wood"] or abs(said["lid"] - lid) > 2 or abs(said["kit"] - 70 - kit) > 1 or said["handles"] != handles:
-                    failures.append(f"file:// step {name}: {said}")
-            page.close()
-        finally:
-            scratch.unlink(missing_ok=True)
-        browser.close()
+def flow_log(browser, port, name, extra, d, failures):
+    """The flow, in Chrome, through the stand-in driver; its log written. The right page must pass."""
+    lines, failed = [], []
+    stand = Stand(browser, port, lines, extra)
+    if name == "right":
+        tool.run_turn(stand, failed)
+        tool.run_totals(stand, failed)
+        tool.run_fit(stand, failed)
+        # The read must see a wrong total: a browser that stopped summing.
+        stand.open(False)
+        stand.script(tool.ADD_STYLE, ".compte { counter-increment: none !important; }")
+        stand.pick(["n6"])
+        if stand.price_is(".ticket .prixf", 449 + 72):
+            failures.append("the total's read passed a browser that does not sum")
+    tool.run_states(stand, lines.append, failed)
+    stand.top.close()
+    if name == "right" and failed:
+        failures.append(f"the flow on a right page: {failed}")
+    log = Path(d) / name
+    log.write_text("\n".join(lines) + "\n")
+    return log
 
-    # Outside the block: extract opens its own Playwright, which cannot nest.
+
+def check_file_probe(browser, port, failures):
+    """Over file://: the beacon comes back and the steps do what they say."""
+    scratch = REPO / "dernier-prix/_sonde_test.html"
+    try:
+        scratch.write_text(tool.scratch_page(port, "t"), encoding="utf-8")
+        page = browser.new_page(viewport={"width": 1280, "height": 900})
+        page.goto(scratch.as_uri())
+        load = tool.wait_for("t-load", 8)
+        failures.extend(tool.load_problems(load))
+        expected = {"ferme": ("pin", 0, 0, 0), "ouvert": ("pin", 104, 0, 0), "kit": ("pin", 0, 92, 0),
+                    "bout": ("pin", 0, 0, 0), "chene": ("chene", 0, 0, 6)}
+        for name, _, angle, _ in tool.STEPS:
+            said = tool.wait_for(f"t-{name}", 12)
+            failures.extend(tool.step_problems(name, angle, said))
+            wood, lid, kit, handles = expected[name]
+            if not said or wood not in said["wood"] or abs(said["lid"] - lid) > 2 or abs(said["kit"] - 70 - kit) > 1 or said["handles"] != handles:
+                failures.append(f"file:// step {name}: {said}")
+        page.close()
+    finally:
+        scratch.unlink(missing_ok=True)
+
+
+def check_extract(logs, d, failures):
+    """The pixel read: the right log passes, the lidless one fails."""
     if tool.extract(logs["right"], Path(d) / "right-out"):
         failures.append("--extract refused the right page")
     if not tool.extract(logs["lidless"], Path(d) / "lidless-out"):
         failures.append("--extract passed a lid with no top")
+
+
+def main():
+    failures = []
+    check_constants(failures)
+    port = serve()
+    d = tempfile.mkdtemp()
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(channel="chrome", args=["--hide-scrollbars"])
+        # A lid with no top: must be caught.
+        logs = {name: flow_log(browser, port, name, extra, d, failures)
+                for name, extra in (("right", ""), ("lidless", ".h-de { visibility: hidden !important; }"))}
+        check_file_probe(browser, port, failures)
+        browser.close()
+    # Outside the block: extract opens its own Playwright, which cannot nest.
+    check_extract(logs, d, failures)
     shutil.rmtree(d)
     for failure in failures:
         print("FAILED:", failure)
