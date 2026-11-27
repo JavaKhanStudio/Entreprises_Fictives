@@ -20,7 +20,7 @@ import urllib.error
 from unittest import mock
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
-import check_names  # noqa: E402
+import check_names
 
 
 def http_error(code):

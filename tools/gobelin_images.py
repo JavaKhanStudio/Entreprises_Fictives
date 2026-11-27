@@ -46,11 +46,11 @@ STYLES = {
               "black, acid green and hot pink, halftone shadows, graphic poster"),
 }
 TAKE_SUBJECTS = {
-    "portrait": ("head and shoulders portrait of a tired female goblin in a grey hoodie, big "
-                 "ears, green skin, dark rings under her eyes, looking at the camera", 1024, 1024),
-    "cle": ("a small screaming goblin in a dark cave clutching a heap of gold coins, a tall thin "
+    "portrait": (("head and shoulders portrait of a tired female goblin in a grey hoodie, big "
+                 "ears, green skin, dark rings under her eyes, looking at the camera"), 1024, 1024),
+    "cle": (("a small screaming goblin in a dark cave clutching a heap of gold coins, a tall thin "
             "tax inspector in a grey suit with a briefcase walks down the stone stairs behind a "
-            "torch, wide shot", 1216, 832),
+            "torch, wide shot"), 1216, 832),
 }
 
 
@@ -77,31 +77,31 @@ PICTURES = {
                 "her ear, overalls smeared with green paint, amused sideways glance"),
     "odile": (108, 1024, 1024, PORTRAIT + f"female elderly {GOBLIN}, accountant, tight grey bun, reading "
               "glasses on a chain, beige cardigan, perfectly rested, stern unimpressed look"),
-    "cle": (311, 1216, 832, f"close-up of a small {GOBLIN} in tattered rags screaming in terror, enormous open "
+    "cle": (311, 1216, 832, (f"close-up of a small {GOBLIN} in tattered rags screaming in terror, enormous open "
             "mouth, eyes bulging, hugging gold coins in a dark cave, behind him very far away at the top of "
-            "stone stairs a tiny black silhouette of a man holding one briefcase in a doorway of cold light"),
-    "capture": (202, 1216, 832, "top-down isometric view of a roguelike video game level, an underground "
+            "stone stairs a tiny black silhouette of a man holding one briefcase in a doorway of cold light")),
+    "capture": (202, 1216, 832, ("top-down isometric view of a roguelike video game level, an underground "
                 f"dungeon of glowing tunnels, a tiny {GOBLIN} running with a sack of gold, dozens of paper "
-                "sheets flying in the air, torches, chests, purple crystals, no interface"),
-    "morve": (213, 832, 1216, f"heroic box art of a fantasy video game, a proud {GOBLIN} in dented armour "
+                "sheets flying in the air, torches, chests, purple crystals, no interface")),
+    "morve": (213, 832, 1216, (f"heroic box art of a fantasy video game, a proud {GOBLIN} in dented armour "
               "raising a sword on a hill, thick string of bright green snot hanging from his nose, a green "
-              "banner in the wind, sunset, epic"),
-    "forge": (214, 1216, 832, "low angle shot of the underside of a heavy wooden office desk in a stone cellar, "
+              "banner in the wind, sunset, epic")),
+    "forge": (214, 1216, 832, ("low angle shot of the underside of a heavy wooden office desk in a stone cellar, "
               "under the desk on the floor sits one old dented black computer tower with blinking green "
-              "lights, tangle of cables, a pillow on the floor next to it, an office chair, night"),
-    "open-space": (415, 1216, 800, "messy indie game studio in a stone cellar at night, a large blank white "
+              "lights, tangle of cables, a pillow on the floor next to it, an office chair, night")),
+    "open-space": (415, 1216, 800, ("messy indie game studio in a stone cellar at night, a large blank white "
                    "whiteboard on the back wall, a fridge on the right, three glowing computer monitors on "
                    f"desks in the foreground, a {GOBLIN} asleep on a keyboard, pizza boxes, red energy drink "
-                   "cans, photo taken straight ahead with a phone"),
-    "bureau": (206, 1216, 832, f"a {GOBLIN} in a sleeping bag asleep on the floor under a desk, at night in "
+                   "cans, photo taken straight ahead with a phone")),
+    "bureau": (206, 1216, 832, (f"a {GOBLIN} in a sleeping bag asleep on the floor under a desk, at night in "
                "a cellar, a laptop still open beside him lighting his face, slices of cold pizza, a "
-               "cardboard medal on a string around his neck"),
-    "inspecteur": (417, 1216, 832, "a tall thin faceless silhouette of a man in a grey suit holding one single briefcase, "
+               "cardboard medal on a string around his neck")),
+    "inspecteur": (417, 1216, 832, ("a tall thin faceless silhouette of a man in a grey suit holding one single briefcase, "
                    "standing alone in a huge dark cave, dozens of small glowing green eyes watching him from the "
-                   "darkness, a single cold light from above, ominous, wide shot"),
-    "cave": (208, 832, 1216, "narrow concrete stairs going down to a heavy steel door in the basement of an "
+                   "darkness, a single cold light from above, ominous, wide shot")),
+    "cave": (208, 832, 1216, ("narrow concrete stairs going down to a heavy steel door in the basement of an "
              "old warehouse, green light leaking under the door, stacks of pizza boxes on the steps, "
-             "tangled cable along the wall, night, dramatic perspective, seen from the top of the stairs"),
+             "tangled cable along the wall, night, dramatic perspective, seen from the top of the stairs")),
 }
 
 
@@ -244,6 +244,7 @@ def marker(picture, text, x, y, colour, size, rng):
 def write_board(picture, box):
     """The clue, in letters that can be read, inside the painted whiteboard."""
     import random
+
     from PIL import ImageFilter
     left, top, right, bottom = box
     rng = random.Random(13)

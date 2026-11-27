@@ -14,7 +14,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from gobelin_images import generate  # noqa: E402
+from gobelin_images import generate
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RAW = pathlib.Path.home() / ".cache" / "dernier-prix-images"
@@ -26,26 +26,26 @@ HEAD = ("corporate staff headshot photograph of a french {who}, plain yellow pol
         "blurred discount store aisle, looking at the camera, natural skin, sharp focus, {mood}")
 # name: seed, width, height, subject.
 PICTURES = {
-    "chene": (41, 1216, 832, "catalogue product photograph of a dark polished oak coffin with brass handles, "
-              f"three quarter view, {PACK}"),
-    "peuplier": (42, 1216, 832, "catalogue product photograph of a very plain white painted coffin without any "
-                 f"decoration, three quarter view, {PACK}"),
-    "plaque": (43, 1024, 1024, "catalogue product photograph of a blank polished grey granite memorial plaque "
-               f"with a small brass vase, no inscription, {PACK}"),
+    "chene": (41, 1216, 832, ("catalogue product photograph of a dark polished oak coffin with brass handles, "
+              f"three quarter view, {PACK}")),
+    "peuplier": (42, 1216, 832, ("catalogue product photograph of a very plain white painted coffin without any "
+                 f"decoration, three quarter view, {PACK}")),
+    "plaque": (43, 1024, 1024, ("catalogue product photograph of a blank polished grey granite memorial plaque "
+               f"with a small brass vase, no inscription, {PACK}")),
     "bouquet": (44, 1024, 1024, f"catalogue product photograph of a modest bunch of white chrysanthemums in a plastic pot, {PACK}"),
     "bambou": (45, 1024, 1024, f"catalogue product photograph of a plain bamboo funeral urn with a lid, {PACK}"),
-    "rayon": (146, 1216, 832, "discount warehouse store aisle, on both sides tall metal pallet racking, on every shelf "
+    "rayon": (146, 1216, 832, ("discount warehouse store aisle, on both sides tall metal pallet racking, on every shelf "
               "light pine wood funeral coffins lying side by side, clearly coffins with handles and tapered lids, polished "
-              f"concrete floor, fluorescent tube lights, {PHOTO}"),
-    "facade": (47, 1216, 832, "exterior of a low cheap big box discount store in a french retail park, blank bright "
+              f"concrete floor, fluorescent tube lights, {PHOTO}")),
+    "facade": (47, 1216, 832, ("exterior of a low cheap big box discount store in a french retail park, blank bright "
                "yellow and red metal cladding facade, automatic glass doors, empty car park with white lines, grey "
-               f"overcast sky, wide shot, {PHOTO}"),
-    "camion": (48, 1216, 832, "bright yellow delivery van with blank sides parked in a small french village street "
-               f"in front of an old stone church, overcast day, {PHOTO}"),
-    "palettes": (249, 1216, 832, "a yellow forklift lifting one single light pine wood funeral coffin with metal handles, "
-                 f"the coffin lying on a wooden pallet, warehouse loading bay, {PHOTO}"),
-    "caisse": (250, 1216, 832, "close-up of a supermarket checkout counter, black rubber conveyor belt, lying flat on the "
-               f"belt a round funeral wreath of white flowers, a card payment terminal beside it, nobody, {PHOTO}"),
+               f"overcast sky, wide shot, {PHOTO}")),
+    "camion": (48, 1216, 832, ("bright yellow delivery van with blank sides parked in a small french village street "
+               f"in front of an old stone church, overcast day, {PHOTO}")),
+    "palettes": (249, 1216, 832, ("a yellow forklift lifting one single light pine wood funeral coffin with metal handles, "
+                 f"the coffin lying on a wooden pallet, warehouse loading bay, {PHOTO}")),
+    "caisse": (250, 1216, 832, ("close-up of a supermarket checkout counter, black rubber conveyor belt, lying flat on the "
+               f"belt a round funeral wreath of white flowers, a card payment terminal beside it, nobody, {PHOTO}")),
     "didier": (51, 1024, 1024, HEAD.format(who="man of fifty-eight, greying hair, wearing a navy blazer over the polo",
                                            mood="huge confident salesman smile")),
     "nathalie": (52, 1024, 1024, HEAD.format(who="woman accountant of fifty, short brown hair, reading glasses",
@@ -56,9 +56,9 @@ PICTURES = {
                                            mood="warm radiant smile")),
     "gaetan": (55, 1024, 1024, HEAD.format(who="man of thirty-one, trendy round glasses, lanyard",
                                            mood="smug little smile")),
-    "bernadette": (56, 1024, 1024, "corporate staff headshot photograph of a french woman of sixty-two, grey chignon, "
+    "bernadette": (56, 1024, 1024, ("corporate staff headshot photograph of a french woman of sixty-two, grey chignon, "
                    "severe black suit, white shirt, in front of a blurred discount store aisle, looking at the camera, "
-                   "natural skin, sharp focus, solemn, unsmiling"),
+                   "natural skin, sharp focus, solemn, unsmiling")),
     "loic": (57, 1024, 1024, HEAD.format(who="man of forty-five, stocky delivery driver, shaved head",
                                          mood="cheerful")),
 }

@@ -14,7 +14,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from gobelin_images import generate  # noqa: E402
+from gobelin_images import generate
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RAW = pathlib.Path.home() / ".cache" / "inviolia-images"
@@ -24,20 +24,20 @@ STOCK = "corporate stock photograph, sharp focus, professional lighting"
 HEAD = ("corporate headshot portrait photograph, head and shoulders, looking at the camera, plain very dark "
         "navy background, cool blue rim light, sharp focus, realistic skin")
 PICTURES = {
-    "soc": (41, 1216, 832, "security operations center, dark room, analysts seen from behind at desks, huge wall "
-            f"of blue screens with world maps and graphs, red alerts glowing, {STOCK}"),
-    "accueil": (42, 1216, 832, "empty modern glass office reception desk, a row of blue lanyards with blank white "
-                f"access cards hanging from hooks on the desk, nobody present, cool light, {STOCK}"),
-    "serveurs": (43, 1216, 832, "data center corridor between server racks, blue light, blinking leds, symmetrical "
-                 f"perspective, {STOCK}"),
-    "poignee": (44, 1216, 832, "two businessmen in dark suits shaking hands in front of a window, faces out of "
-                f"frame, close on the hands, blue tint, {STOCK}"),
-    "cadenas": (45, 1216, 832, "glowing blue digital padlock floating over a dark circuit board, cybersecurity "
-                "concept, 3d render, high tech"),
-    "scene": (46, 1216, 832, "man in a dark suit seen from behind on a conference stage, arms open, facing a dark "
-              f"audience, giant red glowing screen behind him, no words on the screen, {STOCK}"),
-    "immeuble": (47, 1216, 832, "low modern office building of dark glass in a business park at dusk, small car "
-                 f"park, blue lit lobby, {STOCK}"),
+    "soc": (41, 1216, 832, ("security operations center, dark room, analysts seen from behind at desks, huge wall "
+            f"of blue screens with world maps and graphs, red alerts glowing, {STOCK}")),
+    "accueil": (42, 1216, 832, ("empty modern glass office reception desk, a row of blue lanyards with blank white "
+                f"access cards hanging from hooks on the desk, nobody present, cool light, {STOCK}")),
+    "serveurs": (43, 1216, 832, ("data center corridor between server racks, blue light, blinking leds, symmetrical "
+                 f"perspective, {STOCK}")),
+    "poignee": (44, 1216, 832, ("two businessmen in dark suits shaking hands in front of a window, faces out of "
+                f"frame, close on the hands, blue tint, {STOCK}")),
+    "cadenas": (45, 1216, 832, ("glowing blue digital padlock floating over a dark circuit board, cybersecurity "
+                "concept, 3d render, high tech")),
+    "scene": (46, 1216, 832, ("man in a dark suit seen from behind on a conference stage, arms open, facing a dark "
+              f"audience, giant red glowing screen behind him, no words on the screen, {STOCK}")),
+    "immeuble": (47, 1216, 832, ("low modern office building of dark glass in a business park at dusk, small car "
+                 f"park, blue lit lobby, {STOCK}")),
     "jean-marc": (51, 832, 832, f"man of 58, silver hair, navy suit, no tie, arms crossed, stern, {HEAD}"),
     "sylvie": (52, 832, 832, f"woman of 55, short grey hair, glasses, dark blazer, tight smile, {HEAD}"),
     "marc-antoine": (53, 832, 832, f"man of 45, tanned, very white smile, slim blue suit, pocket square, {HEAD}"),

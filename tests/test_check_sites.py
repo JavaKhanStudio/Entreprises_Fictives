@@ -17,7 +17,7 @@ import unittest
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "tools"))
-import check_sites  # noqa: E402
+import check_sites
 
 with open(os.path.join(REPO, "shared/modele.html"), encoding="utf-8") as model_file:
     MODEL = model_file.read()

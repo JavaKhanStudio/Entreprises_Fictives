@@ -1,0 +1,2 @@
+# Where the local modules live, so import sorting keeps them in their own group (r110).
+src = [".", "tools"]

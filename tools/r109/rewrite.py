@@ -1,6 +1,9 @@
 """r109: replace each over-long pack's context with its trimmed text. What leaves a pack
 goes, word for word, into .atelier/notes/<tag>.md, which the pack names."""
-import pathlib, re, tomllib
+import pathlib
+import re
+import tomllib
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 P = ROOT / ".atelier/packs.toml"
 ROUND = 'ROUND (board skill §4, r4524): an ask\'s first picture is close on its subject (magick -crop WxH+X+Y +repage), captioned "Shows: <it>"; then the takes; one context picture at most.'
@@ -74,7 +77,7 @@ CLUES: in r77's note of 2026-11-03 02:30 (atelier show r77 --full), never in thi
 
 src = P.read_text()
 for slug, text in NEW.items():
-    pat = re.compile(r'(\[tags\.' + re.escape(slug) + r'\][^\[]*?context = """)\n.*?\n(""")', re.S)
+    pat = re.compile(r'(\[tags\.' + re.escape(slug) + r'\][^\[]*?context = """)\n.*?\n(""")', re.DOTALL)
     src, n = pat.subn(lambda m: m.group(1) + text.rstrip("\n") + "\n" + m.group(2), src, count=1)
     assert n == 1, slug
 P.write_text(src)
@@ -87,9 +90,9 @@ def notes(old):
     for slug in NEW:
         out = [f"# #{slug}: the full notes behind its context pack",
                "",
-               f"The pack in .atelier/packs.toml is the short index an agent reads first; this is what it",
-               f"points to. Cut from the pack, word for word, on r109. Fix a line here in the same commit",
-               f"as what makes it wrong.", ""]
+               "The pack in .atelier/packs.toml is the short index an agent reads first; this is what it",
+               "points to. Cut from the pack, word for word, on r109. Fix a line here in the same commit",
+               "as what makes it wrong.", ""]
         for line in old[slug].strip().split("\n"):
             m = re.match(r"([A-Z][A-Z ]+?)(?: \(([^)]*)\))?: (.*)", line)
             if m and m.group(1) == "THE ROUND":

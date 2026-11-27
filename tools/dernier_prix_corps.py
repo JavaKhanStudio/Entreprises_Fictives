@@ -64,7 +64,7 @@ def woman():
 def main():
     html = PAGE.read_text(encoding="utf-8")
     bodies = "".join(f'              <div class="corps {name}">{who()}</div>\n' for name, who in (("homme", man), ("femme", woman)))
-    html, count = re.subn(r"( *<!-- corps -->\n).*?( *<!-- /corps -->\n)", lambda m: m[1] + bodies + m[2], html, flags=re.S)
+    html, count = re.subn(r"( *<!-- corps -->\n).*?( *<!-- /corps -->\n)", lambda m: m[1] + bodies + m[2], html, flags=re.DOTALL)
     if count != 1:
         raise SystemExit("the page's corps markers are not there once")
     PAGE.write_text(html, encoding="utf-8")

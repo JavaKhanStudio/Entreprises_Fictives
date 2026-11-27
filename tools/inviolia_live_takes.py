@@ -79,7 +79,7 @@ NEON = """      tirs.forEach(function (s, i) {
 
 def patch(text, old, new, regex=False):
     if regex:
-        out, n = re.subn(old, lambda _: new, text, count=1, flags=re.S)
+        out, n = re.subn(old, lambda _: new, text, count=1, flags=re.DOTALL)
     else:
         out, n = text.replace(old, new, 1), old in text
     if not n:

@@ -39,10 +39,10 @@ COMPANIES = ("merlin", "gobelin", "courtepaille", "inviolia", "dernier-prix", "s
 FICTION_PHONE_ROOTS = ("019900", "026191", "035301", "046571", "053649", "063998")
 
 EM_DASH = "\u2014"
-FOOTER = re.compile(r"<footer\b.*?</footer>", re.I | re.S)
-COMMENT = re.compile(r"<!--.*?-->", re.S)
-CSS_COMMENT = re.compile(r"/\*.*?\*/", re.S)
-CSS_URL = re.compile(r"""url\(\s*['"]?([^'")\s]*)|@import\s+['"]([^'"]+)""", re.I)
+FOOTER = re.compile(r"<footer\b.*?</footer>", re.IGNORECASE | re.DOTALL)
+COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
+CSS_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
+CSS_URL = re.compile(r"""url\(\s*['"]?([^'")\s]*)|@import\s+['"]([^'"]+)""", re.IGNORECASE)
 # Words joined by dots, ending in letters. Hits "bob@a.fr" and "a.fr/page" alike.
 DOMAIN = re.compile(r"(?<![\w.@-])(?:([\w.+-]+)@)?((?:[\w-]+\.)+[^\W\d_]{2,})(?![\w-])")
 BARE_EMAIL = re.compile(r"(?<![\w.+-])[\w.+-]+@[\w-]+(?![\w-]|\.\w)")
@@ -58,7 +58,7 @@ PHONE = re.compile(rf"(?<!\w)(?<![\w.][/\-])\+?\d(?:{PHONE_SEPARATOR}{{0,3}}\d)*
 # A label glued to its number: Tel-0612345678, T0612345678, Tél/0612345678. Blanked like a date,
 # so the number is read; the word has to be whole, Hotel-0612345678 is a reference.
 PHONE_LABEL = re.compile(r"(?<!\w)(?:t|tel|tél|telephone|téléphone|phone|fax|mob|mobile|portable"
-                         r"|gsm)[/\-_]?(?=\+?\d)", re.I)
+                         r"|gsm)[/\-_]?(?=\+?\d)", re.IGNORECASE)
 # Between two numbers in a row, when the run is not one number: two separators or more
 # ("01 99 00 12 34 - 2026"), or one that does not sit inside a number on its own account: a line
 # break or tab, a comma, an underscore, a typographic dash.
@@ -77,7 +77,7 @@ URL_ATTRS = {"href", "src", "srcset", "poster", "data", "action", "formaction", 
              "cite", "ping", "xlink:href"}
 # Attributes holding page plumbing rather than something to read.
 PLAIN_ATTRS = {"class", "id", "style", "rel", "type", "charset", "lang", "name", "for", "media"}
-URL_SCHEME = re.compile(r"^([a-z][a-z0-9+.-]*):", re.I)
+URL_SCHEME = re.compile(r"^([a-z][a-z0-9+.-]*):", re.IGNORECASE)
 
 
 class Refusals:

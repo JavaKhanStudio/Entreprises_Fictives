@@ -10,7 +10,6 @@ over http and prints the score and the blocking time (needs npx; several minutes
 """
 
 import json
-import shutil
 import socket
 import subprocess
 import sys

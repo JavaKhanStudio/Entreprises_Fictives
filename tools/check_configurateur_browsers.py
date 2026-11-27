@@ -36,7 +36,7 @@ from PIL import Image, ImageChops
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import check_configurateur as cc  # noqa: E402
+import check_configurateur as cc
 
 WIDTHS = (1280, 390)
 CONTROLS = {

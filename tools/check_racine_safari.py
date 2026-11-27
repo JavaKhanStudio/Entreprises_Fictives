@@ -336,6 +336,7 @@ def steady_shot(name, take, wait=SETTLE):
 def extract(log, out):
     """Write the frames, and read the paper in them the way tools/check_racine.py does."""
     from PIL import Image
+
     from check_racine import PAPER_AT_LEAST, paper_share
 
     out.mkdir(parents=True, exist_ok=True)

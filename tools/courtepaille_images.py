@@ -19,7 +19,7 @@ import numpy
 from PIL import Image, ImageDraw, ImageFilter
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import gobelin_images as painter  # noqa: E402
+import gobelin_images as painter
 
 RAW = pathlib.Path.home() / ".cache" / "courtepaille-images"
 SHIPPED = painter.ROOT / "courtepaille" / "img" / "facade-photo.jpg"

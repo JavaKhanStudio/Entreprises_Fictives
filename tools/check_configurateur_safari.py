@@ -511,6 +511,7 @@ def extract(log, out):
     """Write the frames, draw the same states in Chrome, read the pixels."""
     from PIL import Image, ImageChops, ImageFilter
     from playwright.sync_api import sync_playwright
+
     import check_configurateur as cc
     import check_configurateur_browsers as ccb
 

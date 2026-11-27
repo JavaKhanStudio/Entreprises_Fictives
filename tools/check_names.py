@@ -222,10 +222,10 @@ def web_mentions(name):
     query = urllib.parse.quote(f'"{name}"')
     page = fetch(f"https://search.brave.com/search?q={query}", BROWSER)
     body = page[page.find("<body"):]
-    body = re.sub(r"<(script|style|svg|input|form)\b.*?</\1>", " ", body, flags=re.S | re.I)
+    body = re.sub(r"<(script|style|svg|input|form)\b.*?</\1>", " ", body, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body)))
     return [text[max(0, hit.start() - 50):hit.end() + 60]
-            for hit in re.finditer(re.escape(name), text, re.I)]
+            for hit in re.finditer(re.escape(name), text, re.IGNORECASE)]
 
 
 def web_control():

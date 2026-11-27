@@ -205,6 +205,7 @@ def on_the_mac():
 def extract(log, out):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from PIL import Image
+
     import check_badge_browsers as reads
 
     out.mkdir(parents=True, exist_ok=True)

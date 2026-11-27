@@ -23,7 +23,6 @@ Safari: tools/check_badge_safari.py.
 """
 
 import argparse
-import io
 import json
 import os
 import subprocess
@@ -34,7 +33,7 @@ from PIL import Image, ImageChops
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import check_badge  # noqa: E402
+import check_badge
 
 WIDTHS = (1280, 390)
 TURNED = 20750  # ms into the cycle: .tour has the back towards us

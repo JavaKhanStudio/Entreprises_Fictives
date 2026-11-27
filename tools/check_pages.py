@@ -26,10 +26,10 @@ REPO = Path(__file__).resolve().parent.parent
 PUBLIC = "https://javakhanstudio.github.io/Entreprises_Fictives/"
 RENDERED = ("index.html", "merlin/index.html", "gobelin/index.html", "courtepaille/index.html", "inviolia/index.html", "dernier-prix/index.html", "source-eclat/index.html")
 GENERATED = ("README.html", "CLAUDE.html")
-NOINDEX = re.compile(r'<meta\s+name="robots"\s+content="noindex"\s*/?>', re.I)
-FOOTER = re.compile(r"<footer\b.*?</footer>", re.I | re.S)
-LOCAL = re.compile(r"""\b(?:href|src|srcset)="([^"]+)\"""", re.I)
-COMMENT = re.compile(r"<!--.*?-->", re.S)
+NOINDEX = re.compile(r'<meta\s+name="robots"\s+content="noindex"\s*/?>', re.IGNORECASE)
+FOOTER = re.compile(r"<footer\b.*?</footer>", re.IGNORECASE | re.DOTALL)
+LOCAL = re.compile(r"""\b(?:href|src|srcset)="([^"]+)\"""", re.IGNORECASE)
+COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 
 
 def fetch(url):
@@ -54,7 +54,7 @@ def local_targets(page_url, body, base):
     found = set()
     for attribute in LOCAL.findall(COMMENT.sub("", body)):
         for target in targets(attribute.strip()):
-            if re.match(r"[a-z][a-z0-9+.-]*:", target, re.I) or target.startswith("#"):
+            if re.match(r"[a-z][a-z0-9+.-]*:", target, re.IGNORECASE) or target.startswith("#"):
                 continue
             url = urllib.parse.urljoin(page_url, target).split("#")[0].split("?")[0]
             if url.startswith(base):

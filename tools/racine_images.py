@@ -14,7 +14,7 @@ import sys
 from PIL import Image
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from gobelin_images import generate  # noqa: E402
+from gobelin_images import generate
 
 RAW = pathlib.Path.home() / ".cache" / "racine-images"
 SHIPPED = pathlib.Path(__file__).resolve().parent.parent / "merlin" / "img" / "vignette.webp"
