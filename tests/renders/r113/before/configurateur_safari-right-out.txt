@@ -1,0 +1,165 @@
+exit 0
+57 frames in configurateur_safari-right-out
+reference: chrome 156.0.8078.47
+OK   safari at 1280: side on is wider than end on (437 against 176 px)
+OK   safari at 1280: seen from above, end on still shows its length (285 high, 176 wide)
+OK   safari at 1280: the lid rises above the coffin (top 61, closed 179)
+OK   safari at 1280: the kit lifts the lid and spreads the walls (575x351 against 439x246)
+OK   safari at 1280: oak with its handles (69.1% oak, 5.25% gold)
+OK   safari at 1280: the oak's total is 905 €, in pixels
+OK   safari at 1280: no page error
+OK   safari at 1280: shut, nothing of the occupant shows (0.00% of the box changed)
+OK   safari at 1280: the occupant shows, open (7.3% man, 6.5% woman) and in kit (7.6%)
+OK   safari at 1280: the man is not the woman (2.5%)
+OK   safari at 1280: ferme is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: face is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: bout is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: ouvert is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: chene is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: kit is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: ferme-occupe is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: homme is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: femme is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: femme-kit is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 1280: repere-dessus: 12839 px of the marker against Chrome's 13117
+OK   safari at 1280: repere-doublure: 73169 px of the marker against Chrome's 73693
+CONTROL plat-repere-dessus: 0 px of the marker, 0% of Chrome's
+CONTROL plat-ferme: 71.9% of the coffin's box far from Chrome
+CONTROL creux-repere-dessus: 12823 px of the marker, 98% of Chrome's
+CONTROL creux-ferme: 0.0% of the coffin's box far from Chrome
+OK   safari at 390: side on is wider than end on (248 against 97 px)
+OK   safari at 390: seen from above, end on still shows its length (158 high, 97 wide)
+OK   safari at 390: the lid rises above the coffin (top 64, closed 134)
+OK   safari at 390: the kit lifts the lid and spreads the walls (304x173 against 255x137)
+OK   safari at 390: oak with its handles (68.6% oak, 5.21% gold)
+OK   safari at 390: the oak's total is 905 €, in pixels
+OK   safari at 390: no page error
+OK   safari at 390: shut, nothing of the occupant shows (0.00% of the box changed)
+OK   safari at 390: the occupant shows, open (7.1% man, 6.4% woman) and in kit (7.7%)
+OK   safari at 390: the man is not the woman (2.5%)
+OK   safari at 390: ferme is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: face is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: bout is drawn as in Chrome (1.2% of its box far apart)
+OK   safari at 390: ouvert is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: chene is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: kit is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: ferme-occupe is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: homme is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: femme is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: femme-kit is drawn as in Chrome (0.0% of its box far apart)
+OK   safari at 390: repere-dessus: 4053 px of the marker against Chrome's 4224
+OK   safari at 390: repere-doublure: 24093 px of the marker against Chrome's 24359
+OK
+
+--- stderr
+
+--- files
+6d0d0300ff1b7ff6  chrome-1280-bout.png
+157d98dc4c3957cf  chrome-1280-chene.png
+a248904eaefd3fb3  chrome-1280-face.png
+e95d895bf28680c0  chrome-1280-femme-kit.png
+8f74f5ad8dca6fac  chrome-1280-femme.png
+350736db7b6787d2  chrome-1280-ferme-occupe.png
+350736db7b6787d2  chrome-1280-ferme.png
+393c7863b83251ad  chrome-1280-homme.png
+94b6fdc9245b8187  chrome-1280-kit.png
+371973f2dcc63a94  chrome-1280-ouvert.png
+66990f3d7df3f165  chrome-1280-repere-dessus.png
+15b3e64f6b0b89ba  chrome-1280-repere-doublure.png
+ec855975fc054b85  chrome-390-bout.png
+b03a3c224ea076f4  chrome-390-chene.png
+766537bff55d350e  chrome-390-face.png
+baf94d16749d5b36  chrome-390-femme-kit.png
+3160e379a02c65da  chrome-390-femme.png
+f65267269aabc1a8  chrome-390-ferme-occupe.png
+f65267269aabc1a8  chrome-390-ferme.png
+532dc823adf2c071  chrome-390-homme.png
+562d13c0c73918e5  chrome-390-kit.png
+d3a7569a186b0e83  chrome-390-ouvert.png
+53c800c49153e2cc  chrome-390-repere-dessus.png
+ee7a4f4dbd8baff9  chrome-390-repere-doublure.png
+5d9b9da35df30e4f  creux-ferme-1280-ferme.png
+6cb4827a803c56f3  mac-1280-bout-vide.jpg
+3b66176c45fab8e0  mac-1280-bout.jpg
+bb07b7d472000a88  mac-1280-chene-vide.jpg
+cea70b73051ed547  mac-1280-chene.jpg
+adfa4cc0d6ee01f4  mac-1280-creux-ferme-vide.jpg
+7dab1d3bb0fc4e62  mac-1280-creux-ferme.jpg
+adfa4cc0d6ee01f4  mac-1280-creux-repere-dessus-vide.jpg
+ff7920df4de280cb  mac-1280-creux-repere-dessus.jpg
+2fd4d363123e41fa  mac-1280-face-vide.jpg
+a0e861bba608a735  mac-1280-face.jpg
+ac381d6c2106e086  mac-1280-femme-kit-vide.jpg
+c4b6ee511334e0fc  mac-1280-femme-kit.jpg
+d5619a440527d162  mac-1280-femme-vide.jpg
+d5a00a33385a6319  mac-1280-femme.jpg
+b91c414ebc2205f4  mac-1280-ferme-occupe-vide.jpg
+2d6a9062598305d7  mac-1280-ferme-occupe.jpg
+adfa4cc0d6ee01f4  mac-1280-ferme-vide.jpg
+40d2929254061887  mac-1280-ferme.jpg
+7ab0041d67a255e6  mac-1280-homme-vide.jpg
+b2e6cc48a0d9ebf6  mac-1280-homme.jpg
+e2f7248b52a07ccc  mac-1280-kit-vide.jpg
+78aa5f4f2212683e  mac-1280-kit.jpg
+ca90f98d44759353  mac-1280-ouvert-vide.jpg
+811e3bc1a4435f4a  mac-1280-ouvert.jpg
+0dd52196482a12ea  mac-1280-plat-ferme-vide.jpg
+289452e6dbc71daf  mac-1280-plat-ferme.jpg
+0dd52196482a12ea  mac-1280-plat-repere-dessus-vide.jpg
+289452e6dbc71daf  mac-1280-plat-repere-dessus.jpg
+adfa4cc0d6ee01f4  mac-1280-repere-dessus-vide.jpg
+57be695bd78711bf  mac-1280-repere-dessus.jpg
+ca90f98d44759353  mac-1280-repere-doublure-vide.jpg
+3f52c1d329768d4f  mac-1280-repere-doublure.jpg
+2d21ce1e3e1817cd  mac-390-bout-vide.jpg
+1be4b4134e0b2508  mac-390-bout.jpg
+b16d332c4c5f46cc  mac-390-chene-vide.jpg
+81df789fe5e9aecf  mac-390-chene.jpg
+cf15b20aa30aafe0  mac-390-face-vide.jpg
+7f8468effb5376da  mac-390-face.jpg
+74547b3e669e849f  mac-390-femme-kit-vide.jpg
+ca809b28fe8f7cc1  mac-390-femme-kit.jpg
+613d16c239fd85df  mac-390-femme-vide.jpg
+f61e94b8fab54abd  mac-390-femme.jpg
+609f8d53d4187b78  mac-390-ferme-occupe-vide.jpg
+93535751319b13dd  mac-390-ferme-occupe.jpg
+609f8d53d4187b78  mac-390-ferme-vide.jpg
+f030272ebf80e378  mac-390-ferme.jpg
+44bb843aa59953c3  mac-390-homme-vide.jpg
+e48066d761c5c1b3  mac-390-homme.jpg
+8b9e34d9a969a9d3  mac-390-kit-vide.jpg
+7f5c8c37cfff09d2  mac-390-kit.jpg
+cfd7f95956b492f6  mac-390-ouvert-vide.jpg
+8d029f23c2e7190e  mac-390-ouvert.jpg
+d4e0d5ebbf6aea1d  mac-390-repere-dessus-vide.jpg
+69b99c82d39b0660  mac-390-repere-dessus.jpg
+bb7e94fd56d60165  mac-390-repere-doublure-vide.jpg
+78f09bb3d847f262  mac-390-repere-doublure.jpg
+60de3f7fac0a6b2a  mac-fit-1007-kit.jpg
+5764d5a2b209d3ed  plat-ferme-1280-ferme.png
+f68eefb10f3222ac  safari-1280-bout.png
+aec151c304a63db2  safari-1280-chene.png
+c462daa03caf1242  safari-1280-creux-repere-dessus.png
+770e98fcb51f36c8  safari-1280-face.png
+e5e427b801aefacd  safari-1280-femme-kit.png
+71ac7f03882d5793  safari-1280-femme.png
+25e5e0889074a055  safari-1280-ferme-occupe.png
+25e5e0889074a055  safari-1280-ferme.png
+f17e6e762d52e03d  safari-1280-homme.png
+8028012cdfc2ec41  safari-1280-kit.png
+a6ec74cde4291ff6  safari-1280-ouvert.png
+5764d5a2b209d3ed  safari-1280-plat-repere-dessus.png
+ce01a90cf6c4c948  safari-1280-repere-dessus.png
+190905dad21f41b4  safari-1280-repere-doublure.png
+e6b93031dbc3f1b8  safari-390-bout.png
+b9a9332500e840c4  safari-390-chene.png
+e500594ae41e931f  safari-390-face.png
+94d31a1cedfec2de  safari-390-femme-kit.png
+7626a53f41387787  safari-390-femme.png
+7c6a4cd44a666002  safari-390-ferme-occupe.png
+7c6a4cd44a666002  safari-390-ferme.png
+1b845372d73fd884  safari-390-homme.png
+8efdeb1eb92412e8  safari-390-kit.png
+45fec58ed1b232a2  safari-390-ouvert.png
+18e509446b654f05  safari-390-repere-dessus.png
+4bab52a8b97073eb  safari-390-repere-doublure.png

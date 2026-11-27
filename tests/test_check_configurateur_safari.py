@@ -19,7 +19,7 @@ from playwright.sync_api import sync_playwright
 import check_configurateur as cc
 import check_configurateur_browsers as ccb
 import check_configurateur_safari as tool
-from check_trombone_safari import BEGIN, END, serve
+from safari_driver import BEGIN, END, serve
 
 
 def as_function(source):

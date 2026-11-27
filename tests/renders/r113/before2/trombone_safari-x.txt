@@ -1,0 +1,10 @@
+exit 0
+4 frames in trombone_safari-x
+
+--- stderr
+
+--- files
+25bc7b997d93a80a  safari-buffer-1280-0.jpg
+b32358a4d9bbfd31  safari-file-0.jpg
+4469cad43599d4dc  safari-page-1280.jpg
+efea4ace77cb59cc  safari-still.jpg

@@ -1,0 +1,13 @@
+exit 1
+2 frames in racine_safari-out2
+ouvert-inviolia: 1% paper where the letter stands, flap m22 -1.00, hover True
+plat-inviolia: 88% paper where the letter stands, flap m22 -1.00, hover True
+FAILED: ouvert-inviolia: 1% paper where the letter stands: something is over it
+FAILED: plat-inviolia: the flat control still reads 88% paper: this read proves nothing
+NOT OK
+
+--- stderr
+
+--- files
+f30f12583cb11539  safari-ouvert-inviolia.jpg
+1f1f5b119fb9506d  safari-plat-inviolia.jpg

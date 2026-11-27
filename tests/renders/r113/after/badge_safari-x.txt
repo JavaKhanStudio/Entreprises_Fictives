@@ -1,0 +1,23 @@
+exit 0
+7 frames in badge_safari-x
+1280-front {'facing': 0.97, 'hover': False, 'clip': 'padding-box', 'animations': 6, 'reduced': False, 'wide': 0, 'inner': [1280, 1000]}
+  1280-front gold 0.561 crimson 0.0 medal green 0.0
+1280-edge {'facing': 0.01, 'hover': False, 'clip': 'padding-box', 'animations': 6, 'reduced': False, 'wide': 0, 'inner': [1280, 1000]}
+  1280-edge edge width 380 css px
+1280-turned {'facing': -0.9, 'hover': False, 'clip': 'padding-box', 'animations': 6, 'reduced': False, 'wide': 0, 'inner': [1280, 1000]}
+  1280-turned {'kraft': 0.006987192945622507, 'dark': 0.0, 'crimson': 0.0, 'green': 0.0010917488977535167}
+1280-back {'facing': -0.95, 'hover': False, 'clip': 'padding-box', 'animations': 6, 'reduced': False, 'wide': 0, 'inner': [1280, 1000]}
+  1280-back {'kraft': 0.005662805662805663, 'dark': 0.0, 'crimson': 0.0, 'green': 0.0}
+390-front {'facing': 0.97, 'hover': False, 'clip': 'padding-box', 'animations': 6, 'reduced': False, 'wide': 0, 'inner': [1280, 1000]}
+390-back {'facing': -0.9, 'hover': False, 'clip': 'padding-box', 'animations': 6, 'reduced': False, 'wide': 0, 'inner': [1280, 1000]}
+
+--- stderr
+
+--- files
+42e3816e007fd934  safari-1280-back.jpg
+fabb8d0de9cd570c  safari-1280-edge.jpg
+07f516706e382645  safari-1280-front.jpg
+dd277416af768eda  safari-1280-turned.jpg
+8dcb36c146a74cfa  safari-390-back.jpg
+7d179bfc4cb8077e  safari-390-front.jpg
+e98143ac904cb2a9  safari-screen-1280-front.jpg

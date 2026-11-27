@@ -1,0 +1,11 @@
+exit 1
+2 frames in racine_safari-out-black-ouvert
+plat-inviolia: 1% paper where the letter stands, flap m22 -1.00, hover True
+FAILED: ouvert-inviolia: a black window: the shot failed, this says nothing of the letter
+NOT OK
+
+--- stderr
+
+--- files
+e5c437d38cb6f1c4  safari-ouvert-inviolia.jpg
+f30f12583cb11539  safari-plat-inviolia.jpg

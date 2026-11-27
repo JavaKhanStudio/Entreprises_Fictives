@@ -27,22 +27,25 @@ above the opened page's folder (r61), which left each site without shared/base.c
 """
 
 import base64
-import functools
-import http.server
 import json
 import subprocess
 import sys
-import tempfile
-import threading
 import time
-import urllib.error
-import urllib.parse
-import urllib.request
 from pathlib import Path
 
+from safari_driver import (
+    Quiet,
+    call,
+    print_frame,
+    read_frames,
+    reports,
+    safari_session,
+    screen,
+    serve,
+    small_jpeg,
+)
+
 REPO = Path(__file__).resolve().parent.parent
-DRIVER = "http://127.0.0.1:4444"
-BEGIN, END = "=====FRAME", "=====END"
 
 LOOK = """
 const c = document.getElementById('trombone'), r = document.getElementById('trombone-repli');
@@ -91,52 +94,14 @@ const g = k.getContext('webgl');
 """
 
 
-def call(method, path, body=None, timeout=60):
-    data = None if body is None else json.dumps(body).encode()
-    request = urllib.request.Request(DRIVER + path, data=data, method=method, headers={"Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(request, timeout=timeout) as answer:
-            return json.load(answer)["value"]
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"{method} {path}: {e.code} {e.read()[:400]!r}") from None
-
-
-def small_jpeg(png):
-    """A retina PNG is too much for a log: sips, which every Mac has, makes it a small JPEG."""
-    with tempfile.TemporaryDirectory() as d:
-        source, target = Path(d) / "s.png", Path(d) / "t.jpg"
-        source.write_bytes(png)
-        subprocess.run(["sips", "-Z", "700", "-s", "format", "jpeg", "-s", "formatOptions", "70",
-                        str(source), "--out", str(target)], check=True, capture_output=True)
-        return target.read_bytes()
-
-
-def print_frame(name, jpeg):
-    print(f"{BEGIN} {name}")
-    text = base64.b64encode(jpeg).decode()
-    for i in range(0, len(text), 100):
-        print(text[i:i + 100])
-    print(END, flush=True)
-
-
 CALME = 'window.matchMedia("(prefers-reduced-motion: reduce)").matches'
 patched = {"motion": False}
-reports = {}
 
 
-class Quiet(http.server.SimpleHTTPRequestHandler):
+class Merlin(Quiet):
     """Serves the page, and once told to, merlin.js with reduced motion read as off."""
 
-    def log_message(self, *args):
-        pass
-
     def do_GET(self):
-        if self.path.startswith("/sonde?"):
-            query = urllib.parse.parse_qs(self.path.split("?", 1)[1])
-            reports[query["n"][0]] = json.loads(query["d"][0])
-            self.send_response(204)
-            self.end_headers()
-            return
         if patched["motion"] and self.path.startswith("/merlin/merlin.js"):
             body = (REPO / "merlin/merlin.js").read_text(encoding="utf-8")
             assert CALME in body
@@ -150,56 +115,31 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
 
-def serve():
-    handler = functools.partial(Quiet, directory=str(REPO))
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
-    threading.Thread(target=server.serve_forever, daemon=True).start()
-    return server.server_address[1]
-
-
 def double_click():
     """file://, opened as a student opens it. Only the screen can say what it drew."""
     subprocess.run(["open", "-a", "Safari", str(REPO / "merlin/index.html")], check=True)
-    with tempfile.TemporaryDirectory() as d:
-        for i in range(3):
-            time.sleep(6 if i == 0 else 2)
-            shot = Path(d) / f"{i}.png"
-            done = subprocess.run(["screencapture", "-x", str(shot)], capture_output=True, text=True, check=False)
-            if not shot.exists():
-                print("screencapture took nothing:", done.returncode, done.stderr.strip())
-                return
-            print_frame(f"file-{i}", small_jpeg(shot.read_bytes()))
+    for i in range(3):
+        time.sleep(6 if i == 0 else 2)
+        if not screen(f"file-{i}", 700, 70):
+            return
 
 
 def on_the_mac():
     print(subprocess.run(["sw_vers"], capture_output=True, text=True, check=False).stdout)
-    enable = subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True, check=False)
-    print("safaridriver --enable:", enable.returncode, enable.stderr.strip())
-    driver = subprocess.Popen(["safaridriver", "-p", "4444"])
     failed = []
-    try:
-        for _ in range(40):
-            try:
-                call("GET", "/status", timeout=2)
-                break
-            except (OSError, RuntimeError):
-                time.sleep(0.5)
-        session = call("POST", "/session", {"capabilities": {"alwaysMatch": {"browserName": "safari"}}}, timeout=120)
-        sid = session["sessionId"]
-        print("Safari", session["capabilities"].get("browserVersion"), flush=True)
-        here = f"/session/{sid}"
+    with safari_session() as here:
 
         def script(source, kind="sync"):
             return call("POST", f"{here}/execute/{kind}", {"script": source, "args": []}, timeout=30)
 
-        page = f"http://127.0.0.1:{serve()}/merlin/index.html"
+        page = f"http://127.0.0.1:{serve(Merlin)}/merlin/index.html"
         call("POST", f"{here}/url", {"url": page})
         if script(LOOK)["reduced"]:
             # A runner's Mac may ask for reduced motion: merlin.js then draws once and stands still,
             # as it should, and there is no turn to see. Look at the turn all the same.
             print("this Mac asks for reduced motion: first the page as it is, still", flush=True)
             still = call("GET", f"{here}/screenshot")
-            print_frame("still", small_jpeg(base64.b64decode(still)))
+            print_frame("still", small_jpeg(base64.b64decode(still), 700, 70))
             patched["motion"] = True
             call("POST", f"{here}/url", {"url": f"{page}?turning"})
             print("reduced motion read as off in merlin.js from here on", flush=True)
@@ -213,11 +153,8 @@ def on_the_mac():
             print("LOOK", json.dumps(look), flush=True)
             if not look["canvas"] or look["drawn"]:
                 failed.append(f"at {width} the canvas does not show")
-            print_frame(f"page-{width}", small_jpeg(base64.b64decode(call("GET", f"{here}/screenshot"))))
-            screen = Path(tempfile.gettempdir()) / f"screen-{width}.png"
-            subprocess.run(["screencapture", "-x", str(screen)], check=False)
-            if screen.exists():
-                print_frame(f"http-screen-{width}", small_jpeg(screen.read_bytes()))
+            print_frame(f"page-{width}", small_jpeg(base64.b64decode(call("GET", f"{here}/screenshot")), 700, 70))
+            screen(f"http-screen-{width}", 700, 70)
             shots = []
             for i in range(3):
                 time.sleep(1.5)
@@ -229,9 +166,6 @@ def on_the_mac():
                     failed.append(f"at {width} frame {i}: the page's buffer is empty")
             if len(set(shots)) != len(shots):
                 failed.append(f"at {width} the page's buffer does not turn")
-        call("DELETE", here)
-    finally:
-        driver.terminate()
     double_click()
     print("FAILED: " + "; ".join(failed) if failed else "ALL OK")
     return 1 if failed else 0
@@ -279,10 +213,7 @@ def file_probe():
             print("REPORT", name, json.dumps(reports.get(name, "nothing came back")), flush=True)
             said = reports.get(name)
             failed = failed or not said or bool(said["failed"]) or said["scrollWidth"] > said["client"]
-            shot = Path(tempfile.gettempdir()) / f"{name}.png"
-            subprocess.run(["screencapture", "-x", str(shot)], check=False)
-            if shot.exists():
-                print_frame(f"probe-{name}", small_jpeg(shot.read_bytes()))
+            screen(f"probe-{name}", 700, 70)
     finally:
         for path in scratch:
             path.unlink(missing_ok=True)
@@ -290,19 +221,7 @@ def file_probe():
 
 
 def extract(log, out):
-    out.mkdir(parents=True, exist_ok=True)
-    name, parts, wrote = None, [], 0
-    for line in log.read_text(errors="replace").splitlines():
-        line = line.strip()
-        if BEGIN in line:
-            name, parts = line.split(BEGIN, 1)[1].strip(), []
-        elif END in line and name:
-            (out / f"safari-{name}.jpg").write_bytes(base64.b64decode("".join(parts)))
-            name, wrote = None, wrote + 1
-        elif name:
-            parts.append(line.split()[-1] if line else "")
-    print(f"{wrote} frames in {out}")
-    return 0 if wrote else 1
+    return 0 if read_frames(log, out)[1] else 1
 
 
 if __name__ == "__main__":

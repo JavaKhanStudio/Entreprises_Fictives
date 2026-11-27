@@ -20,7 +20,14 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_badge_safari import BEGIN, END, call, print_frame, serve, small_jpeg
+from safari_driver import (
+    call,
+    print_frame,
+    read_frames,
+    safari_session,
+    serve,
+    small_jpeg,
+)
 
 STATE = """
 const of = s => document.querySelector(s);
@@ -36,19 +43,8 @@ return {y: scrollY, wide: document.documentElement.scrollWidth - innerWidth, viv
 def on_the_mac():
     print(subprocess.run(["sw_vers"], capture_output=True, text=True, check=False).stdout)
     subprocess.run(["defaults", "write", "com.apple.universalaccess", "reduceMotion", "-bool", "false"], check=False)
-    subprocess.run(["sudo", "safaridriver", "--enable"], check=False)
-    driver = subprocess.Popen(["safaridriver", "-p", "4444"])
     failed = []
-    try:
-        for _ in range(40):
-            try:
-                call("GET", "/status", timeout=2)
-                break
-            except (OSError, RuntimeError):
-                time.sleep(0.5)
-        session = call("POST", "/session", {"capabilities": {"alwaysMatch": {"browserName": "safari"}}}, timeout=120)
-        print("Safari", session["capabilities"].get("browserVersion"), flush=True)
-        here = f"/session/{session['sessionId']}"
+    with safari_session() as here:
         port = serve()
 
         def script(source):
@@ -91,25 +87,12 @@ def on_the_mac():
             take(f"{one}-middle", last // 2)
             if take(f"{one}-end", last)["faded"]:
                 failed.append(f"{one}: faded at the end")
-        call("DELETE", here)
-    finally:
-        driver.terminate()
     print("FAILED: " + "; ".join(failed) if failed else "OK")
     return 1 if failed else 0
 
 
 def extract(log, out):
-    out.mkdir(parents=True, exist_ok=True)
-    name, parts, wrote = None, [], 0
-    for line in log.read_text(errors="replace").splitlines():
-        if BEGIN in line:
-            name, parts = line.split(BEGIN, 1)[1].strip(), []
-        elif END in line and name:
-            (out / f"safari-{name}.jpg").write_bytes(base64.b64decode("".join(parts)))
-            name, wrote = None, wrote + 1
-        elif name and line.strip():
-            parts.append(line.split()[-1])
-    print(f"{wrote} frames in {out}")
+    read_frames(log, out)
 
 
 if __name__ == "__main__":

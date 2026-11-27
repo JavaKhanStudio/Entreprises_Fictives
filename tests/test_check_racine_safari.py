@@ -22,7 +22,7 @@ from playwright.sync_api import sync_playwright
 
 import check_racine
 import check_racine_safari as tool
-from check_trombone_safari import BEGIN, END, reports, serve
+from safari_driver import BEGIN, END, reports, serve
 
 
 def as_function(source):

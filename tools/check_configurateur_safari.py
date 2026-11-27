@@ -38,12 +38,20 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_badge_safari import small_jpeg
-from check_trombone_safari import BEGIN, END, call, print_frame, reports, serve
+from safari_driver import (
+    META,
+    call,
+    print_frame,
+    read_frames,
+    safari_session,
+    screen,
+    serve,
+    small_jpeg,
+    wait_for,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 PAGE = "dernier-prix/configurateur.html"
-META = "=====META"
 SETTLE = 1.1  # the longest transition (.couvercle) and a margin
 FREEZE_AT = 6000  # the sway at its middle, as in tools/check_configurateur_browsers.py
 # (id of each choice, view, lid open): tests/test_check_configurateur_safari.py holds them to that tool's.
@@ -373,46 +381,13 @@ class Safari:
 
 
 def over_http(failed):
-    subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True, check=False)
-    driver = subprocess.Popen(["safaridriver", "-p", "4444"])
-    try:
-        for _ in range(40):
-            try:
-                call("GET", "/status", timeout=2)
-                break
-            except (OSError, RuntimeError):
-                time.sleep(0.5)
-        session = call("POST", "/session", {"capabilities": {"alwaysMatch": {"browserName": "safari"}}}, timeout=120)
-        here = f"/session/{session['sessionId']}"
-        print("Safari", session["capabilities"].get("browserVersion"), flush=True)
+    with safari_session() as here:
         call("POST", f"{here}/window/rect", {"width": 1280, "height": 1000, "x": 0, "y": 0})
         d = Safari(here, serve())
         run_turn(d, failed)
         run_totals(d, failed)
         run_fit(d, failed)
         run_states(d, lambda line: print(line, flush=True), failed)
-        call("DELETE", here)
-    finally:
-        driver.terminate()
-
-
-def screen(name):
-    from tempfile import TemporaryDirectory
-    with TemporaryDirectory() as d:
-        picture = Path(d) / "s.png"
-        done = subprocess.run(["screencapture", "-x", str(picture)], capture_output=True, text=True, check=False)
-        if picture.exists():
-            print_frame(name, small_jpeg(picture.read_bytes(), 1400))
-        else:
-            print("screencapture took nothing:", name, done.returncode, done.stderr.strip(), flush=True)
-
-
-def wait_for(name, seconds=20):
-    for _ in range(seconds * 4):
-        if name in reports:
-            return reports[name]
-        time.sleep(0.25)
-    return None
 
 
 def scratch_page(port, name):
@@ -489,24 +464,6 @@ def on_the_mac():
     return 1 if failed else 0
 
 
-def read_log(log, out):
-    """The frames as files, and what the page said of each."""
-    name, parts, metas, wrote = None, [], {}, 0
-    for line in log.read_text(errors="replace").splitlines():
-        if META in line:
-            key, state = line.split(META, 1)[1].strip().split(" ", 1)
-            metas[key] = json.loads(state)
-        elif BEGIN in line:
-            name, parts = line.split(BEGIN, 1)[1].strip(), []
-        elif END in line and name:
-            (out / f"mac-{name}.jpg").write_bytes(base64.b64decode("".join(parts)))
-            name, wrote = None, wrote + 1
-        elif name:
-            parts.append(line.split()[-1] if line.strip() else "")
-    print(f"{wrote} frames in {out}")
-    return metas
-
-
 def extract(log, out):
     """Write the frames, draw the same states in Chrome, read the pixels."""
     from PIL import Image, ImageChops, ImageFilter
@@ -523,8 +480,7 @@ def extract(log, out):
         rgb = Image.open(path).convert("RGB").tobytes()
         return sum(1 for i in range(0, len(rgb), 3) if kind(rgb[i], rgb[i + 1], rgb[i + 2]))
 
-    out.mkdir(parents=True, exist_ok=True)
-    metas = read_log(log, out)
+    metas = read_frames(log, out, "mac")[0]
     problems = []
     widths = sorted({key.split("-", 1)[0] for key in metas}, key=int, reverse=True)
     if not widths:

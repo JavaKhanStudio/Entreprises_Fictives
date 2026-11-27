@@ -31,17 +31,25 @@ import io
 import json
 import subprocess
 import sys
-import tempfile
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_badge_safari import small_jpeg
-from check_trombone_safari import BEGIN, END, call, print_frame, reports, serve
+from safari_driver import (
+    META,
+    call,
+    print_frame,
+    read_frames,
+    reports,
+    safari_session,
+    screen,
+    serve,
+    small_jpeg,
+    wait_for,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 CARDS = ("merlin", "gobelin", "courtepaille", "inviolia", "dernier-prix", "source-eclat")
-META = "=====META"
 SETTLE = 1.7
 # r97: once a shot came back a black window, its JPEG 30 KB and no pixel above 16; a page's are 286 KB
 # and up, with white in them. Measured on Safari 26.6.2 on the runner.
@@ -132,18 +140,7 @@ def open_problems(card, state):
 
 def over_http(failed):
     """A real pointer on each card, from safaridriver."""
-    subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True, check=False)
-    driver = subprocess.Popen(["safaridriver", "-p", "4444"])
-    try:
-        for _ in range(40):
-            try:
-                call("GET", "/status", timeout=2)
-                break
-            except (OSError, RuntimeError):
-                time.sleep(0.5)
-        session = call("POST", "/session", {"capabilities": {"alwaysMatch": {"browserName": "safari"}}}, timeout=120)
-        here = f"/session/{session['sessionId']}"
-        print("Safari", session["capabilities"].get("browserVersion"), flush=True)
+    with safari_session() as here:
 
         def script(source, *args):
             return call("POST", f"{here}/execute/sync", {"script": source, "args": list(args)}, timeout=30)
@@ -197,9 +194,6 @@ def over_http(failed):
         state = hover(CARDS[3])
         failed.extend(f"at 390, {problem}" for problem in open_problems(CARDS[3], state))
         shot(f"tel-{CARDS[3]}", state)
-        call("DELETE", here)
-    finally:
-        driver.terminate()
 
 
 class Point(ctypes.Structure):
@@ -216,24 +210,6 @@ def move_mouse(x, y):
     for dx in (-3, -1, 0):
         quartz.CGEventPost(0, quartz.CGEventCreateMouseEvent(None, 5, Point(x + dx, y), 0))   # 5: mouse moved
         time.sleep(0.1)
-
-
-def screen(name):
-    with tempfile.TemporaryDirectory() as d:
-        picture = Path(d) / "s.png"
-        done = subprocess.run(["screencapture", "-x", str(picture)], capture_output=True, text=True, check=False)
-        if picture.exists():
-            print_frame(name, small_jpeg(picture.read_bytes(), 1400))
-        else:
-            print("screencapture took nothing:", name, done.returncode, done.stderr.strip(), flush=True)
-
-
-def wait_for(name, seconds=20, ready=lambda said: True):
-    for _ in range(seconds * 4):
-        if name in reports and ready(reports[name]):
-            return reports[name]
-        time.sleep(0.25)
-    return reports.get(name)
 
 
 def scratch_page(port, name, force=False):
@@ -339,20 +315,7 @@ def extract(log, out):
 
     from check_racine import PAPER_AT_LEAST, paper_share
 
-    out.mkdir(parents=True, exist_ok=True)
-    name, parts, metas, wrote = None, [], {}, 0
-    for line in log.read_text(errors="replace").splitlines():
-        if META in line:
-            key, state = line.split(META, 1)[1].strip().split(" ", 1)
-            metas[key] = json.loads(state)
-        elif BEGIN in line:
-            name, parts = line.split(BEGIN, 1)[1].strip(), []
-        elif END in line and name:
-            (out / f"safari-{name}.jpg").write_bytes(base64.b64decode("".join(parts)))
-            name, wrote = None, wrote + 1
-        elif name:
-            parts.append(line.split()[-1] if line.strip() else "")
-    print(f"{wrote} frames in {out}")
+    metas, wrote = read_frames(log, out)
     problems = []
     for key, state in metas.items():
         if Image.open(out / f"safari-{key}.jpg").convert("L").getextrema()[1] <= BLACK_AT_MOST:

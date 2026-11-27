@@ -1,0 +1,9 @@
+exit 0
+3 frames in inviolia_safari-x
+
+--- stderr
+
+--- files
+25bc7b997d93a80a  safari-equipe-middle.jpg
+4469cad43599d4dc  safari-home-end.jpg
+efea4ace77cb59cc  safari-home-top.jpg

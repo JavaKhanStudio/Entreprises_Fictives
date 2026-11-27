@@ -1,0 +1,11 @@
+exit 0
+2 frames in racine_safari-out
+ouvert-inviolia: 88% paper where the letter stands, flap m22 -1.00, hover True
+plat-inviolia: 1% paper where the letter stands, flap m22 -1.00, hover True
+OK
+
+--- stderr
+
+--- files
+1f1f5b119fb9506d  safari-ouvert-inviolia.jpg
+f30f12583cb11539  safari-plat-inviolia.jpg
