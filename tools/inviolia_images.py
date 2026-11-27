@@ -14,7 +14,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from gobelin_images import generate
+from gobelin_images import cli, make_named, write_sizes
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RAW = pathlib.Path.home() / ".cache" / "inviolia-images"
@@ -56,10 +56,7 @@ KEPT = {}     # name: seed, when the take that won is not the first
 
 
 def make(names):
-    for name in names or PICTURES:
-        name, _, other = name.partition(":")
-        seed, width, height, subject = PICTURES[name]
-        generate(f"{name}-{other}" if other else name, subject, int(other or seed), width, height, RAW)
+    make_named(PICTURES, names, RAW)
 
 
 def ship():
@@ -71,17 +68,8 @@ def ship():
         else:
             source = RAW / (f"{name}-{KEPT[name]}.png" if name in KEPT else f"{name}.png")
         picture = Image.open(source).convert("RGB")
-        height = round(picture.height * width / picture.width)
-        target = IMG / f"{name}.webp"
-        picture.resize((width, height), Image.LANCZOS).save(target, quality=quality, method=6)
-        print(f"{target.name}: {width}x{height}, {target.stat().st_size // 1024} KB")
+        write_sizes(picture, IMG, name, width, quality)
 
 
 if __name__ == "__main__":
-    action = sys.argv[1] if len(sys.argv) > 1 else ""
-    if action == "make":
-        make(sys.argv[2:])
-    elif action == "ship":
-        ship()
-    else:
-        sys.exit(__doc__)
+    cli(__doc__, make, ship)

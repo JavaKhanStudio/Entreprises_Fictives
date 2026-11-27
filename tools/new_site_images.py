@@ -12,7 +12,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from gobelin_images import generate
+from gobelin_images import make_named
 
 RAW = pathlib.Path.home() / ".cache" / "new-site-takes"
 STOCK = "corporate stock photograph, sharp focus, professional lighting"
@@ -35,10 +35,7 @@ PICTURES = {
 
 
 def main(names):
-    for name in names or PICTURES:
-        name, _, other = name.partition(":")
-        seed, width, height, subject = PICTURES[name]
-        generate(f"{name}-{other}" if other else name, subject, int(other or seed), width, height, RAW)
+    make_named(PICTURES, names, RAW)
 
 
 if __name__ == "__main__":

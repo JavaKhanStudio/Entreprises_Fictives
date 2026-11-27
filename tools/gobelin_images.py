@@ -275,6 +275,42 @@ def poster_title(picture):
               "Le fisc arrive. Hurlez.", font=line, fill=(242, 244, 239))
 
 
+def write_sizes(picture, img, name, width, quality, smaller=None):
+    """The picture as img/name.webp at width, and as img/name-<w>.webp when smaller is (w, quality)."""
+    from PIL import Image
+    out = [(img / f"{name}.webp", width, quality)]
+    if smaller:
+        small, small_quality = smaller
+        out.append((img / f"{name}-{small}.webp", small, small_quality))
+    for target, size, q in out:
+        height = round(picture.height * size / picture.width)
+        picture.resize((size, height), Image.LANCZOS).save(target, quality=q, method=6)
+        print(f"{target.name}: {size}x{height}, {target.stat().st_size // 1024} KB")
+
+
+def make_named(pictures, names, raw):
+    """Each name of pictures (name: seed, width, height, subject), or the given ones, into raw.
+
+    name:seed tries another seed, as raw/name-seed.png."""
+    for name in names or pictures:
+        name, _, other = name.partition(":")
+        seed, width, height, subject = pictures[name]
+        generate(f"{name}-{other}" if other else name, subject, int(other or seed), width, height, raw)
+
+
+def cli(doc, make, ship, **more):
+    """make [name ...], ship, or one of more's verbs; anything else prints doc."""
+    action = sys.argv[1] if len(sys.argv) > 1 else ""
+    if action == "make":
+        make(sys.argv[2:])
+    elif action == "ship":
+        ship()
+    elif action in more:
+        more[action]()
+    else:
+        sys.exit(doc)
+
+
 def ship():
     from PIL import Image
     for name, (width, quality) in SHIP.items():
@@ -284,26 +320,11 @@ def ship():
             write_board(picture, BOARD_INSIDE)
         if name == "cle":
             poster_title(picture)
-        out = [(IMG / f"{name}.webp", width, quality)]
-        if name in SMALLER:
-            small, small_quality = SMALLER[name]
-            out.append((IMG / f"{name}-{small}.webp", small, small_quality))
-        for target, size, q in out:
-            height = round(picture.height * size / picture.width)
-            picture.resize((size, height), Image.LANCZOS).save(target, quality=q, method=6)
-            print(f"{target.name}: {size}x{height}, {target.stat().st_size // 1024} KB")
+        write_sizes(picture, IMG, name, width, quality, SMALLER.get(name))
 
 
 def main():
-    action = sys.argv[1] if len(sys.argv) > 1 else ""
-    if action == "takes":
-        takes()
-    elif action == "make":
-        make(sys.argv[2:])
-    elif action == "ship":
-        ship()
-    else:
-        sys.exit(__doc__)
+    cli(__doc__, make, ship, takes=takes)
 
 
 if __name__ == "__main__":

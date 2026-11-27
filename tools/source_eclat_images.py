@@ -14,7 +14,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from gobelin_images import generate
+from gobelin_images import cli, make_named, write_sizes
 from new_site_images import PICTURES as MOCKUP
 from new_site_images import RAW as MOCKUP_RAW
 
@@ -77,10 +77,7 @@ def raw(name):
 
 
 def make(names):
-    for name in names or PICTURES:
-        name, _, other = name.partition(":")
-        seed, width, height, subject = {**MOCKUP, **PICTURES}[name]
-        generate(f"{name}-{other}" if other else name, subject, int(other or seed), width, height, RAW)
+    make_named({**MOCKUP, **PICTURES}, names or list(PICTURES), RAW)
 
 
 def ship():
@@ -88,23 +85,10 @@ def ship():
     IMG.mkdir(parents=True, exist_ok=True)
     for name, (width, quality) in SHIP.items():
         picture = Image.open(raw(name)).convert("RGB")
-        out = [(IMG / f"{name}.webp", width, quality)]
-        if name in SMALLER:
-            small, small_quality = SMALLER[name]
-            out.append((IMG / f"{name}-{small}.webp", small, small_quality))
-        for target, size, q in out:
-            height = round(picture.height * size / picture.width)
-            picture.resize((size, height), Image.LANCZOS).save(target, quality=q, method=6)
-            print(f"{target.name}: {size}x{height}, {target.stat().st_size // 1024} KB")
+        write_sizes(picture, IMG, name, width, quality, SMALLER.get(name))
     face = Image.open(raw("plage")).convert("RGB").crop(FOUNDER).resize((320, 320), Image.LANCZOS)
     face.save(IMG / "marie-ange.webp", quality=78, method=6)
 
 
 if __name__ == "__main__":
-    action = sys.argv[1] if len(sys.argv) > 1 else ""
-    if action == "make":
-        make(sys.argv[2:])
-    elif action == "ship":
-        ship()
-    else:
-        sys.exit(__doc__)
+    cli(__doc__, make, ship)
