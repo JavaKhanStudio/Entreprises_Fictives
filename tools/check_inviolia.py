@@ -21,6 +21,7 @@ Needs Playwright, Chrome, `playwright install firefox`, Pillow for OUT.
 import itertools
 import re
 import sys
+import time
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -179,12 +180,39 @@ def anchors(page):
         expect(f"{one}#{anchor}: not under the header", s[0] >= s[1] - 2 or s[2] < 2, s)
 
 
-def live(page, width, height, words):
-    """The counter, the feed and the comets, each on and off screen."""
-    label = f"live {width}x{height}"
-    page.goto((SITE / "index.html").as_uri())
-    page.wait_for_load_state("load")
-    center = lambda what: page.evaluate(f"(() => {{ const r = document.querySelector('{what}').getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); }})()")
+BAND = "document.querySelector('.chiffres').offsetHeight"
+LIVE_STATE = """() => {
+  const f = document.querySelector('.flux'), ps = [...f.children], box = f.getBoundingClientRect();
+  const c = document.querySelector('.tirs'), i = document.querySelector('.carte img');
+  const a = c.getBoundingClientRect(), b = i.getBoundingClientRect();
+  let painted = 0;
+  if (c.width) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; for (let n = 3; n < d.length; n += 4) if (d[n]) painted++; }
+  return {rows: ps.slice().sort((x, y) => x.getBoundingClientRect().top - y.getBoundingClientRect().top).map(p => p.textContent),
+          first: ps.reduce((m, p) => p.getBoundingClientRect().top < m[0] ? [p.getBoundingClientRect().top, p.textContent] : m, [1e9, ''])[1],
+          inView: box.bottom > 0 && box.top < innerHeight, order: ps.map(p => p.style.order).join(), high: f.offsetHeight, text: f.textContent,
+          painted, pic: c.toDataURL(), moving: f.getAnimations({subtree: true}).length, wide: f.scrollWidth - f.clientWidth,
+          box: [box.top, box.bottom], lines: ps.map(p => { const r = p.getBoundingClientRect(); return [r.top, r.bottom]; }),
+          same: Math.abs(a.left - b.left) < 2 && Math.abs(a.top - b.top) < 2 && Math.abs(a.width - b.width) < 2 && Math.abs(a.height - b.height) < 2,
+          hidden: c.getAttribute('aria-hidden'), canvasInView: a.bottom > 0 && a.top < innerHeight};
+}"""
+TALL = """([targets, attacks]) => {
+  const f = document.querySelector('.flux'), p = f.lastElementChild, was = p.firstChild.textContent, seen = {};
+  for (const t of targets) for (const a of attacks) { p.firstChild.textContent = `03:12:17 · Inconnu → ${t} · ${a} `; seen[f.offsetHeight] = `${t} / ${a}`; }
+  p.firstChild.textContent = was;
+  return seen;
+}"""
+
+
+def center(page, what):
+    page.evaluate(f"(() => {{ const r = document.querySelector('{what}').getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); }})()")
+
+
+def count(page):
+    return int(re.sub(r"\D", "", page.locator(".chiffres .rouge").text_content()))
+
+
+def live_first_screen(page, label):
+    """Fresh from load: the feed and the comets wait while off screen."""
     first_screen = page.evaluate("""() => {
       const f = document.querySelector('.flux').getBoundingClientRect(), c = document.querySelector('.tirs');
       let n = 0; if (c.width) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; }
@@ -195,104 +223,117 @@ def live(page, width, height, words):
         expect(f"{label}: the feed waits while off screen", page.evaluate("[...document.querySelectorAll('.flux p')].map(p => p.style.order).join('')") == "")
     if not first_screen["canvas"]:
         expect(f"{label}: no comet while off screen", first_screen["painted"] == 0, first_screen["painted"])
-    center(".chiffres")
-    count = lambda: int(re.sub(r"\D", "", page.locator(".chiffres .rouge").text_content()))
-    band = "document.querySelector('.chiffres').offsetHeight"
-    high = page.evaluate(band)
+
+
+def live_counter(page, label):
+    """The counter starts at its written value, climbs at its stated rate, and the band holds its height."""
+    center(page, ".chiffres")
+    high = page.evaluate(BAND)
     page.wait_for_timeout(300)
-    one = count()
+    one = count(page)
     expect(f"{label}: the counter starts where the page says", 0 <= one - int(re.sub(r"\D", "", START)) < 500, one)
     page.wait_for_timeout(2000)
-    rate = (count() - one) / 2
+    rate = (count(page) - one) / 2
     expect(f"{label}: the counter climbs at what its words say, 56 a second", 20 < rate < 110, rate)
     shown = page.locator(".chiffres .rouge").text_content()
     expect(f"{label}: the counter stays grouped as written", re.fullmatch("\\d\u00a0\\d{3}\u00a0\\d{3}", shown), repr(shown))
-    expect(f"{label}: the band keeps its height", page.evaluate(band) == high, (high, page.evaluate(band)))
-    wider = page.evaluate(f"(() => {{ const b = document.querySelector('.chiffres .rouge'), s = b.textContent; b.textContent = '8\\u00a0888\\u00a0888'; const h = {band}; b.textContent = s; return h; }})()")
+    expect(f"{label}: the band keeps its height", page.evaluate(BAND) == high, (high, page.evaluate(BAND)))
+    wider = page.evaluate(f"(() => {{ const b = document.querySelector('.chiffres .rouge'), s = b.textContent; b.textContent = '8\\u00a0888\\u00a0888'; const h = {BAND}; b.textContent = s; return h; }})()")
     expect(f"{label}: the band keeps its height on the widest digits", wider == high, (high, wider))
 
-    state = """() => {
-      const f = document.querySelector('.flux'), ps = [...f.children], box = f.getBoundingClientRect();
-      const c = document.querySelector('.tirs'), i = document.querySelector('.carte img');
-      const a = c.getBoundingClientRect(), b = i.getBoundingClientRect();
-      let painted = 0;
-      if (c.width) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; for (let n = 3; n < d.length; n += 4) if (d[n]) painted++; }
-      return {rows: ps.slice().sort((x, y) => x.getBoundingClientRect().top - y.getBoundingClientRect().top).map(p => p.textContent),
-              first: ps.reduce((m, p) => p.getBoundingClientRect().top < m[0] ? [p.getBoundingClientRect().top, p.textContent] : m, [1e9, ''])[1],
-              inView: box.bottom > 0 && box.top < innerHeight, order: ps.map(p => p.style.order).join(), high: f.offsetHeight, text: f.textContent,
-              painted, pic: c.toDataURL(), moving: f.getAnimations({subtree: true}).length, wide: f.scrollWidth - f.clientWidth,
-              box: [box.top, box.bottom], lines: ps.map(p => { const r = p.getBoundingClientRect(); return [r.top, r.bottom]; }),
-              same: Math.abs(a.left - b.left) < 2 && Math.abs(a.top - b.top) < 2 && Math.abs(a.width - b.width) < 2 && Math.abs(a.height - b.height) < 2,
-              hidden: c.getAttribute('aria-hidden'), canvasInView: a.bottom > 0 && a.top < innerHeight};
-    }"""
-    center(".carte img")
+
+def live_comets(page, label):
+    """The comets' canvas lies on the globe, hidden from a screen reader, painted and moving."""
+    center(page, ".carte img")
     page.wait_for_timeout(900)
-    start = page.evaluate(state)
+    start = page.evaluate(LIVE_STATE)
     expect(f"{label}: the comets' frame lies on the globe", start["same"])
     expect(f"{label}: the comets are hidden from a screen reader", start["hidden"] == "true")
     pics, painted = set(), 0
     for _ in range(12):
         page.wait_for_timeout(300)
-        s = page.evaluate(state)
+        s = page.evaluate(LIVE_STATE)
         pics.add(s["pic"])
         painted = max(painted, s["painted"])
     expect(f"{label}: comets are painted", painted > 50, painted)
     expect(f"{label}: the comets move", len(pics) >= 9, len(pics))
 
-    center(".flux")
+
+def feed_at_rest(label, s):
+    """One still frame of the feed: the page's own lines, the clock forward, no pair twice, all in the box."""
+    rows = [re.fullmatch(LINE, row.strip()) for row in s["rows"]]
+    expect(f"{label}: each line is the page's own words", all(r and r[2] in TARGETS and r[3] in ATTACKS for r in rows), s["rows"])
+    if all(rows):
+        clock = [r[1] for r in rows]
+        expect(f"{label}: the clock runs forward", clock == sorted(set(clock)), clock)
+        pairs = [(r[2], r[3]) for r in rows]
+        expect(f"{label}: no pair twice on screen", len(set(pairs)) == len(pairs), pairs)
+    out = [line for line in s["lines"] if line[0] < s["box"][0] - 1 or line[1] > s["box"][1] + 1]
+    expect(f"{label}: at rest every line is in its box", not out, (s["box"], out))
+
+
+def live_feed(page, label):
+    """The feed rolls, keeps its height and width, and every still frame reads right."""
+    center(page, ".flux")
     page.wait_for_timeout(600)
-    start = page.evaluate(state)
+    start = page.evaluate(LIVE_STATE)
     seen = []
     for _ in range(16):
         page.wait_for_timeout(350)
-        s = page.evaluate(state)
+        s = page.evaluate(LIVE_STATE)
         if not seen or seen[-1] != s["first"]:
             seen.append(s["first"])
         expect(f"{label}: the feed keeps its height", s["high"] == start["high"], (start["high"], s["high"]))
         expect(f"{label}: no line wider than the feed", s["wide"] <= 0, s["wide"])
         if not s["moving"]:
-            rows = [re.fullmatch(LINE, row.strip()) for row in s["rows"]]
-            expect(f"{label}: each line is the page's own words", all(r and r[2] in TARGETS and r[3] in ATTACKS for r in rows), s["rows"])
-            if all(rows):
-                clock = [r[1] for r in rows]
-                expect(f"{label}: the clock runs forward", clock == sorted(set(clock)), clock)
-                pairs = [(r[2], r[3]) for r in rows]
-                expect(f"{label}: no pair twice on screen", len(set(pairs)) == len(pairs), pairs)
-            out = [line for line in s["lines"] if line[0] < s["box"][0] - 1 or line[1] > s["box"][1] + 1]
-            expect(f"{label}: at rest every line is in its box", not out, (s["box"], out))
+            feed_at_rest(label, s)
     expect(f"{label}: the feed rolls", len(seen) >= 3, seen)
-    tall = """([targets, attacks]) => {
-      const f = document.querySelector('.flux'), p = f.lastElementChild, was = p.firstChild.textContent, seen = {};
-      for (const t of targets) for (const a of attacks) { p.firstChild.textContent = `03:12:17 · Inconnu → ${t} · ${a} `; seen[f.offsetHeight] = `${t} / ${a}`; }
-      p.firstChild.textContent = was;
-      return seen;
-    }"""
-    drawn = page.evaluate(tall, [sorted(TARGETS), sorted(ATTACKS)])
+
+
+def live_feed_height(page, label, width, height, words):
+    """Every pair the feed can draw leaves it the same height, before and after a resize."""
+    drawn = page.evaluate(TALL, [sorted(TARGETS), sorted(ATTACKS)])
     expect(f"{label}: every pair the feed can draw leaves it the same height", len(drawn) == 1, drawn)
     page.set_viewport_size({"width": width - 90, "height": height})
     page.wait_for_timeout(200)
-    drawn = page.evaluate(tall, [sorted(TARGETS), sorted(ATTACKS)])
+    drawn = page.evaluate(TALL, [sorted(TARGETS), sorted(ATTACKS)])
     expect(f"{label}: and so after a resize", len(drawn) == 1, drawn)
     page.set_viewport_size({"width": width, "height": height})
     page.wait_for_timeout(200)
     expect(f"{label}: the same words on the page", text(page) == words["index"])
 
+
+def live_off_screen(page, label):
+    """At the page's end the counter, the feed and the comets wait; back on screen the counter catches up."""
     page.evaluate("scrollTo(0, document.documentElement.scrollHeight)")
     page.wait_for_timeout(900)
-    s = page.evaluate(state)
+    s = page.evaluate(LIVE_STATE)
     gone = page.evaluate("document.querySelector('.chiffres').getBoundingClientRect().bottom < 0")
     expect(f"{label}: the band has left the screen at the page's end", gone)
-    before, pic, was = count(), s["pic"], s["order"]
+    before, pic, was = count(page), s["pic"], s["order"]
     page.wait_for_timeout(2000)
-    after = page.evaluate(state)
-    expect(f"{label}: the counter's digits wait off screen", count() == before, count() - before)
+    after = page.evaluate(LIVE_STATE)
+    expect(f"{label}: the counter's digits wait off screen", count(page) == before, count(page) - before)
     if not s["inView"]:  # a big window still shows the feed at the page's end; its first screen proved this
         expect(f"{label}: the feed waits off screen", after["order"] == was)
     if not after["canvasInView"]:
         expect(f"{label}: the comets wait off screen", after["pic"] == pic)
-    center(".chiffres")
+    center(page, ".chiffres")
     page.wait_for_timeout(500)
-    expect(f"{label}: the counter catches up on return", count() - before > 60, count() - before)
+    expect(f"{label}: the counter catches up on return", count(page) - before > 60, count(page) - before)
+
+
+def live(page, width, height, words):
+    """The counter, the feed and the comets, each on and off screen."""
+    label = f"live {width}x{height}"
+    page.goto((SITE / "index.html").as_uri())
+    page.wait_for_load_state("load")
+    live_first_screen(page, label)
+    live_counter(page, label)
+    live_comets(page, label)
+    live_feed(page, label)
+    live_feed_height(page, label, width, height, words)
+    live_off_screen(page, label)
 
 
 def film(browser, out):
@@ -357,33 +398,43 @@ def sheets(browser, out):
             page.context.close()
 
 
-only_live = "--live" in sys.argv
-out_dir = next((a for a in sys.argv[1:] if a != "--live"), None)
+def one_browser(browser, only_live):
+    """Every window in one browser: the scroll, the pinned hero, the stops, the anchors and the live map."""
+    words = stills(browser)
+    for width, height in WINDOWS:
+        page = browser.new_context(viewport={"width": width, "height": height}, reduced_motion="no-preference").new_page()
+        errors = []
+        page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
+        page.on("console", lambda m, errors=errors: errors.append(m.text) if m.type == "error" else None)
+        for one in () if only_live else PAGES:
+            sweep(page, one, width, height, words)
+        if (width, height) in PINNED and not only_live:
+            pinned(page, width, height)
+            stops(page, width, height)
+            anchors(page)
+        live(page, width, height, words)
+        expect(f"{width}x{height}: no script or console error", not errors, errors[:3])
+        page.context.close()
 
-with sync_playwright() as p:
-    for kind in ("chromium", "firefox"):
-        before = len(failures)
-        browser = getattr(p, kind).launch()
-        words = stills(browser)
-        for width, height in WINDOWS:
-            page = browser.new_context(viewport={"width": width, "height": height}, reduced_motion="no-preference").new_page()
-            errors = []
-            page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
-            page.on("console", lambda m, errors=errors: errors.append(m.text) if m.type == "error" else None)
-            for one in () if only_live else PAGES:
-                sweep(page, one, width, height, words)
-            if (width, height) in PINNED and not only_live:
-                pinned(page, width, height)
-                stops(page, width, height)
-                anchors(page)
-            live(page, width, height, words)
-            expect(f"{width}x{height}: no script or console error", not errors, errors[:3])
-            page.context.close()
-        print(f"{kind}: {len(failures) - before} failure(s)")
-        if kind == "chromium" and out_dir:
-            sheets(browser, Path(out_dir))
-            film(browser, Path(out_dir))
-        browser.close()
 
-print("OK" if not failures else f"{len(failures)} failure(s)")
-sys.exit(1 if failures else 0)
+def main():
+    only_live = "--live" in sys.argv
+    out_dir = next((a for a in sys.argv[1:] if a != "--live"), None)
+    with sync_playwright() as p:
+        for kind in ("chromium", "firefox"):
+            before, began = len(failures), time.monotonic()
+            browser = getattr(p, kind).launch()
+            one_browser(browser, only_live)
+            print(f"{kind}: {len(failures) - before} failure(s), {time.monotonic() - began:.0f} s", flush=True)
+            if kind == "chromium" and out_dir:
+                began = time.monotonic()
+                sheets(browser, Path(out_dir))
+                film(browser, Path(out_dir))
+                print(f"sheets and film: {time.monotonic() - began:.0f} s", flush=True)
+            browser.close()
+    print("OK" if not failures else f"{len(failures)} failure(s)")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
