@@ -1,6 +1,7 @@
 # Entreprises fictives' TAGS AND THEIR CONTEXT PACKS (board slug entreprises-fictives).
 # Refine with /write-context-pack, and fix a pack IN THE SAME COMMIT as what made it stale.
-# Only [tags.<slug>] tables belong here.
+# Only [tags.<slug>] tables belong here. A pack is capped at 20 lines as shown: what it cannot
+# hold goes, word for word, in .atelier/notes/<tag>.md, which it names (r109).
 # THIS REPO IS PUBLIC: nothing here but what can be read by anyone. A site's clue list stays in
 # the done note of its card (r2, r3, r4), never in a pack.
 
@@ -9,15 +10,14 @@ label = "Skeleton & gate"
 visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "What all the sites share: shared/, the root index, the footer, and the tools/ and tests/ that check every site (check_sites gate, check_names, check_pages, render_pages)"
 context = """
-FILES: index.html + index.css (the root list of the companies; its words name no count, Simon on r10, so a company can be added; a card shows a picture its own site ships, plus merlin/img/vignette.webp from tools/racine_images.py, and a manila envelope that opens on hover, CSS only, Simon on r77; after touching it run python3 tools/check_racine.py OUT, in Chrome and Firefox, because render_pages.py freezes it; a change to its timings or its flap also runs python3 tools/check_racine_frames.py OUT, which seeks every moment of the swing (r95: Chrome 156 draws a clip-path on the swinging flap adrift, so its triangles are masks, and the letter starts only once the flap has landed); real Safari, over file:// and http, is python3 tools/check_racine_safari.py on a macOS runner (r81, its docstring), which ten-times-priced minutes keep for a change of the 3D, the clip-paths and masks or where the pictures live; a new company also needs its name in CARDS there and in that tool, its --teinte and --cadre in index.css), shared/base.css (what every page shares, no company's look), shared/modele.html (the page every site starts from, and the reference footer), tools/check_sites.py (the gate), tests/test_check_sites.py (each refusal proved), tools/render_pages.py (the browser's view).
-GATE: python3 tools/check_sites.py walks every .html and .css and must pass before any push. It refuses, by rule name: noindex, footer, above-folder, base-copy, form, tel, external (an http(s) resource, also in CSS), live-link (an a href to any domain, mailto), relative (a link from /), dead-link (also a wrong case, also a folder), em-dash, domain (not .example), resolves (dig says the name exists or cannot tell: offline, the gate fails), phone (outside ARCEP's fiction ranges, cited in the script; what it does not read as a phone is listed at the top of the script: under 8 digits, split across tags, a long run whose groups of digits never add up to a number (0612 3456 7890, an IBAN, a SIRET), a comma number that is not five pairs joined by bare commas, a mark not in PHONE_SEPARATOR such as a middle dot or colon, a number glued to a word that is not in PHONE_LABEL or after a word and a slash or hyphen (FAC-0612345678, dossier/0612345678.pdf), an unprefixed run not starting 0, 33 or in the North American shape), index (a company's index.html the root list does not link).
-TEST: python3 tests/test_check_sites.py when the gate changes; a new refusal gets its scratch page there, and a false alarm goes into test_what_the_gate_lets_through.
-RENDER: python3 tools/render_pages.py OUT_DIR index.html merlin/index.html opens each page over file:// and over http from a server of its own on a free port, at 1280 and 390, fails on a failed request, on base.css not applied, on a page wider than its window or on the two ways differing. Two runs at once are safe: python3 tests/test_render_pages.py proves it. Attach the pictures with atelier attach.
-HEALTH: atelier quality audits the paths in lighthouse_paths of projects/entreprises-fictives.toml in the atelier checkout. Do not chase cache-insight or uses-long-cache-ttl: both are about the Cache-Control header of the server, here ~/Documents/GitHub/atelier/tools/serve_static.py, and no file in this repo can set a header. The largest image of a page takes fetchpriority="high" (lcp-discovery-insight), as gobelin/index.html and courtepaille/index.html do. Do not chase is-crawlable: it is the noindex tools/check_sites.py requires on every page, and removing it would fail the gate. Do not chase image-delivery-insight on gobelin/index.html: uses-responsive-images passes with the srcset there (r58), and this one counts CSS pixels and ignores screen density, so passing it means a 372 px picture that a phone at 1.75x shows blurred. A new company picture shown small gets a lighter copy through SMALLER in tools/gobelin_images.py. Do not chase meta-description: Simon accepted that loss on r19, because these noindex pages are not found by search and a description reaches SEO only 60, so seo stays 50 to 54. Do not chase network-dependency-tree-insight, render-blocking-insight or render-blocking-resources: all three report a page and its two stylesheets, shared/base.css and the company's, with no @import (Lighthouse 12.8.2 lists exactly those two on merlin/index.html). Inlining base.css would break RULE below. Inlining the company's would copy it into every page of that company, for a performance score already at 100. Deferring either needs JS and shows the page unstyled first.
-RULE: what two sites share lives ONCE, in shared/. One exception, shared/base.css: real Safari over file:// refuses what is above the opened page's folder (r61, tools/check_trombone_safari.py --file-probe), so each company holds a copy as <company>/base.css and its pages link base.css. Change shared/base.css, then copy it to the three: the gate refuses a copy that differs (base-copy) and any load going up a folder (above-folder). Their look does not: each company has its own CSS on top. HTML has no include, so the footer is copied verbatim from shared/modele.html into each page and the gate compares bytes. To change its words, change every page in the same commit.
-ICON: each page links its tab icon in its head: <company>/img/icone.svg, icon.svg for the root (Simon on r19). A page without one logs a 404 on /favicon.ico and Best Practices drops to 96. To change an icon, read it at 16 px with python3 tools/icon_takes.py --shipped OUT_DIR.
-OPEN: double-click must work, so links are relative and name their file (merlin/index.html, never merlin/: over file:// a folder opens a listing). A page tested only through http.server can hide a broken file:// path: render_pages.py tests both.
-THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
+FILES: index.html + index.css (the root list; its words name no count, Simon on r10), shared/base.css (no company's look), shared/modele.html (every page's start and footer). Details: .atelier/notes/shared.md.
+ROOT LIST: its envelopes are CSS only (r77), frozen by renders: after touching them run python3 tools/check_racine.py OUT, and for their timings or flap tools/check_racine_frames.py OUT. A new company: its name in CARDS in those tools, its --teinte and --cadre in index.css.
+GATE: tools/check_sites.py; what it does not see is in its docstring. A new refusal gets a scratch page in tests/test_check_sites.py, a false alarm test_what_the_gate_lets_through.
+RENDER: tools/render_pages.py fails on a failed request, base.css not applied, a page wider than its window or file:// and http differing. Attach the pictures.
+RULE: what two sites share lives ONCE, in shared/, but base.css is copied into each company (CLAUDE.md, Traps) and the gate refuses a copy that differs. The footer is copied byte for byte from shared/modele.html: change its words on every page in one commit.
+ICON: every page links <company>/img/icone.svg (icon.svg at the root), or Best Practices drops to 96. Read one at 16 px: tools/icon_takes.py --shipped OUT.
+HEALTH: before chasing a Lighthouse audit, read HEALTH in the notes: eight are left on purpose.
+ROUND (board skill §4, r4524): an ask's first picture is close on its subject (magick -crop WxH+X+Y +repage), captioned "Shows: <it>"; then the takes; one context picture at most.
 """
 
 [tags.merlin]
@@ -25,15 +25,13 @@ label = "Papeterie Merlin"
 visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of Papeterie Merlin, in merlin/"
 context = """
-FILES: 7 pages in merlin/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact), merlin/merlin.css, merlin/merlin.js, merlin/base.css (a copy, see RULE in #shared). Domain: papeterie-merlin.example.
-NEW PAGE: copy shared/modele.html to merlin/, then add merlin.css after base.css and the icon, as its comment says. Render with tools/render_pages.py (see #shared).
-CANON: ~/Documents/GitHub/Social_Engineering_en_visuel/faux-president/js/i18n.js, steps.research (the page on Eve's laptop): since 1987, 12 followers, Mme Merlin "Presidente Executive Principale" always travelling, Alice "Directrice des Directions" Bob's boss, Bob "Ninja des virements" the accountant, conquering abroad, #PapierAgile. The capsule reuses these names: the site must not contradict them. faux-president/sources.md says what is invented there.
-ATTACK SURFACE TO KEEP, from the Lumisol sample (~/Documents/Claude_GDrive_HQ/boards/social-engineering/verif/r32/kit.py, company dropped by Simon): an address format, a client portal, supplier invoices by PDF mail, a recent hire in accounting, a lone overworked IT person mid migration to Microsoft 365, a payment threshold, a press release naming a contract. Do not reuse from it: the 02 40 number, PayFlow, Claire Fontaine, Thomas Berger, Karim Haddad, Saint-Herblain.
-LOOK: Simon on r2: more real, more professional, and the company would vibe-code its site. So a generated-landing-page look (dark bands, one gradient, glass header, cards). Its jokes stay quiet: nothing on the site says the clip is useless.
-SCRIPT: merlin/merlin.js is the one JS of the sites: the WebGL clip with no library, counters, reveals. A classic script, because file:// refuses modules. Every word stays in the HTML, and merlin/img/trombone-3d.svg shows without WebGL or JS. The clip is a tube swept along the same path as merlin/img/trombone.svg.
-NO GPU: where WebGL's renderer names software, sansGpu() in merlin/merlin.js draws the clip without antialiasing, at 1x pixels and 30 frames a second (Simon on r55). Lighthouse's Chrome is such a machine, so its Merlin score measures this path, not what a student with a GPU sees. That score follows the machine's load: 99 to 100 at a load average near 25, 68 to 81 above 60, so read uptime before calling it a regression. check_trombone.py proves the cheap path, check_trombone_browsers.py the full one.
-MOTION: tools/render_pages.py renders under reduced motion, so its pictures show the clip standing still. python3 tools/check_trombone.py checks what moves, the two fallbacks, and overflow at 8 widths. Run it when merlin.js or merlin.css changes.
-THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
+FILES: merlin/ (7 pages), merlin/merlin.css, merlin/merlin.js, merlin/base.css (a copy, RULE in #shared). Domain: papeterie-merlin.example. A new page links merlin.css after base.css and the icon, as shared/modele.html's comment says.
+CANON: ~/Documents/GitHub/Social_Engineering_en_visuel/faux-president/js/i18n.js, steps.research: the capsule reuses Merlin's names and facts, so the site must not contradict them. The list, and what not to reuse from the Lumisol sample: .atelier/notes/merlin.md.
+LOOK: a vibe-coded landing page (Simon on r2): dark bands, one gradient, glass header, cards. Nothing on the site says the clip is useless.
+SCRIPT: merlin/merlin.js is a classic script (file:// refuses modules): the WebGL clip with no library, counters, reveals. Every word stays in the HTML, and merlin/img/trombone-3d.svg shows without WebGL or JS.
+NO GPU: sansGpu() in merlin/merlin.js draws a cheap clip on a software renderer (Simon on r55), and Lighthouse's Chrome is one: its Merlin score follows the machine's load (99 to 100 near a load of 25, 68 to 81 above 60). Read uptime before calling it a regression.
+MOTION: render_pages.py freezes the clip. When merlin.js or merlin.css changes, run python3 tools/check_trombone.py (the cheap path, the fallbacks, 8 widths) and tools/check_trombone_browsers.py OUT (the full one).
+ROUND (board skill §4, r4524): an ask's first picture is close on its subject (magick -crop WxH+X+Y +repage), captioned "Shows: <it>"; then the takes; one context picture at most.
 """
 
 [tags.gobelin]
@@ -41,14 +39,13 @@ label = "Gobelin Hurlant"
 visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the indie game studio Gobelin Hurlant, in gobelin/"
 context = """
-FILES: 8 pages in gobelin/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact, connexion-discord), gobelin/gobelin.css, gobelin/base.css (a copy, see RULE in #shared). Domain: gobelin-hurlant.example. gobelin/connexion-discord.html is the trap page: it leaves the fiction on purpose (Simon, r3).
-NEW PAGE: copy shared/modele.html to gobelin/, then add gobelin.css after base.css and the icon, as its comment says. Render with tools/render_pages.py (see #shared).
-SURFACE: a public Discord and its fans, a publisher, a build under NDA, crunch worn as a badge. Different from Merlin: the money is not the prize here, the build and the accounts are.
-DATES: the plot's dates stay as they are after 13 Nov 2026, though students then read a milestone already past (Simon, r3 answer 2A): do not move or drop them. They also sit in a picture: BOARD_LINES in tools/gobelin_images.py, the same words as the alt text in gobelin/a-propos.html and gobelin/equipe.html.
-PICTURES: the .webp in gobelin/img/ come from tools/gobelin_images.py. make paints into ~/.cache/gobelin-images with the local ComfyUI, which whoever runs it starts (nice -n 15 python main.py in ~/ComfyUI) and stops after the batch. ship resizes that cache into gobelin/img/ and needs no ComfyUI. The model's lettering is always false: what must be read is pasted on by ship.
-BADGE: the 3D badge on gobelin/a-propos.html is CSS only, in gobelin/gobelin.css. After touching it, run python3 tools/check_badge.py and python3 tools/check_badge_browsers.py OUT: check_badge.py alone cannot see 3D, its matrices read the same with the 3D flattened (r59). Firefox paints nothing for background-clip: text on the element that carries the 3D transform, so the gold of .crunch sits on its inner span. Safari: tools/check_badge_safari.py.
-CLUES: the list is in r3's done note (atelier show r3 --full), never in this repo.
-THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
+FILES: gobelin/ (8 pages), gobelin/gobelin.css, gobelin/base.css (a copy, RULE in #shared). Domain: gobelin-hurlant.example. A new page links gobelin.css after base.css and the icon, as shared/modele.html's comment says. gobelin/connexion-discord.html leaves the fiction on purpose: the trap page (Simon, r3).
+SURFACE: a public Discord and its fans, a publisher, a build under NDA, crunch worn as a badge: the build and the accounts are the prize, not the money.
+DATES: they stay as they are after 13 Nov 2026 (Simon, r3 answer 2A). They also sit in a picture: BOARD_LINES in tools/gobelin_images.py, the same words as the alt text in gobelin/a-propos.html and gobelin/equipe.html.
+PICTURES: tools/gobelin_images.py. make paints with the local ComfyUI, which whoever runs it starts and stops (how: .atelier/notes/gobelin.md); ship resizes into gobelin/img/ without it. The model's lettering is always false: what must be read is pasted on by ship.
+BADGE: CSS only, on gobelin/a-propos.html. Run python3 tools/check_badge.py AND tools/check_badge_browsers.py OUT: the first cannot see 3D (r59). Firefox paints no background-clip: text on the element carrying the 3D transform, so the gold of .crunch sits on its inner span. Safari: tools/check_badge_safari.py.
+CLUES: in r3's done note (atelier show r3 --full), never in this repo.
+ROUND (board skill §4, r4524): an ask's first picture is close on its subject (magick -crop WxH+X+Y +repage), captioned "Shows: <it>"; then the takes; one context picture at most.
 """
 
 [tags.courtepaille]
@@ -56,12 +53,11 @@ label = "Etude Courtepaille"
 visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the notary's office Etude Courtepaille, in courtepaille/"
 context = """
-FILES: 7 pages in courtepaille/ (index, a-propos, equipe, organigramme, recrutement, communique, contact), courtepaille/courtepaille.css, courtepaille/base.css (a copy, see RULE in #shared). Domain: etude-courtepaille.example.
-NEW PAGE: copy shared/modele.html to courtepaille/, then add courtepaille.css after base.css and the icon, as its comment says. Render with tools/render_pages.py (see #shared).
-SURFACE: large property transfers, elderly clients, paper first, a website that looks its age. Simon kept the name (2026-11-02) though Courtepaille is also a restaurant chain: the site says nothing of restaurants.
-PICTURES: the portraits and the seal are SVG. The home page's photograph is courtepaille/img/facade-photo.jpg, painted and aged by tools/courtepaille_images.py, deliberately small and poor (Simon, r68). The counter's number on index.html links img/facade.svg with no look of a link: an easter egg, not a leftover.
-DATES: no year in the plot, it runs as a yearly habit (Simon, r4). The pages agree on: 16 novembre au 4 décembre, grandes ventes signed the troisième vendredi de décembre at 15 h, pli RIB three weeks before, funds the Friday before, successor the premier lundi de janvier. A duration never sits beside its start year (41 ans, no 1985). The footer reads "Dernière mise à jour : 2 novembre 2026 (la précédente datait de 2009)": Simon took back his flat 2009 on r86, so leave the bracket. No page says neveu: the surname says it. No real notary's name, checked by search: the public directory is https://www.notaires.fr/fr/directory.
-THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
+FILES: courtepaille/ (7 pages), courtepaille/courtepaille.css, courtepaille/base.css (a copy, RULE in #shared). Domain: etude-courtepaille.example. A new page links courtepaille.css after base.css and the icon, as shared/modele.html's comment says.
+SURFACE: large property transfers, elderly clients, paper first, a website that looks its age. The name is also a restaurant chain's (Simon kept it, 2026-11-02): the site says nothing of restaurants.
+PICTURES: the portraits and the seal are SVG. courtepaille/img/facade-photo.jpg is painted and aged by tools/courtepaille_images.py, small and poor on purpose (Simon, r68). The counter's number on index.html links img/facade.svg with no look of a link: an easter egg, not a leftover (tools/check_courtepaille_egg.py).
+DATES: no year in the plot (Simon, r4); the dates every page agrees on are in .atelier/notes/courtepaille.md. A duration never sits beside its start year. Leave the footer's bracket "(la précédente datait de 2009)" (Simon, r86). No page says neveu. No real notary's name: check https://www.notaires.fr/fr/directory.
+ROUND (board skill §4, r4524): an ask's first picture is close on its subject (magick -crop WxH+X+Y +repage), captioned "Shows: <it>"; then the takes; one context picture at most.
 """
 
 [tags.inviolia]
@@ -69,15 +65,14 @@ label = "Inviolia"
 visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the cybersecurity vendor Inviolia, in inviolia/"
 context = """
-FILES: 7 pages in inviolia/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact), inviolia/inviolia.css, inviolia/inviolia.js, inviolia/base.css (a copy, see RULE in #shared). Domain: inviolia.example.
-NEW PAGE: copy shared/modele.html to inviolia/, then add inviolia.css after base.css and the icon, as its comment says, and inviolia.js after them. Render with tools/render_pages.py (see #shared).
-GENRE: a security vendor that sells fear: hood, glowing globe, threat level always critical. Simon saw the Guy Fawkes mask the model painted on pirate and kept the picture. The words of inviolia/index.html start from his pick on r70, INVIOLIA in tools/new_site_takes.py.
-SURFACE: a vendor holding admin access to its clients, and staff used to fake emails.
-PICTURES: the .webp in inviolia/img/ come from tools/inviolia_images.py: make paints into ~/.cache/inviolia-images with the local ComfyUI, ship resizes into inviolia/img/. pirate and globe come from tools/new_site_images.py. The model's lettering is always false, so no word sits in a picture.
-MOTION: inviolia/inviolia.js (a classic script in the head) sets html.vivant and each block's --p from the scroll; inviolia.css moves things only under .vivant, so without the script or under reduced motion the page stands still and every word is in the HTML. Stops are hand hooks, data-stop in the pages (Simon on r75, the gentle locking of ficelle-site r67). Render pictures freeze all this: python3 tools/check_inviolia.py [OUT] proves it in Chrome and Firefox, tools/check_inviolia_safari.py on a macOS runner. LIVE MAP (r78, r90): the same script climbs the counter at the rate its words give (4 812 336 a day), rolls the feed by CSS order, and paints neon comets on a canvas over the globe, Simon's pick on r90; none of it runs off screen. The line that leaves comes back as a new one: its clock later than the last, its target and attack both from the HTML's own lines, its pair not on screen, so the page's six lines are all the words the feed can use. tools/inviolia_live_takes.py holds the takes he chose from. The counter and the feed's clock start at the written values on each load.
-DATES: staff posts run from September to November 2026, the press release is 20 October 2026, and the migration it announces is 11 to 15 January 2027. Pages agree on 147 clients, 8 staff, 2017, 212 podcast episodes.
-CLUES: the list is in r75's done note (atelier show r75 --full), never in this repo.
-THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
+FILES: inviolia/ (7 pages), inviolia/inviolia.css, inviolia/inviolia.js, inviolia/base.css (a copy, RULE in #shared). Domain: inviolia.example. A new page links inviolia.css after base.css and the icon, as shared/modele.html's comment says, then inviolia.js.
+GENRE: a vendor that sells fear: hood, glowing globe, threat level always critical. Words from Simon's pick on r70, INVIOLIA in tools/new_site_takes.py. SURFACE: admin access to its clients, staff used to fake emails.
+PICTURES: tools/inviolia_images.py (make with the local ComfyUI, ship into inviolia/img/); pirate and globe from tools/new_site_images.py. No word sits in a picture.
+MOTION: inviolia.js sets html.vivant and each block's --p from the scroll; inviolia.css moves only under .vivant, so without it the page stands still with every word in the HTML. Stops are data-stop in the pages (Simon, r75). Renders freeze it: python3 tools/check_inviolia.py OUT (Chrome, Firefox), tools/check_inviolia_safari.py.
+LIVE MAP (r78, r90): the counter, the feed and the comets on the globe; how the feed reuses only the page's six lines is in .atelier/notes/inviolia.md. They start from the written values on each load.
+DATES: the dates and counts the pages agree on are in the notes.
+CLUES: in r75's done note (atelier show r75 --full), never in this repo.
+ROUND (board skill §4, r4524): an ask's first picture is close on its subject (magick -crop WxH+X+Y +repage), captioned "Shows: <it>"; then the takes; one context picture at most.
 """
 
 [tags.source-eclat]
@@ -85,16 +80,13 @@ label = "Source & Eclat"
 visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the multi-level marketing firm Source & Eclat, in source-eclat/"
 context = """
-FILES: 7 pages in source-eclat/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact), source-eclat/source-eclat.css, source-eclat/source-eclat.js, source-eclat/base.css (a copy, see RULE in #shared). Domain: source-et-eclat.example.
-NEW PAGE: copy shared/modele.html to source-eclat/, then add source-eclat.css after base.css and the icon, as its comment says. Render with tools/render_pages.py (see #shared).
-START: the mock-up Simon chose on r70: SOURCE in tools/new_site_takes.py, its pictures plage and eau in tools/new_site_images.py. Read "A new company" in CLAUDE.md first.
-GENRE: multi-level marketing: sunset, countdown, rank ladder. Its voice is the nearest to merlin/equipe.html's posts: read them, and do not reuse a joke of theirs.
-SURFACE: a weekly message forwarded unchanged down the line, and money paid to a sponsor by a RIB sent in a message.
-SCRIPT: source-eclat/source-eclat.js only moves the countdown of the top band; it restarts at every page load, on purpose, as such timers do, and stands still under reduced motion, so render_pages.py compares one picture. Every word is in the HTML. No page says it restarts. python3 tools/check_source_eclat.py checks what moves, the numbers below and overflow at 8 widths.
-PICTURES: the .webp in source-eclat/img/ come from tools/source_eclat_images.py. make paints into ~/.cache/source-eclat-images with the local ComfyUI (see #gobelin's PICTURES), ship resizes into source-eclat/img/. plage and eau are the mock-up's, from ~/.cache/new-site-takes; Marie-Ange's portrait is cropped out of plage, so one face. The model's lettering is false, so no picture holds text to read.
-NUMBERS: the pages agree: 1+3+14+61+412+8679 = 9 170 Ambassadors, and the ladder's monthly incomes multiply out to the 5,8 M euros of commissions a year (a-propos, communique). Change one, change them all. The chain's hours on organigramme.html are the hours in Christelle's and Didier's posts.
-CLUES: the list is in r76's done note (atelier show r76 --full), never in this repo.
-THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
+FILES: source-eclat/ (7 pages), source-eclat/source-eclat.css, source-eclat/source-eclat.js, source-eclat/base.css (a copy, RULE in #shared). Domain: source-et-eclat.example. A new page links source-eclat.css after base.css and the icon, as shared/modele.html's comment says.
+GENRE: multi-level marketing: sunset, countdown, rank ladder. Its voice is nearest merlin/equipe.html's posts: read them, reuse no joke of theirs. SURFACE: a weekly message forwarded unchanged down the line, money paid to a sponsor by a RIB sent in a message.
+SCRIPT: source-eclat.js moves only the top band's countdown, which restarts at each load on purpose; no page says so. python3 tools/check_source_eclat.py checks it, the numbers and 8 widths.
+PICTURES: tools/source_eclat_images.py (make with the local ComfyUI, ship into source-eclat/img/). Marie-Ange's portrait is cropped out of plage, so one face. No picture holds text to read.
+NUMBERS: 9 170 Ambassadors and 5,8 M euros a year are sums the pages share (.atelier/notes/source-eclat.md): change one, change them all.
+CLUES: in r76's done note (atelier show r76 --full), never in this repo.
+ROUND (board skill §4, r4524): an ask's first picture is close on its subject (magick -crop WxH+X+Y +repage), captioned "Shows: <it>"; then the takes; one context picture at most.
 """
 
 [tags.dernier-prix]
@@ -102,17 +94,14 @@ label = "Au Dernier Prix"
 visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
 description = "The site of the hard-discount funeral home Au Dernier Prix, in dernier-prix/"
 context = """
-FILES: 8 pages in dernier-prix/ (index, a-propos, equipe, organigramme, offre-emploi, communique, contact, configurateur), dernier-prix/dernier-prix.css, dernier-prix/configurateur.css (that page only), dernier-prix/base.css (a copy, see RULE in #shared). Domain: au-dernier-prix.example.
-NEW PAGE: copy shared/modele.html to dernier-prix/, then add dernier-prix.css after base.css and the icon, as its comment says. Render with tools/render_pages.py (see #shared).
-START: the mock-up Simon chose on r70: DERNIER in tools/new_site_takes.py, its pictures cercueil, gerbe and urne in tools/new_site_images.py. Read "A new company" in CLAUDE.md first.
-GENRE: a hard-discount shop: starbursts, stars, stock left, cart.
-SPICY: the whole site is, so .claude/skills/humour/SKILL.md applies to every line. Simon's r70 pick passed Partez moins cher, Offre Couple and Je reviendrai. Any other spicy line goes to him by name on the card.
-SURFACE: death notices naming the family, the date and the address, and invoices sent as PDF by email to people who do not read them closely.
-PICTURES: bois-*.webp are computed by tools/dernier_prix_bois.py. The other .webp in dernier-prix/img/ come from tools/dernier_prix_images.py: make paints into ~/.cache/dernier-prix-images with the local ComfyUI, ship resizes into dernier-prix/img/. cercueil, gerbe and urne come from tools/new_site_images.py. ship crops the false logos off the portraits, and mirrors the shop and letters its sign along the cladding: the sign is not the model's.
-STILL: no JS, the page stands still. AJOUTER AU PANIER and Mon panier go to the empty cart on the home page, which collects nothing; the search box is a link. Only configurateur.html moves, in CSS but for configurateur.js, the press and drag that turns the coffin (r89: a pointer alone turns nothing, a release stops it): Configurer en 3D opens it. Its choices are radios outside any form, its total is summed by CSS counters. The occupant's planes are written into the page by tools/dernier_prix_corps.py. Prove a change with tools/check_configurateur.py and tools/check_configurateur_browsers.py, real Safari with tools/check_configurateur_safari.py: each plane shows from its outside only (backface-visibility), or Firefox sorts a turned-away face over the lid. Prices there are the home page's.
-DATES: the notices are dated for the week of 2 November 2026 (Thursday 5, Friday 6, Saturday 7). Pages agree on: press release 2 November, Didier at the salon and the new bank 16 November, Black Friday 27 November, Toussaint offer to 30 November, invoice job from 4 January to 26 March. Also on 1952, 14 staff, 1 140 families in 2025, 8 days and 10 %, 48 h, 5 000 euros, 6 400 cards, 2 300 contracts, the reference FAC-2026-xxxxx.
-CLUES: the list is in r77's note of 2026-11-03 02:30 (atelier show r77 --full), never in this repo.
-THE ROUND (board skill §4, r4524): an ask's first picture is framed close on its subject, captioned "Shows: <it>" (a closer camera, or magick <shot> -crop WxH+X+Y +repage <lead>); then the takes; at most one context picture.
+FILES: dernier-prix/ (8 pages), dernier-prix/dernier-prix.css, dernier-prix/configurateur.css (that page only), dernier-prix/base.css (a copy, RULE in #shared). Domain: au-dernier-prix.example. A new page links dernier-prix.css after base.css and the icon, as shared/modele.html's comment says.
+SPICY: the whole site (.claude/skills/humour/SKILL.md). A spicy line beyond the three Simon passed on r70 (.atelier/notes/dernier-prix.md) goes to him by name on the card.
+PICTURES: bois-*.webp from tools/dernier_prix_bois.py; the others from tools/dernier_prix_images.py (make with the local ComfyUI, ship into dernier-prix/img/; ship draws the shop's sign, not the model).
+STILL: no JS, the cart collects nothing. Only configurateur.html moves: the coffin turns only on press and drag (configurateur.js, r89), its choices are radios outside any form, its total CSS counters, its prices the home page's. The occupant is written in by tools/dernier_prix_corps.py.
+3D: each plane shows from its outside only (backface-visibility), or Firefox sorts a turned-away face over the lid. Prove a change with tools/check_configurateur.py and tools/check_configurateur_browsers.py OUT; Safari: tools/check_configurateur_safari.py.
+DATES: the dates and figures the pages agree on are in the notes.
+CLUES: in r77's note of 2026-11-03 02:30 (atelier show r77 --full), never in this repo.
+ROUND (board skill §4, r4524): an ask's first picture is close on its subject (magick -crop WxH+X+Y +repage), captioned "Shows: <it>"; then the takes; one context picture at most.
 """
 [tags.hosting]
 label = "Hosting"
