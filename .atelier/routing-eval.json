@@ -1,0 +1,339 @@
+{
+ "board": "entreprises-fictives",
+ "built_at": "2026-11-27 04:37:45",
+ "tags": [
+  "commissar",
+  "coordinator",
+  "courtepaille",
+  "dernier-prix",
+  "docs",
+  "gobelin",
+  "hosting",
+  "inviolia",
+  "merlin",
+  "shared",
+  "source-eclat"
+ ],
+ "tickets": [
+  {
+   "ref": "r44",
+   "title": "Humour pass on Papeterie Merlin once the writing skill is upgraded",
+   "detail": "WANTED: Simon on r2, 14:59: \"Just make a humour pass after the skill is upgraded to double check but at first glance this is great\". Read the seven merlin/ pages against the upgraded skill and change only what it catches.\nWAITS ON: the skill does not exist yet. Where the rule lives is r4's question 3, not answered when this was raised; this card sits after r4 for that reason. If r4's answer creates a skill task, it must wait on that task too. Read r4's last answer first; if Simon chose no skill, ask him what this pass runs against.\nDONE WHEN: gate green, a before/after list on the card, or a note saying the pass found nothing. Any change to text goes to Simon before it counts (Dain1); no change, no ask.\nOUT OF SCOPE: what Simon has already passed on r2: the likes counts and the four absurd titles stay unless he says otherwise. No clue lost, r2's closing note holds the list.\nDiscovered while: closing r2 on Simon's answer.",
+   "tags": [
+    "merlin"
+   ]
+  },
+  {
+   "ref": "r99",
+   "title": "r95: Root list, phone loop, index.css:293-297: the letter now stays at full height 0.36 s (16% to 20% of 9 s) where it stayed 0.9 s (12% to 22%). r95's close reports the slower rise and never this cut, and Simon asked for neither on a phone. It should hold about 0.9 s again without the flap over the letter (the flap's own keyframes at :288-292 can stay open longer); DONE WHEN python3 tools/check_racine_frames.py exits 0 and a 390 sheet of the loop is attached. OUT: the desktop hover timings. Discovered while: grading r95.",
+   "detail": "Wanted: Root list, phone loop, index.css:293-297: the letter now stays at full height 0.36 s (16% to 20% of 9 s) where it stayed 0.9 s (12% to 22%). r95's close reports the slower rise and never this cut, and Simon asked for neither on a phone. It should hold about 0.9 s again without the flap over the letter (the flap's own keyframes at :288-292 can stay open longer); DONE WHEN python3 tools/check_racine_frames.py exits 0 and a 390 sheet of the loop is attached. OUT: the desktop hover timings. Discovered while: grading r95.\n\nThe Commissar saw it in the result of r95 (There a small bug where the letter seem to be on the wrong z index for a fraction of a second when hover (on the front page) Also, let's make the letter exist a bit slower) while grading it 4: Both flashes are gone: I reran the frame check (exit 0, flap over the letter 28 px at most in Chrome, 14 in Firefox, under its 60 px limit, and the sheets read clean) and the slowing is what you asked (rise 0.5 s to 0.75 s, settled at 1.2 s, one line to change), but taste costs it: unasked and unsaid, the phone letter's time at the top falls from 0.9 s to 0.36 s (Dain2), and no phone picture is attached though the loop changed. One Safari black frame stays unexplained, said openly and queued as r97.\n\nRead `atelier show r95` and its renders first. Done when the flaw is gone from the result, shown the way r95 showed it.\nDiscovered while: grading r95 for Simon's review (r1841).",
+   "tags": [
+    "shared"
+   ]
+  },
+  {
+   "ref": "r107",
+   "title": "Split: iris carries more of the open work than they close",
+   "detail": "iris is assigned 5 open tickets, 100% of this board's open assigned work, and closes 36% of what closes here (each close halved every 30 days): past 1.5 times, the fit at birth now gives new tickets to the next best fit (atelier r2928). Their open tickets, by tag:\n\n  #docs: 4 open (r102, r103, r104, r105)\n  #shared: 1 open (r106)\n\nTheir tickets closed by someone else in 30 days: cass 6, mira 1.\n\nSimon (r2928): « If one worker is doing most of the work, we try to split it and special it, if possible. » Read the open tickets (`atelier show <ref>`) and decide one:\n  - SPECIALIST: one of their tags has a way of working of its own: bear a member for it, `atelier persona birth <slug> --first <Name> --pitch \"...\" --about - --specialty <tag> --why \"split from iris, r2928\" --mark \"#rrggbb <path>\"` (the about names files and commands like a context pack; draw the cast with `.venv/bin/python tools/persona_marks_shot.py`), or hire from the roster with `--for <tag>`. Then `atelier assign <ref> <slug>` each open ticket of that tag over to them.\n  - DIVIDE: a ticket of theirs is several jobs: split it into child tickets (`atelier add --parent <ref>`), each on the tag of its job.\n  - NOBODY: the load is a passing batch: say so in your closing note.\n\niris is not put to a Split pass again for 30 days after this closes.",
+   "tags": [
+    "coordinator"
+   ]
+  },
+  {
+   "ref": "r86",
+   "title": "I was wrong about forcing the date on 2009 for the notaria site : You  proposed the line (update in 2026) or something like that. Let's put it back",
+   "detail": "",
+   "tags": [
+    "courtepaille"
+   ]
+  },
+  {
+   "ref": "r13",
+   "title": "r3: run the open-web name check on Gobelin Hurlant's names",
+   "detail": "WANTED: the exact-string open-web check of the Gobelin names, which r3 could not do. Brave answered 429 on every run of 2026-11-02 (two sessions on one IP), and Bing and DuckDuckGo failed the control in tools/check_names.py. Fr and en Wikipedia, Wikidata and the French registers already score 0. NAMES: Maëlle Quentrec, Bastien Lorquet, Ingrid Talloire, Nolan Perchaud, Lou Vasseur, Théo Ragueneau, Yasmine Delorge, Odile Fourneret, Sandrine Pouzargue, Gobelin Hurlant, Grotte Fiscale, Morve et Gloire, Hyperbole Interactive, Saint-Glinglin-des-Bugs, Morvoteur. DONE WHEN: tools/check_names.py prints a web control line and a web count for each, and any name belonging to a notable person or a real company is renamed in gobelin/ on every page, gate green. OUT OF SCOPE: common-name collisions with private individuals, other sites. Retry when no other session is running the tool. Discovered while: r3.",
+   "tags": [
+    "gobelin"
+   ]
+  },
+  {
+   "ref": "r89",
+   "title": "This is getting dark but can we add the option to have a dead body in the cerceuil ? Man or woman, as a choice ? Also make the existing checkbox flash (just a little) when never used (so people think of using it)",
+   "detail": "",
+   "tags": [
+    "dernier-prix"
+   ]
+  },
+  {
+   "ref": "r90",
+   "title": "r78: inviolia/index.html: the home's live map has two looks Simon never chose: the comets (pale red arcs, white head, green ring on landing, inviolia/inviolia.js carte()) and the feed looping its six lines, so under 'en temps réel' the clock runs 03:12:14 then back to 03:12:08 and the same pair recurs. Put 2-3 takes to him with atelier ask on the comets' look (or none), and on the feed's loop against the clock. Film on r78: vivant-accueil-1280.webm.",
+   "detail": "Wanted: inviolia/index.html: the home's live map has two looks Simon never chose: the comets (pale red arcs, white head, green ring on landing, inviolia/inviolia.js carte()) and the feed looping its six lines, so under 'en temps réel' the clock runs 03:12:14 then back to 03:12:08 and the same pair recurs. Put 2-3 takes to him with atelier ask on the comets' look (or none), and on the feed's loop against the clock. Film on r78: vivant-accueil-1280.webm.\n\nThe Commissar saw it in the result of r78 (Inviolia: the live attack map and the moving counter on the home page) while grading it 4: Works as asked and the proof holds: on the commit extracted clean, check_inviolia --live and the gate pass, my own probe at 1100, 768, 390 and 360 over file:// in Chrome and Firefox shows no overflow, no console error and the still fallback, and the public site serves this exact script; taste costs it, capped at 3 because the comets' look and the feed's backward-looping clock were never put to Simon, who picked a still mock-up, and well loses one for a control run cut off at 280 s, Safari unproved (both said) and a public result left 'in the session' (I reran it: OK).\n\nRead `atelier show r78` and its renders first. Done when the flaw is gone from the result, shown the way r78 showed it.\nDiscovered while: grading r78 for Simon's review (r1841).",
+   "tags": [
+    "inviolia"
+   ]
+  },
+  {
+   "ref": "r72",
+   "title": "Skill humour: record Simon's verdict on the Merlin pass, where catches 1 and 3 cut too much",
+   "detail": "WANTED: skills/humour/SKILL.md in the atelier repo, section \"A humour pass\", carries r44's verdict, so the next pass does not cut the same kind of line. Simon's words: \"The before is better in every cases / Except for 4, 5\".\nRestored on his word: a bio stating the fact a tagline jokes on (\"Entrée dans l'entreprise en 1987 comme stagiaire, elle la préside depuis 1988\", \"Il est le service informatique à lui seul\"), caught as \"explains the joke\"; and \"Vous aimez Excel, y compris à 47 onglets\" on another page than Bob's post, caught as \"told a second time\".\nUpheld: a wink (\"Vous n'avez pas peur de cliquer\"), and 12 abonnés a third time on one page.\nDONE WHEN: the four examples sit in the skill as a table, his sentence quoted, and the wording goes no further than these cases; he gave no general rule, so the agent's reading is marked as such, per the skill's first paragraph. Commit in the atelier repo, staged by name: other sessions have edits there.\nOUT OF SCOPE: rerunning a pass on any site; changing a page.\nDiscovered while: applying Simon's answer on r44 (7cd2bd2).",
+   "tags": [
+    "docs"
+   ]
+  },
+  {
+   "ref": "r98",
+   "title": "Grade sampled closes",
+   "detail": "Closes sampled for Simon's review (r839). Grade each on THREE AXES, then an OVERALL (r2314, Simon's), every one 1-5 as he scores: 1 really bad, 2 bad, 3 neutral, 4 good, 5 very good.\n  --asked  Did what was asked: the ask done, all of it, nothing it did not ask\n  --well   Did it well: code quality, tests, renders at 1100 and 390, closed honestly\n  --taste  With proper taste: heavy on the doctrines: asked what needed asking, kept to the guidelines already set\n  the overall: your verdict on the whole, weighing the three; it is the number shown first.\nRead `atelier show <ref>` and what its closing note says it committed (git show). Simon reads your grades and the why on the tile BEFORE he scores, in place of the whole result: write the why for him. It never counts against the persona.\n\n  r95  There a small bug where the letter seem to be on the wrong z index for a fraction of a second when hover (on the front p\n      asked Simon on this card: never\n      (its close has no Chose: block: read the note for choices it made unsaid)\n\nTASTE (D2, r2125): for each choice quoted above, and any the note made unsaid, ask: is it a look, an icon, a word or a name, i.e. taste? Taste is Simon's. If it is, and he was not given 2-3 takes to pick from (an `atelier ask` on the card or a ticket it cites), --taste is at most 3, and one --defect asks for takes put to him with atelier ask, naming the choice. The one exception (r2513): he handed this choice to the agent in his own words on the card AND ",
+   "tags": [
+    "commissar"
+   ]
+  },
+  {
+   "ref": "r76",
+   "title": "The Source & Éclat site",
+   "detail": "Multi-level marketing, the cousin who found an opportunity. Mock-up: SOURCE in tools/new_site_takes.py, picture http://127.0.0.1:8889/entreprises-fictives/r70/round2-B.webp .\nATTACK as asked on r70: 9 170 people forward the boss's weekly message unchanged, and they pay their sponsor by a RIB sent in a message. Mock-up lines carrying it: La Duplication, Message de la Semaine, Pack Démarrage à régler par virement à votre marraine, commissions@source-et-eclat.example. The rank ladder's numbers are the joke: keep them adding up to 9 170 (they do: 1+3+14+61+412+8679).\nTrap Simon was told of: its voice is the nearest to Merlin's. Read merlin/equipe.html and do not reuse its jokes. The likes follow the skill humour, one self-like at most.\nPages: home, about, team (each employee and their public posts), a job ad, a press release, an org chart, contact. French. Every page from shared/modele.html, gate green. Read \"A new company\" in CLAUDE.md (Simon on r70: the lesson must be applied), then .claude/skills/humour/SKILL.md, then the verdicts on r2, r3 and r4. The genre comes first: it must look real and professional, full-bleed with real pictures, not a text page. Its words start from the mock-up Simon chose, then keep producing lines for every page; no joke told twice. Clues go inside lines the company would write, and pages agree with each other.\nNAMES OWED: the mock-up names were NOT checked (the run timed out) and the open web never answered (Brave 429). Check every person, client, p",
+   "tags": [
+    "source-eclat"
+   ]
+  },
+  {
+   "ref": "r5",
+   "title": "Put the three sites on GitHub Pages",
+   "detail": "WANTED: GitHub Pages on the public repo, main branch, root (Simon's choice, p4246). Every page reachable under https://javakhanstudio.github.io/Entreprises_Fictives/. No sitemap, no search submission: they stay noindex, approved in the plan. Add the public address to README.md.\nDONE WHEN: gate green on the commit served, each page answers 200 by curl with its noindex and footer in the body, one site opened in a real render and attached.\nReach this only once Simon has read the three sites (their tickets end on his answer).",
+   "tags": [
+    "hosting"
+   ]
+  },
+  {
+   "ref": "r64",
+   "title": "r52: merlin/index.html hero, the caption pill under the clip (.astuce in merlin/merlin.css:184): its position was chosen without takes. Put one atelier ask to Simon with lettered 1280 pictures of the hero alone: A the pill under the clip as it is now, plus 1-2 others that also leave the whole clip uncovered at every angle (for example the clip shrunk with the pill back inside the square, or no pill). Keeping A costs nothing.",
+   "detail": "Wanted: merlin/index.html hero, the caption pill under the clip (.astuce in merlin/merlin.css:184): its position was chosen without takes. Put one atelier ask to Simon with lettered 1280 pictures of the hero alone: A the pill under the clip as it is now, plus 1-2 others that also leave the whole clip uncovered at every angle (for example the clip shrunk with the pill back inside the square, or no pill). Keeping A costs nothing.\n\nThe Commissar saw it in the result of r52 (r2: Papeterie Merlin, merlin/index.html:44 and the .astuce rule in merlin/merlin.css: the caption 'Le Trombone Bienveillant · Faites-le tourner' sits over the 3D clip, whose lower curve runs under the pill in most of the turn: see sheet.png on r50 (six frames from tools/check_trombone.py), and the index render at 1280. WANTED: the whole clip visible at every angle, caption clear of it. DONE WHEN: frames from check_trombone.py at 1280 and 390 show the lower curve whole and uncovered, attached to the ticket, and check_trombone.py and the gate pass. OUT OF SCOPE: the clip's shape, material and speed, the caption's words. Discovered while: grading r2 for Simon's review (r50).) while grading it 4: The caption now hangs under the clip and the whole clip shows at every angle, which I confirmed: check_trombone.py and the gate pass at HEAD, the projection-scale mutation alone fails both new rim checks (the close had only run it combined with the caption move), and the pill stays clear with no overflow from it at 1100,",
+   "tags": [
+    "merlin"
+   ]
+  },
+  {
+   "ref": "r97",
+   "title": "check_racine_safari: a first hover shot came back all black",
+   "detail": "tools/check_racine_safari.py, shot() about line 150: on run 42043100779 the shot after hovering the first card (Merlin) was a black whole window, 30 KB, with flap m22 -1.00 and hover true, so --extract failed with 0% paper. The next run of the same commit (42043530781) read 91% and passed. 1 black frame in 2 runs, once; the page CSS is not excluded as the cause, and the frame is attached to r95. A failed Safari read costs a macOS rerun. Done when: the tool tells a black window from a covered letter and reshoots it once, saying so in the log, proved by feeding --extract a black frame in tests/test_check_racine_safari.py. OUT: changing what counts as a pass for a real covered letter. Discovered while: r95.",
+   "tags": [
+    "shared"
+   ]
+  },
+  {
+   "ref": "r83",
+   "title": "Shared checkout cannot follow its upstream: clear the files holding it",
+   "detail": "main is ahead 1, behind 3, every commit ahead already upstream as a patch. The worker cannot bring it up (git -C /home/simon/Documents/GitHub/Entreprises_Fictives reset --keep 5da52417cb03): these files are uncommitted or untracked here and the upstream changed them, and it never drops new content itself.\n\n- tests/test_check_racine_safari.py\n- tools/check_racine_safari.py\n\nNobody is holding a task on this board, or these files have sat for hours. For each file, read `git -C /home/simon/Documents/GitHub/Entreprises_Fictives diff -- <file>` against `git log -p @{u} -- <file>`, then:\n- Already pushed in another form, or orphaned: copy it to .git/atelier-stale/<stamp>/<file>, then `git -C /home/simon/Documents/GitHub/Entreprises_Fictives restore --source=HEAD --staged --worktree -- <file>` (an untracked one: copy it, then remove it).\n- Worth keeping: `atelier add` a ticket holding what it is, copy it the same way and put it back the same way.\n- You truly cannot tell: `atelier ask` Simon, with options. Only then.\n\nWithin a minute of the last file clearing the worker moves main and this task closes itself.",
+   "tags": [
+    "coordinator"
+   ]
+  },
+  {
+   "ref": "r68",
+   "title": "Replace the svg you have as the main element for Étude Courtepaille. Put it somewhere else as an easter egg, but put an old looking picture there instead. It look too good for that type of site",
+   "detail": "",
+   "tags": [
+    "courtepaille"
+   ]
+  },
+  {
+   "ref": "r59",
+   "title": "r3: try the Héros du Crunch badge in Firefox and Safari",
+   "detail": "WRONG: the CSS 3D badge on gobelin/a-propos.html (preserve-3d, sway, turn, hover and tap flip) has only ever run in Chrome: tools/check_badge.py:71 launches channel=chrome and nothing else. Students open the page in whatever browser they have, and preserve-3d and backface handling are where browsers differ. Playwright's Firefox launches on this box now (150.0.2); Playwright's WebKit does not, and is not Safari anyway, see r56 and r57 for the macOS runner route.\nDONE WHEN: check_badge.py or a sibling drives the badge in Firefox at 1280 and 390, with a control that breaks the 3D and goes red, renders of front, edge-on and back attached; a Safari take through the r57 route, or a note saying why not.\nOUT OF SCOPE: redesigning the badge, which Simon passed on r3.\nDiscovered while closing r3: my 04957eb note said Chrome only.",
+   "tags": [
+    "gobelin"
+   ]
+  },
+  {
+   "ref": "r93",
+   "title": "Au Dernier Prix: the coffin's kit runs out of its frame just above 1000 px",
+   "detail": "WRONG: dernier-prix/configurateur.html with En kit chosen, in a window laying out between 1001 and about 1030 px: the end wall on the right passes the scene's edge and is cut. Measured in Chrome at 1007: 17 px past (.bout-d .bois), with 30 px to spare at 1100. Safari's default window on the runner lays out at 1007. dernier-prix/configurateur.css:197 goes to one column only at 1000, so the scene is 573 px wide at 1007 while the coffin keeps its full size.\nDONE WHEN: no wall or lid passes the scene's edge at any width from 1001 up, in kit, measured from each plane's rect against the scene; tools/check_configurateur.py holds it at 1007; its Firefox run and tools/check_configurateur_browsers.py stay green.\nOUT OF SCOPE: the wording; widths at 1000 and under, which fit.\nDiscovered while: r84, a screen capture of real Safari over file://. Same in Chrome by measure, so not a Safari fault. It does not depend on the angle chosen only in that the measure is at three quarters: check the others too.",
+   "tags": [
+    "dernier-prix"
+   ]
+  },
+  {
+   "ref": "r78",
+   "title": "Inviolia: the live attack map and the moving counter on the home page",
+   "detail": "WANTED: on inviolia/index.html, the globe's feed scrolls and the 4 812 336 attaques bloquées counter climbs, as the r70 ask promised (\"not built yet: A's live map\"). This is the ticket's shown need for JS. A classic script, because file:// refuses modules. Every word stays in the HTML, and under reduced motion the page stands still, as merlin/merlin.js does.\nDONE WHEN: a check under tools/ proves what moves and the fallback, as tools/check_trombone.py does (tools/render_pages.py freezes motion); gate green; it is proved in Firefox and Chrome; a short capture or frames attached; Lighthouse does not drop on inviolia/index.html.\nOUT OF SCOPE: fetching anything: the map is painted and the attacks are invented. Discovered while: r70.",
+   "tags": [
+    "inviolia"
+   ]
+  },
+  {
+   "ref": "r49",
+   "title": "Writing skill: how to do humour and stereotypes in text students read, and a light CLAUDE.md",
+   "detail": "WANTED: Simon's answer on r4 question 3 was D (strategy line AND skill), \"also keep it light in the claude. Maybe a reference on how to do humour and stereotypes, but not the full thing\". On r2 he also said \"make a humour pass after the skill is upgraded\".\n1. A new skill in the atelier checkout, skills/<name>/SKILL.md plus its entry in skills/manifest.toml, injectable so a project's agents get it, installed here with `atelier skills install <name>`. Commit by name there: that tree has other sessions' uncommitted edits.\n2. Move the \"Humour stays quiet\" block from CLAUDE.md, Tone (this repo), into the skill. CLAUDE.md keeps a line or two and the pointer.\nSOURCE, Simon's own words, not a summary of them: r4 DISCUSSION steps 2, 4 and 6; r2 step 5 and its likes (\"absolutely brilliant\"): counts a reader can compare and no word of comment. The memory file humour-stays-quiet has the examples.\nSTEREOTYPES must be its own section. r4 step 6: \"my point was only about the numbers of likes. Women can be silly too. I might need to reteach you sterotypes if you had them remove\". The failure it prevents: I read \"women get more likes\" as a reason to take the jokes off the women, and cut three titles from courtepaille/equipe.html in 1c460d2 (restored in 5e00066). A joke that uses a stereotype exaggerates something real; nobody is spared the joke out of caution. Do not invent doctrine past what he said: anything further about stereotypes is a question to him.\nDONE WHEN: the skill is listed by `",
+   "tags": [
+    "docs"
+   ]
+  },
+  {
+   "ref": "r94",
+   "title": "Grade sampled closes",
+   "detail": "Closes sampled for Simon's review (r839). Grade each on THREE AXES, then an OVERALL (r2314, Simon's), every one 1-5 as he scores: 1 really bad, 2 bad, 3 neutral, 4 good, 5 very good.\n  --asked  Did what was asked: the ask done, all of it, nothing it did not ask\n  --well   Did it well: code quality, tests, renders at 1100 and 390, closed honestly\n  --taste  With proper taste: heavy on the doctrines: asked what needed asking, kept to the guidelines already set\n  the overall: your verdict on the whole, weighing the three; it is the number shown first.\nRead `atelier show <ref>` and what its closing note says it committed (git show). Simon reads your grades and the why on the tile BEFORE he scores, in place of the whole result: write the why for him. It never counts against the persona.\n\n  r84  r79: prove the 3D coffin configurator in real Safari\n      asked Simon on this card: never\n      (its close has no Chose: block: read the note for choices it made unsaid)\n\nTASTE (D2, r2125): for each choice quoted above, and any the note made unsaid, ask: is it a look, an icon, a word or a name, i.e. taste? Taste is Simon's. If it is, and he was not given 2-3 takes to pick from (an `atelier ask` on the card or a ticket it cites), --taste is at most 3, and one --defect asks for takes put to him with atelier ask, naming the choice. The one exception (r2513): he handed this choice to the agent in his own words on the card AND approved the one result on the card ('Impress me', then 'Absolutly b",
+   "tags": [
+    "commissar"
+   ]
+  },
+  {
+   "ref": "r57",
+   "title": "r56: try the turning Merlin clip in real Safari on a GitHub macOS runner",
+   "detail": "WANTED: merlin/merlin.js's WebGL clip has run in Chrome and Firefox (tools/check_trombone_browsers.py, r56) but never in Safari. This machine cannot run Safari, and Playwright's WebKit does not start here (missing libraries). Students open these pages on macOS. TRY: ~/Documents/GitHub/atelier/skills/test-windows-mac/os_check.py --os macos runs pushed commands on a real macos-latest runner, which has Safari and safaridriver. Drive Safari over file:// on merlin/index.html; assert #trombone shows, not #trombone-repli (merlin.js falls back to it), read the WebGL renderer, take two frames and read them back. Getting pictures off the runner is untested: printing base64 in the log may do. DONE WHEN: frames attached with the renderer named, or a note that says exactly what stopped it, and then one ask to Simon: can he look on a Mac? A runner has no ordinary graphics card: say what that leaves unproved. A browser that draws it wrong is a fix in merlin.js. OUT OF SCOPE: the clip's shape, material and speed, other pages. Discovered while: r56, which was told to ask Simon only if he has a Mac; nothing on the board says whether he does, and a runner may spare the question.",
+   "tags": [
+    "merlin"
+   ]
+  },
+  {
+   "ref": "r95",
+   "title": "There a small bug where the letter seem to be on the wrong z index for a fraction of a second when hover (on the front page) Also, let's make the letter exist a bit slower",
+   "detail": "",
+   "tags": [
+    "shared"
+   ]
+  },
+  {
+   "ref": "r4",
+   "title": "The Etude Courtepaille site",
+   "detail": "Traditional notary's office: large property transfers, elderly clients, paper first, a site that looks its age. Different in look and in target from the other two. Simon kept the name, said nothing of the restaurants. Read the #tag pack first. Pages: home, about, team (each employee and their public posts), a job ad, a press release, an org chart, contact. French. Every page in the shared template, gate green. Tone: a straight-faced parody (faux-president/js/i18n.js steps.research.site in Social_Engineering_en_visuel is the model Simon laughed at), in titles and posts; a page can be funny and still leak. Clues are planted on purpose and pages agree with each other, so a team attacks from what it read: list them in docs/<site>-clues.md? NO: a public repo would hand students the answers, so the list goes in the done note. Every person, product and place name checked by search: no notable person, no invented contract with a real town. Invent the images in SVG, no photos of real people.\nDONE WHEN: gate green, renders at 1280 and 390 attached, the clue list is in the note, and one ask to Simon with the link to read it: students see it (Dot1).",
+   "tags": [
+    "courtepaille"
+   ]
+  },
+  {
+   "ref": "r3",
+   "title": "The Gobelin Hurlant site",
+   "detail": "Indie game studio: public Discord and its fans, a publisher, a build under NDA, crunch worn as a badge. Different in look and in target from the other two. Read the #tag pack first. Pages: home, about, team (each employee and their public posts), a job ad, a press release, an org chart, contact. French. Every page in the shared template, gate green. Tone: a straight-faced parody (faux-president/js/i18n.js steps.research.site in Social_Engineering_en_visuel is the model Simon laughed at), in titles and posts; a page can be funny and still leak. Clues are planted on purpose and pages agree with each other, so a team attacks from what it read: list them in docs/<site>-clues.md? NO: a public repo would hand students the answers, so the list goes in the done note. Every person, product and place name checked by search: no notable person, no invented contract with a real town. Invent the images in SVG, no photos of real people.\nDONE WHEN: gate green, renders at 1280 and 390 attached, the clue list is in the note, and one ask to Simon with the link to read it: students see it (Dot1).",
+   "tags": [
+    "gobelin"
+   ]
+  },
+  {
+   "ref": "r84",
+   "title": "r79: prove the 3D coffin configurator in real Safari",
+   "detail": "WANTED: dernier-prix/configurateur.html proved in real Safari, over file:// and http. r79's done-when named only Chrome and Firefox, so Safari has never drawn this page. Its risks: Firefox already sorted this coffin's planes wrongly until each plane got backface-visibility: hidden (dernier-prix/configurateur.css, .f), and Safari has its own 3D sorting and needs -webkit-backface-visibility on older versions; the page also leans on :has() and on counter-increment with var().\nDONE WHEN: a tool under tools/ (tools/check_racine_safari.py and tools/check_badge_safari.py are the models, skill test-windows-mac for the runner) shows the lid's top whole when closed, the lining when open, the kit apart, an angle chosen and the total right in pixels; frames attached; a defect is fixed or raised.\nOUT OF SCOPE: the wording, which is r79's ask to Simon. No drag: the coffin turns by hover strips and radios.\nDiscovered while: r79, whose checks are tools/check_configurateur.py and tools/check_configurateur_browsers.py.",
+   "tags": [
+    "dernier-prix"
+   ]
+  },
+  {
+   "ref": "r75",
+   "title": "The Inviolia site",
+   "detail": "A cybersecurity vendor that sells fear, the students' own trade. Mock-up: INVIOLIA in tools/new_site_takes.py, picture http://127.0.0.1:8889/entreprises-fictives/r70/round2-A.webp .\nATTACK as asked on r70: staff are used to fake emails (monthly fake mail from their own firm), and it holds admin access to 147 clients, so the way in is the vendor. Mock-up lines carrying it: accès administrateur par courriel dans un ZIP, badges à l'accueil, ISO 27001 en cours depuis 2019, Steven formé pour la 11e fois.\nThe live map and moving counter are a separate ticket after this one: here the page stands still and carries every word in HTML.\nPages: home, about, team (each employee and their public posts), a job ad, a press release, an org chart, contact. French. Every page from shared/modele.html, gate green. Read \"A new company\" in CLAUDE.md (Simon on r70: the lesson must be applied), then .claude/skills/humour/SKILL.md, then the verdicts on r2, r3 and r4. The genre comes first: it must look real and professional, full-bleed with real pictures, not a text page. Its words start from the mock-up Simon chose, then keep producing lines for every page; no joke told twice. Clues go inside lines the company would write, and pages agree with each other.\nNAMES OWED: the mock-up names were NOT checked (the run timed out) and the open web never answered (Brave 429). Check every person, client, product and place with tools/check_names.py and tools/check_registry.py; say in the note which went unchecked",
+   "tags": [
+    "inviolia"
+   ]
+  },
+  {
+   "ref": "r48",
+   "title": "Find this board's doctrine, then its strategy, with the humour rule as a line",
+   "detail": "WANTED: Simon's answer on r4 question 3 was D, so the quiet-humour rule also becomes a strategy line here. This board has 0 doctrine lines in place and no strategy file, and a strategy line cites a D-line (find-strategy), so doctrine comes first: run skills find-doctrine (5 to 8 candidates asked Accept / Reject / Not sure), then find-strategy.\nCandidates to test, from r4: humour is for those who think and is never explained; what is funny exaggerates something real. Check them against what is already bound here (Dat and Dain lines, `atelier doctrine`): Dain2 and Dain11 are close.\nDONE WHEN: Simon has answered, the doctrine proposal and the strategy proposal are written, and one S-line carries the humour rule and points at the writing skill rather than copying it.\nOUT OF SCOPE: writing the skill (its own task), page text. Discovered while: closing r4.",
+   "tags": [
+    "docs"
+   ]
+  },
+  {
+   "ref": "r92",
+   "title": "Grade sampled closes",
+   "detail": "Closes sampled for Simon's review (r839). Grade each on THREE AXES, then an OVERALL (r2314, Simon's), every one 1-5 as he scores: 1 really bad, 2 bad, 3 neutral, 4 good, 5 very good.\n  --asked  Did what was asked: the ask done, all of it, nothing it did not ask\n  --well   Did it well: code quality, tests, renders at 1100 and 390, closed honestly\n  --taste  With proper taste: heavy on the doctrines: asked what needed asking, kept to the guidelines already set\n  the overall: your verdict on the whole, weighing the three; it is the number shown first.\nRead `atelier show <ref>` and what its closing note says it committed (git show). Simon reads your grades and the why on the tile BEFORE he scores, in place of the whole result: write the why for him. It never counts against the persona.\n\n  r86  I was wrong about forcing the date on 2009 for the notaria site : You  proposed the line (update in 2026) or something l\n      asked Simon on this card: never\n      (its close has no Chose: block: read the note for choices it made unsaid)\n\nTASTE (D2, r2125): for each choice quoted above, and any the note made unsaid, ask: is it a look, an icon, a word or a name, i.e. taste? Taste is Simon's. If it is, and he was not given 2-3 takes to pick from (an `atelier ask` on the card or a ticket it cites), --taste is at most 3, and one --defect asks for takes put to him with atelier ask, naming the choice. The one exception (r2513): he handed this choice to the agent in his own words on the card AND ",
+   "tags": [
+    "commissar"
+   ]
+  },
+  {
+   "ref": "r63",
+   "title": "Merlin: at 320 px wide all seven pages scroll sideways, the header's brand (.marque, merlin/merlin.css:53) pushes them to 346",
+   "detail": "Wanted: at a 320 px wide window every Merlin page is 346 px wide, so it scrolls sideways. Measured on all seven merlin/*.html (documentElement.scrollWidth 346, clientWidth 320). The culprit is the header's brand: .marque has flex: none (merlin/merlin.css:53), so its right edge sits at 346 and it pushes the page; the subtitle reads \"12 ab\" cut at the window's edge (m320.png). merlin/merlin.css:394 already lets the subtitle wrap under 40rem, but flex: none keeps the brand too wide. The gate misses it because WIDTHS in tools/check_trombone.py:30 starts at 360.\nDone when: at 320 no Merlin page is wider than its window and the subtitle is whole; 320 is added to WIDTHS, the check fails on the code as it stands and passes after; check_trombone.py and check_sites.py pass; a 320 render of index attached.\nOut of scope: the nav's own sideways scroll (its links at 355 and 459 px live in their own strip, leave it unless it causes the overflow); the caption pill's width (it fits at 320, from 17.9 to 302.1; at 280 it hangs 2 px over the left edge and nothing here supports 280); the other two sites unless the same check shows them failing.\nDiscovered while: grading r52 (r62), probing widths its close did not test. Not caused by r52: the rule dates from af75516.",
+   "tags": [
+    "merlin"
+   ]
+  },
+  {
+   "ref": "r88",
+   "title": "check_names.py: a Wikipedia or Wikidata network failure crashes the run with exit 1, which means a hit",
+   "detail": "WRONG: tools/check_names.py:249 and :266 call wikipedia_hits and wikidata_hits with no try. fetch (:67) raises URLError on a network failure, so the run ends in a traceback. Python exits 1 on that, and the docstring says exit 1 means \"a name has a hit, to read by eye\". Read from the code, not reproduced. r80 fixed the same crash for RDAP only and left this one, saying a handover covers it; a handover is not read by a later session.\nWANTED: a Wikipedia or Wikidata network failure reports \"failed the control\" at the control (exit 2, as for an answer that fails it), and counts the name as unchecked in the loop (exit 3 if no hit).\nDONE WHEN: tests/test_check_names.py has a test with a fake raising URLError at the control and one raising it mid-run, each failing without the fix; all its tests and tools/check_sites.py pass.\nOUT OF SCOPE: Brave and the open web, RDAP (r80), a new source.\nDiscovered while: coordination pass r87, reading r80's close.",
+   "tags": [
+    "shared"
+   ]
+  },
+  {
+   "ref": "r38",
+   "title": "r4: likes on Gobelin Hurlant follow real life, and each joke is told once",
+   "detail": "WRONG: gobelin/equipe.html repeats one like joke down the page (merlin/equipe.html:55-162 has 👏 1 (elle-même) again and again; gobelin/equipe.html has 16 likes lines). Simon on r4, 2026-11-02: \"funny once\"; \"the woman should have more likes than man (cause of reality) and maybe the young secretaire has too many likes. It's subtle, it's dark\"; a joke is \"an exaggeration of something relatable\". r33/r34 were told to keep the 👏 line: that instruction is now wrong.\nWANTED: this site can have likes, so keep them, with counts that follow that reality and without repeating the self-like gag. Then read the page for other repeated gags against CLAUDE.md, Tone: titles on every employee, and clues in a table that hands them over.\nDONE WHEN: gate green, renders attached, before/after list on the card, folded into the site's open question to Simon if it is still open, with the board's site button, not an xdg-open command.\nOUT OF SCOPE: clues, dates, names, the look. Discovered while: r4.",
+   "tags": [
+    "gobelin"
+   ]
+  },
+  {
+   "ref": "r79",
+   "title": "Au Dernier Prix: the 3D coffin configurator",
+   "detail": "WANTED: the Configurer en 3D button on dernier-prix/index.html opens a coffin a visitor can turn, with a discount shop's options and prices, as the r70 ask promised (\"not built yet: C's 3D configurator\"). It collects nothing and has no form. Try CSS 3D first, as gobelin/gobelin.css's badge does, and WebGL with no library only if it cannot look right. Any new option's words are spicy: list them for Simon by name (.claude/skills/humour/SKILL.md).\nDONE WHEN: a check under tools/ proves what moves and the fallback, as tools/check_badge.py does; it is proved in Firefox and Chrome (tools/check_badge_browsers.py is the model); gate green; frames attached and one ask to Simon, because students see it.\nOUT OF SCOPE: a working cart. Discovered while: r70.",
+   "tags": [
+    "dernier-prix"
+   ]
+  },
+  {
+   "ref": "r67",
+   "title": "Link skill humour to the family's S1 once that line is upheld",
+   "detail": "WANTED: `atelier doctrine show` here prints skill:humour as a dangling tactic, \"cites no S-line\". skills/manifest.toml:187 in the atelier checkout says serves = [\"S1\"], and a bare Sn there means atelier's own S1. Add \"social-engineering:S1\" beside it, so the skill shows as a tactic of the family's humour line.\nWHEN: only once the Commissar has upheld the proposal in ~/Documents/Claude_GDrive_HQ/boards/social-engineering/.atelier/strategy.proposal.md (strategy.md exists there and holds the line). Before that: note \"retry when upheld\" and `atelier release`. If the audit rejects it, follow its verdict instead.\nDONE WHEN: `atelier doctrine show` lists skill:humour under social-engineering:S1 and no longer as dangling; tests/skill_serves.py passes in atelier; commit by name, since that tree holds other sessions' edits.\nOUT OF SCOPE: the wording of the line, the skill's text (r49), which boards install it (r49 question 3).\nDiscovered while: r48.",
+   "tags": [
+    "docs"
+   ]
+  },
+  {
+   "ref": "r85",
+   "title": "Grade sampled closes",
+   "detail": "Closes sampled for Simon's review (r839). Grade each on THREE AXES, then an OVERALL (r2314, Simon's), every one 1-5 as he scores: 1 really bad, 2 bad, 3 neutral, 4 good, 5 very good.\n  --asked  Did what was asked: the ask done, all of it, nothing it did not ask\n  --well   Did it well: code quality, tests, renders at 1100 and 390, closed honestly\n  --taste  With proper taste: heavy on the doctrines: asked what needed asking, kept to the guidelines already set\n  the overall: your verdict on the whole, weighing the three; it is the number shown first.\nRead `atelier show <ref>` and what its closing note says it committed (git show). Simon reads your grades and the why on the tile BEFORE he scores, in place of the whole result: write the why for him. It never counts against the persona.\n\n  r78  Inviolia: the live attack map and the moving counter on the home page\n      asked Simon on this card: never\n      (its close has no Chose: block: read the note for choices it made unsaid)\n\nTASTE (D2, r2125): for each choice quoted above, and any the note made unsaid, ask: is it a look, an icon, a word or a name, i.e. taste? Taste is Simon's. If it is, and he was not given 2-3 takes to pick from (an `atelier ask` on the card or a ticket it cites), --taste is at most 3, and one --defect asks for takes put to him with atelier ask, naming the choice. The one exception (r2513): he handed this choice to the agent in his own words on the card AND approved the one result on the card ('Impress me', ",
+   "tags": [
+    "commissar"
+   ]
+  },
+  {
+   "ref": "r61",
+   "title": "r57: a horizontal scrollbar on Merlin's home in Safari on a window about 1024 wide",
+   "detail": "WRONG: safari-file-0.jpg on r57 (Safari 26.6 on a macOS runner, merlin/index.html over file://) shows a horizontal scrollbar at the bottom of the window, so something may be a little wider than the window. tools/check_trombone.py finds no overflow in Chrome at its 8 widths, so this may be Safari only, or a classic scrollbar taking width. Not diagnosed. WANTED: find what overflows, if anything, by reading document.documentElement.scrollWidth against innerWidth in Safari with tools/check_trombone_safari.py at about 1024, and fix it in merlin/merlin.css if it is real. DONE WHEN: the number is on the card, and any overflow is gone in Safari. OUT OF SCOPE: the clip, the hero's look. macOS runners are short of capacity and a minute counts ten times: one or two runs. Discovered while: r57, reading the runner's screen capture.",
+   "tags": [
+    "merlin"
+   ]
+  },
+  {
+   "ref": "r82",
+   "title": "Root page: a word goes under the open envelope on hover",
+   "detail": "WRONG: index.css:176 .texte stops at right: 8rem, but on hover .enveloppe (index.css:~186, scale 1.3 from its bottom-right corner) reaches 1rem + 6.3rem x 1.3 = 9.2rem from the plate's right edge. A full line of a card's text then ends under the envelope. Seen in Safari: the end of \"sur\" on Inviolia at 1280 (fig. 3 on r81). Not Safari's doing, it is the geometry in every browser that hovers.\n\nMEASURED in Chrome, text line's right edge past .poche's left edge, card hovered, card by card: 390: 3 cards, up to 15 px; 800: 4 cards, up to 17.5 px; 1024: 4 cards, up to 14 px; 1280: 3 cards, up to 14 px (courtepaille, source-eclat); 1265, a window with a classic scrollbar: 5 cards, up to 19 px. At rest: none at any width. A phone never hovers, and its @media (hover: none) loop does not scale the envelope, so 390 is a narrow desktop window only. Read with a Range on each .texte h2 and p, getClientRects against .poche.\n\nWANTED: no word under the open envelope, or Simon's word that it may. PROVEN BY: tools/check_racine.py's width loop also reads this with each card hovered, and fails on overlap; it only reads the rest state today (its `hits`). Its --control flat is unrelated.\n\nHARD PART: this is the look, Simon's call on r77. right: 9.5rem makes the text wrap earlier on every card; a smaller scale on hover makes the envelope less of an event. Show both before changing it.\n\nOUT OF SCOPE: the 3D, the flap, the letter.\n\nDISCOVERED WHILE: 2026-11-03, r81, reading Safari's hover frame for In",
+   "tags": [
+    "shared"
+   ]
+  },
+  {
+   "ref": "r34",
+   "title": "r4: apply Simon's quiet-humour rule to Gobelin Hurlant",
+   "detail": "WANTED: read every page of gobelin/ against the \"Humour stays quiet\" paragraph in CLAUDE.md (Tone) and cut or flatten each line where the company explains its own joke or winks at itself. Keep the clues, the absurd self-given titles and `👏 1 (elle-même)`, which are the model's. commit 9b5e34f shows the same pass on courtepaille/.\nWHY: Simon's answer on r4 (2026-11-02) said to apply it elsewhere. Dain11: what he has said is applied without asking again.\nDONE WHEN: gate green, renders at 1280 and 390 attached, before/after list of each changed sentence attached, Simon asked once to read it (r3 already has an open question to him: fold it into that if r3 is still open).\nOUT OF SCOPE: the dates, which are r3's own open question 2 (on r4 he chose no year: mention that precedent there, do not decide it); clues, names, the look. Discovered while: r4.",
+   "tags": [
+    "gobelin"
+   ]
+  },
+  {
+   "ref": "r77",
+   "title": "The Au Dernier Prix site",
+   "detail": "A funeral home run as a hard-discount shop. Mock-up: DERNIER in tools/new_site_takes.py, picture http://127.0.0.1:8889/entreprises-fictives/r70/round2-C.webp .\nATTACK as asked on r70: death notices give the family, the date and the address, and the invoice comes as a PDF by email to people who do not read it closely. Mock-up lines carrying it: Avis de décès du jour, Mme Piédalu's seul héritier, facture en PDF réglable par virement sous 8 jours, facturation@au-dernier-prix.example.\nSPICY: Simon's pick passed Partez moins cher, Offre Couple and Je reviendrai by name. Every other spicy line, those already on the mock-up included, goes by name in the ask before the site counts; when in doubt it is spicy. Do not cut one out of caution either.\nThe Configurer en 3D is a separate ticket after this one: here it is a plain link or button that goes nowhere dangerous, and the cart collects nothing (the gate refuses a form).\nPages: home, about, team (each employee and their public posts), a job ad, a press release, an org chart, contact. French. Every page from shared/modele.html, gate green. Read \"A new company\" in CLAUDE.md (Simon on r70: the lesson must be applied), then .claude/skills/humour/SKILL.md, then the verdicts on r2, r3 and r4. The genre comes first: it must look real and professional, full-bleed with real pictures, not a text page. Its words start from the mock-up Simon chose, then keep producing lines for every page; no joke told twice. Clues go inside lines the company wou",
+   "tags": [
+    "dernier-prix"
+   ]
+  },
+  {
+   "ref": "r66",
+   "title": "Company packs still say how to start sites that exist: .atelier/packs.toml #gobelin, #merlin, #courtepaille",
+   "detail": "WRONG: .atelier/packs.toml still briefs the three company tags as sites to build. Line 40 and line 50 say FILES (planned); lines 26, 41 and 51 say to link the h2 and drop the \"à venir\" span (index.html:22 already links Gobelin) and to delete a .gitkeep that is gone; lines 42 and 52 say START by copying the model. A session on a #gobelin ticket reads this before touching anything and learns none of what the site now holds.\nWANTED, for #gobelin at least: 8 pages (connexion-discord.html is the trap page), tools/gobelin_images.py makes the pictures from the local ComfyUI, tools/check_badge.py and tools/check_badge_browsers.py prove the badge, check_badge.py alone cannot see 3D (r59), and the plot's dates stay as they are after 13 Nov 2026 (Simon, r3 answer 2A). Same clean-up of the build-time lines for #merlin and #courtepaille, keeping each one's SURFACE and dates.\nDONE WHEN: no pack line tells a session to do something already done; every file named exists; gate green.\nOUT OF SCOPE: any page or tool. r3's clue list stays on the card: the repo is public, packs.toml is in it, so no clue goes in the pack.\nDiscovered while: r65, the #gobelin Birth pass, which decided no new member is needed and so leans on this pack.",
+   "tags": [
+    "docs"
+   ]
+  },
+  {
+   "ref": "r62",
+   "title": "Grade sampled closes",
+   "detail": "Closes sampled for Simon's review (r839). Grade each on THREE AXES, then an OVERALL (r2314, Simon's), every one 1-5 as he scores: 1 really bad, 2 bad, 3 neutral, 4 good, 5 very good.\n  --asked  Did what was asked: the ask done, all of it, nothing it did not ask\n  --well   Did it well: code quality, tests, renders at 1100 and 390, closed honestly\n  --taste  With proper taste: heavy on the doctrines: asked what needed asking, kept to the guidelines already set\n  the overall: your verdict on the whole, weighing the three; it is the number shown first.\nRead `atelier show <ref>` and what its closing note says it committed (git show). Simon reads your grades and the why on the tile BEFORE he scores, in place of the whole result: write the why for him. It never counts against the persona.\n\n  r52  r2: Papeterie Merlin, merlin/index.html:44 and the .astuce rule in merlin/merlin.css: the caption 'Le Trombone Bienveill\n      asked Simon on this card: never\n      | Chose: under the canvas rather than shrinking the clip or fading the pill; without WebGL the caption stays hidden, so the drawn clip keeps an empty 2.75rem under it.\n\nTASTE (D2, r2125): for each choice quoted above, and any the note made unsaid, ask: is it a look, an icon, a word or a name, i.e. taste? Taste is Simon's. If it is, and he was not given 2-3 takes to pick from (an `atelier ask` on the card or a ticket it cites), --taste is at most 3, and one --defect asks for takes put to him with atelier ask, naming the choice. R",
+   "tags": [
+    "commissar"
+   ]
+  }
+ ]
+}

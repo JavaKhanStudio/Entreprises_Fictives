@@ -7,7 +7,7 @@
 [tags.shared]
 label = "Skeleton & gate"
 visual = true          # a screen: handed the style, its close needs a Chose: line (r3903)
-description = "What all the sites share: shared/, the root index, the footer, the check gate"
+description = "What all the sites share: shared/, the root index, the footer, and the tools/ and tests/ that check every site (check_sites gate, check_names, check_pages, render_pages)"
 context = """
 FILES: index.html + index.css (the root list of the companies; its words name no count, Simon on r10, so a company can be added; a card shows a picture its own site ships, plus merlin/img/vignette.webp from tools/racine_images.py, and a manila envelope that opens on hover, CSS only, Simon on r77; after touching it run python3 tools/check_racine.py OUT, in Chrome and Firefox, because render_pages.py freezes it; a change to its timings or its flap also runs python3 tools/check_racine_frames.py OUT, which seeks every moment of the swing (r95: Chrome 156 draws a clip-path on the swinging flap adrift, so its triangles are masks, and the letter starts only once the flap has landed); real Safari, over file:// and http, is python3 tools/check_racine_safari.py on a macOS runner (r81, its docstring), which ten-times-priced minutes keep for a change of the 3D, the clip-paths and masks or where the pictures live; a new company also needs its name in CARDS there and in that tool, its --teinte and --cadre in index.css), shared/base.css (what every page shares, no company's look), shared/modele.html (the page every site starts from, and the reference footer), tools/check_sites.py (the gate), tests/test_check_sites.py (each refusal proved), tools/render_pages.py (the browser's view).
 GATE: python3 tools/check_sites.py walks every .html and .css and must pass before any push. It refuses, by rule name: noindex, footer, above-folder, base-copy, form, tel, external (an http(s) resource, also in CSS), live-link (an a href to any domain, mailto), relative (a link from /), dead-link (also a wrong case, also a folder), em-dash, domain (not .example), resolves (dig says the name exists or cannot tell: offline, the gate fails), phone (outside ARCEP's fiction ranges, cited in the script; what it does not read as a phone is listed at the top of the script: under 8 digits, split across tags, a long run whose groups of digits never add up to a number (0612 3456 7890, an IBAN, a SIRET), a comma number that is not five pairs joined by bare commas, a mark not in PHONE_SEPARATOR such as a middle dot or colon, a number glued to a word that is not in PHONE_LABEL or after a word and a slash or hyphen (FAC-0612345678, dossier/0612345678.pdf), an unprefixed run not starting 0, 33 or in the North American shape), index (a company's index.html the root list does not link).
@@ -116,7 +116,7 @@ THE ROUND (board skill §4, r4524): an ask's first picture is framed close on it
 """
 [tags.hosting]
 label = "Hosting"
-description = "GitHub Pages for the public repo"
+description = "GitHub Pages for the public repo: turning it on, the served address, and its line in README.md"
 context = """
 HOST: GitHub Pages on JavaKhanStudio/Entreprises_Fictives, main branch, root (Simon, p4246). On since r5. .nojekyll keeps it serving the tree as committed: without it Jekyll generates README.html and CLAUDE.html, pages with no noindex and no footer.
 ROBOTS: every page stays noindex, there is no sitemap and no search engine submission: these sites are not meant to be found.
@@ -125,7 +125,7 @@ CHECK: gh api repos/JavaKhanStudio/Entreprises_Fictives/pages, then python3 tool
 
 [tags.docs]
 label = "Docs & board words"
-description = "CLAUDE.md, README.md; the packs and lexicon"
+description = "The board's words: CLAUDE.md, README.md, the context packs, the lexicon, the skills this board uses (humour and others, even in the atelier checkout), doctrine and strategy, and the board's Maintenance upkeep"
 context = """
 The board's own upkeep lands here: the Maintenance tickets for Context packs, Lexicon, Tag vocabulary and Doctrine (atelier r853).
 .atelier/packs.toml holds one [tags.<slug>] per tag. A pack line names a file or a command; one that does not gets cut. `atelier --project entreprises-fictives doctor context_packs` lists paths that moved.
