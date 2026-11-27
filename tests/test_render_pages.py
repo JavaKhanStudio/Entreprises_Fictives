@@ -63,7 +63,7 @@ class TwoRunsAtOnce(unittest.TestCase):
                   </script></main>"""))
             run = subprocess.run([sys.executable, os.path.join(tree, "tools/render_pages.py"),
                                   os.path.join(tree, "out"), "index.html"],
-                                 capture_output=True, text=True, timeout=120)
+                                 capture_output=True, text=True, timeout=120, check=False)
             self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
             self.assertIn("give different pictures", run.stdout)
 

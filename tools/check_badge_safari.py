@@ -112,7 +112,7 @@ def serve():
 def screen(name):
     with tempfile.TemporaryDirectory() as d:
         shot = Path(d) / "s.png"
-        done = subprocess.run(["screencapture", "-x", str(shot)], capture_output=True, text=True)
+        done = subprocess.run(["screencapture", "-x", str(shot)], capture_output=True, text=True, check=False)
         if shot.exists():
             print_frame(name, small_jpeg(shot.read_bytes()))
         else:
@@ -127,11 +127,11 @@ def double_click():
 
 
 def on_the_mac():
-    print(subprocess.run(["sw_vers"], capture_output=True, text=True).stdout)
+    print(subprocess.run(["sw_vers"], capture_output=True, text=True, check=False).stdout)
     motion = subprocess.run(["defaults", "write", "com.apple.universalaccess", "reduceMotion", "-bool", "false"],
-                            capture_output=True, text=True)
+                            capture_output=True, text=True, check=False)
     print("reduceMotion off:", motion.returncode, motion.stderr.strip())
-    enable = subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True)
+    enable = subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True, check=False)
     print("safaridriver --enable:", enable.returncode, enable.stderr.strip())
     driver = subprocess.Popen(["safaridriver", "-p", "4444"])
     failed = []
@@ -230,7 +230,7 @@ def extract(log, out):
         print(key, {k: state[k] for k in ("facing", "hover", "clip", "animations", "reduced", "wide", "inner")})
         if scale is None:
             continue
-        box = lambda r: tuple(round(v * scale) for v in r)
+        box = lambda r, scale=scale: tuple(round(v * scale) for v in r)
         case = picture.crop(box(state["vitrine"]))
         if label == "front":
             print(" ", key, "gold", round(reads.share(picture, box(state["crunch"]), reads.GOLD), 3),

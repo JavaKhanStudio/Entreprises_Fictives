@@ -164,7 +164,7 @@ def double_click():
         for i in range(3):
             time.sleep(6 if i == 0 else 2)
             shot = Path(d) / f"{i}.png"
-            done = subprocess.run(["screencapture", "-x", str(shot)], capture_output=True, text=True)
+            done = subprocess.run(["screencapture", "-x", str(shot)], capture_output=True, text=True, check=False)
             if not shot.exists():
                 print("screencapture took nothing:", done.returncode, done.stderr.strip())
                 return
@@ -172,8 +172,8 @@ def double_click():
 
 
 def on_the_mac():
-    print(subprocess.run(["sw_vers"], capture_output=True, text=True).stdout)
-    enable = subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True)
+    print(subprocess.run(["sw_vers"], capture_output=True, text=True, check=False).stdout)
+    enable = subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True, check=False)
     print("safaridriver --enable:", enable.returncode, enable.stderr.strip())
     driver = subprocess.Popen(["safaridriver", "-p", "4444"])
     failed = []
@@ -254,7 +254,7 @@ SONDE = """<script>(function () {
 
 def file_probe():
     """What real Safari loads over file://, read from inside the page."""
-    print(subprocess.run(["sw_vers"], capture_output=True, text=True).stdout)
+    print(subprocess.run(["sw_vers"], capture_output=True, text=True, check=False).stdout)
     port = serve()
     scratch = []
 

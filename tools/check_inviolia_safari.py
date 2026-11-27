@@ -34,9 +34,9 @@ return {y: scrollY, wide: document.documentElement.scrollWidth - innerWidth, viv
 
 
 def on_the_mac():
-    print(subprocess.run(["sw_vers"], capture_output=True, text=True).stdout)
-    subprocess.run(["defaults", "write", "com.apple.universalaccess", "reduceMotion", "-bool", "false"])
-    subprocess.run(["sudo", "safaridriver", "--enable"])
+    print(subprocess.run(["sw_vers"], capture_output=True, text=True, check=False).stdout)
+    subprocess.run(["defaults", "write", "com.apple.universalaccess", "reduceMotion", "-bool", "false"], check=False)
+    subprocess.run(["sudo", "safaridriver", "--enable"], check=False)
     driver = subprocess.Popen(["safaridriver", "-p", "4444"])
     failed = []
     try:

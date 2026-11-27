@@ -128,7 +128,7 @@ def dig_status(domain):
     """The DNS status of a name: NXDOMAIN, NOERROR, or why it could not be told."""
     try:
         run = subprocess.run(["dig", "+time=3", "+tries=2", domain, "A"],
-                             capture_output=True, text=True, timeout=30)
+                             capture_output=True, text=True, timeout=30, check=False)
     except (OSError, subprocess.TimeoutExpired) as error:
         return f"dig failed ({error})"
     found = re.search(r"status: (\w+)", run.stdout)

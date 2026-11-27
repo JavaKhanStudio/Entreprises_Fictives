@@ -246,7 +246,7 @@ def write_board(picture, box):
     import random
 
     from PIL import ImageFilter
-    left, top, right, bottom = box
+    left, top, _right, bottom = box
     rng = random.Random(13)
     layer = picture.copy()
     gap = (bottom - top - sum(line[2] for line in BOARD_LINES)) / (len(BOARD_LINES) + 1)

@@ -71,7 +71,7 @@ def apply_take(tree, take):
     text = page.read_text(encoding="utf-8")
     for company in check_sites.COMPANIES:
         text, done = re.subn(rf'(<a href="{company}/index.html">.*?</h2>\s*)<p>.*?</p>',
-                             lambda found: found.group(1) + take[company], text, flags=re.DOTALL)
+                             lambda found, company=company: found.group(1) + take[company], text, flags=re.DOTALL)
         assert done == 1, company
     page.write_text(text, encoding="utf-8")
     with open(tree / "index.css", "a", encoding="utf-8") as stylesheet:

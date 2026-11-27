@@ -46,7 +46,7 @@ def check_black_frames(lines, d, failures):
     """--extract names a black window, open or flat, and never takes it for a read of the letter."""
     for i, kind in enumerate(("ouvert", "plat")):
         black = list(lines)
-        at = [n for n, l in enumerate(black) if l.startswith(f"{BEGIN} {kind}")][0]
+        at = next(n for n, l in enumerate(black) if l.startswith(f"{BEGIN} {kind}"))
         black[at + 1] = base64.b64encode(black_jpeg()).decode()
         log = Path(d) / f"black-{kind}"
         log.write_text("\n".join(black) + "\n")
@@ -65,7 +65,7 @@ def check_steady_shot(real, failures):
     for shots, want, takes, note in (([real], real, 1, False), ([black, real], real, 2, True), ([black, black], black, 2, True)):
         left, said = list(shots), io.StringIO()
         with contextlib.redirect_stdout(said):
-            got = tool.steady_shot("ouvert-merlin", lambda: left.pop(0), wait=0)
+            got = tool.steady_shot("ouvert-merlin", lambda left=left: left.pop(0), wait=0)
         if got != want or len(shots) - len(left) != takes or ("shooting it again" in said.getvalue()) != note:
             failures.append(f"steady_shot on {[len(s) for s in shots]}: {len(got)} bytes, {said.getvalue()!r}")
 
@@ -136,7 +136,7 @@ def main():
                 lines += frame_lines(name, page.screenshot(type="jpeg", quality=85))
                 page.close()
             check_black_frames(lines, d, failures)
-            real = base64.b64decode([lines[i + 1] for i, l in enumerate(lines) if l.startswith(f"{BEGIN} ouvert")][0])
+            real = base64.b64decode(next(lines[i + 1] for i, l in enumerate(lines) if l.startswith(f"{BEGIN} ouvert")))
             check_steady_shot(real, failures)
             log = Path(d) / "log"
             log.write_text("\n".join(lines) + "\n")
@@ -146,8 +146,8 @@ def main():
 
             # A flat control that reads as open must fail the extract.
             swapped = list(lines)
-            opened = [i for i, l in enumerate(swapped) if l.startswith(f"{BEGIN} ouvert")][0]
-            flat = [i for i, l in enumerate(swapped) if l.startswith(f"{BEGIN} plat")][0]
+            opened = next(i for i, l in enumerate(swapped) if l.startswith(f"{BEGIN} ouvert"))
+            flat = next(i for i, l in enumerate(swapped) if l.startswith(f"{BEGIN} plat"))
             swapped[opened + 1], swapped[flat + 1] = swapped[flat + 1], swapped[opened + 1]
             log.write_text("\n".join(swapped) + "\n")
             if not tool.extract(log, Path(d) / "out2"):

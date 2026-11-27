@@ -78,7 +78,7 @@ CLUES: in r77's note of 2026-11-03 02:30 (atelier show r77 --full), never in thi
 src = P.read_text()
 for slug, text in NEW.items():
     pat = re.compile(r'(\[tags\.' + re.escape(slug) + r'\][^\[]*?context = """)\n.*?\n(""")', re.DOTALL)
-    src, n = pat.subn(lambda m: m.group(1) + text.rstrip("\n") + "\n" + m.group(2), src, count=1)
+    src, n = pat.subn(lambda m, text=text: m.group(1) + text.rstrip("\n") + "\n" + m.group(2), src, count=1)
     assert n == 1, slug
 P.write_text(src)
 tomllib.loads(src)

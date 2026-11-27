@@ -18,6 +18,7 @@ Safari is not here: Playwright's WebKit is not Safari.
 Needs Playwright, Chrome, `playwright install firefox`, Pillow for OUT.
 """
 
+import itertools
 import re
 import sys
 from pathlib import Path
@@ -148,7 +149,7 @@ def stops(page, width, height):
     held = page.evaluate("inviolia.arrets()")
     expect(f"{label}: at least four stops", len(held) >= 4, held)
     expect(f"{label}: the page's end is a stop", held[-1] == page.evaluate("document.documentElement.scrollHeight - innerHeight"), held)
-    for before, target in zip(held, held[1:]):
+    for before, target in itertools.pairwise(held):
         # from nearer this stop than the one before it, inside its reach
         page.evaluate(f"scrollTo(0, {target - min(height // 8, (target - before) // 2 - 15)})")
         page.wait_for_timeout(100)
@@ -367,8 +368,8 @@ with sync_playwright() as p:
         for width, height in WINDOWS:
             page = browser.new_context(viewport={"width": width, "height": height}, reduced_motion="no-preference").new_page()
             errors = []
-            page.on("pageerror", lambda e: errors.append(str(e)))
-            page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
+            page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
+            page.on("console", lambda m, errors=errors: errors.append(m.text) if m.type == "error" else None)
             for one in () if only_live else PAGES:
                 sweep(page, one, width, height, words)
             if (width, height) in PINNED and not only_live:

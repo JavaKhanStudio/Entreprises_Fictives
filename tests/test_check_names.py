@@ -188,9 +188,9 @@ class Fetch(unittest.TestCase):
             dropped()
 
         with (mock.patch.object(check_names.urllib.request, "urlopen", urlopen),
-              mock.patch.object(check_names.time, "sleep", lambda seconds: None)):
-            with self.assertRaises(urllib.error.URLError):
-                check_names.fetch("https://rdap.example/domain/x.fr", {})
+              mock.patch.object(check_names.time, "sleep", lambda seconds: None),
+              self.assertRaises(urllib.error.URLError)):
+            check_names.fetch("https://rdap.example/domain/x.fr", {})
         self.assertEqual(len(calls), 4)
 
 

@@ -373,7 +373,7 @@ class Safari:
 
 
 def over_http(failed):
-    subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True)
+    subprocess.run(["sudo", "safaridriver", "--enable"], capture_output=True, text=True, check=False)
     driver = subprocess.Popen(["safaridriver", "-p", "4444"])
     try:
         for _ in range(40):
@@ -400,7 +400,7 @@ def screen(name):
     from tempfile import TemporaryDirectory
     with TemporaryDirectory() as d:
         picture = Path(d) / "s.png"
-        done = subprocess.run(["screencapture", "-x", str(picture)], capture_output=True, text=True)
+        done = subprocess.run(["screencapture", "-x", str(picture)], capture_output=True, text=True, check=False)
         if picture.exists():
             print_frame(name, small_jpeg(picture.read_bytes(), 1400))
         else:
@@ -475,14 +475,14 @@ def over_file(failed):
 
 
 def on_the_mac():
-    print(subprocess.run(["sw_vers"], capture_output=True, text=True).stdout)
+    print(subprocess.run(["sw_vers"], capture_output=True, text=True, check=False).stdout)
     motion = subprocess.run(["defaults", "write", "com.apple.universalaccess", "reduceMotion", "-bool", "false"],
-                            capture_output=True, text=True)
+                            capture_output=True, text=True, check=False)
     print("reduceMotion off:", motion.returncode, motion.stderr.strip())
     failed = []
     try:
         over_http(failed)
-    except Exception as e:     # file:// is still worth a look
+    except (OSError, RuntimeError, ValueError, KeyError, TypeError, IndexError) as e:  # file:// is still worth a look
         failed.append(f"http: {e}")
     over_file(failed)
     print("FAILED: " + "; ".join(failed) if failed else "ALL OK", flush=True)

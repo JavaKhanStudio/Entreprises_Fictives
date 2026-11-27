@@ -68,7 +68,7 @@ def main():
                 picture(browser, where, out / f"astuce-{letter}.png")
                 if letter != "C":
                     done = subprocess.run([sys.executable, str(where / "tools/check_trombone.py")],
-                                          capture_output=True, text=True)
+                                          capture_output=True, text=True, check=False)
                     said = [line for line in done.stdout.splitlines() if not line.startswith("OK")]
                     print(letter, "check_trombone:", done.returncode, said)
                     failed = failed or done.returncode != 0
