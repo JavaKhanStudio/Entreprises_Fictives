@@ -108,13 +108,13 @@
     return !!pilote && /swiftshader|llvmpipe|software/i.test(essai.getParameter(pilote.UNMASKED_RENDERER_WEBGL));
   }
 
-  function trombone(toile, repli) {
-    var gl = null, leger = sansGpu();
+  function contexte(toile, leger) {
     try {
-      gl = toile.getContext("webgl", { alpha: true, antialias: !leger, premultipliedAlpha: true });
-    } catch (e) { gl = null; }
-    if (!gl) return;
+      return toile.getContext("webgl", { alpha: true, antialias: !leger, premultipliedAlpha: true });
+    } catch (e) { return null; }
+  }
 
+  function programme(gl) {
     function nuanceur(type, source) {
       var s = gl.createShader(type);
       gl.shaderSource(s, source);
@@ -125,10 +125,13 @@
     gl.attachShader(prog, nuanceur(gl.VERTEX_SHADER, SOMMETS));
     gl.attachShader(prog, nuanceur(gl.FRAGMENT_SHADER, PIXELS));
     gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
     gl.useProgram(prog);
+    return prog;
+  }
 
-    var forme = tube(ligne(), 0.058, 18);
+  /* The wire's tube into the GPU's buffers, once. */
+  function charge(gl, prog, forme) {
     function attribut(nom, donnees) {
       gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
       gl.bufferData(gl.ARRAY_BUFFER, donnees, gl.STATIC_DRAW);
@@ -142,6 +145,29 @@
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, forme.indices, gl.STATIC_DRAW);
     gl.enable(gl.DEPTH_TEST);
     gl.clearColor(0, 0, 0, 0);
+  }
+
+  /* Roll, then yaw, then pitch, column by column; the float lifts it. */
+  function matrice(lacet, tangage, roulis, flotte) {
+    var cy = Math.cos(lacet), sy = Math.sin(lacet);
+    var cx = Math.cos(tangage), sx = Math.sin(tangage);
+    var cz = Math.cos(roulis), sz = Math.sin(roulis);
+    return new Float32Array([
+      cz * cy, sz * cx + cz * sy * sx, sz * sx - cz * sy * cx, 0,
+      -sz * cy, cz * cx - sz * sy * sx, cz * sx + sz * sy * cx, 0,
+      sy, -cy * sx, cy * cx, 0,
+      0, flotte, 0, 1
+    ]);
+  }
+
+  function trombone(toile, repli) {
+    var leger = sansGpu();
+    var gl = contexte(toile, leger);
+    if (!gl) return;
+    var prog = programme(gl);
+    if (!prog) return;
+    var forme = tube(ligne(), 0.058, 18);
+    charge(gl, prog, forme);
     var monde = gl.getUniformLocation(prog, "monde");
     var aspect = gl.getUniformLocation(prog, "aspect");
 
@@ -158,16 +184,7 @@
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       var flotte = calme ? 0 : Math.sin(t / 1400) * 0.05;
       var roulis = calme ? 0.2 : 0.2 + Math.sin(t / 2300) * 0.05;
-      var cy = Math.cos(lacet), sy = Math.sin(lacet);
-      var cx = Math.cos(tangage), sx = Math.sin(tangage);
-      var cz = Math.cos(roulis), sz = Math.sin(roulis);
-      /* Roll, then yaw, then pitch, column by column. */
-      gl.uniformMatrix4fv(monde, false, new Float32Array([
-        cz * cy, sz * cx + cz * sy * sx, sz * sx - cz * sy * cx, 0,
-        -sz * cy, cz * cx - sz * sy * sx, cz * sx + sz * sy * cx, 0,
-        sy, -cy * sx, cy * cx, 0,
-        0, flotte, 0, 1
-      ]));
+      gl.uniformMatrix4fv(monde, false, matrice(lacet, tangage, roulis, flotte));
       gl.uniform1f(aspect, l / h);
       gl.drawElements(gl.TRIANGLES, forme.indices.length, gl.UNSIGNED_SHORT, 0);
     }
@@ -184,37 +201,46 @@
       window.requestAnimationFrame(image);
     }
 
-    var x0 = 0, y0 = 0;
-    toile.addEventListener("pointerdown", function (e) {
-      tire = true; x0 = e.clientX; y0 = e.clientY;
-      toile.setPointerCapture(e.pointerId);
-    });
-    toile.addEventListener("pointermove", function (e) {
-      if (!tire) return;
-      var dx = (e.clientX - x0) * 0.01;
-      lacet += dx;
-      tangage = Math.max(-0.9, Math.min(0.9, tangage + (e.clientY - y0) * 0.006));
-      inertie = dx * 40;
-      x0 = e.clientX; y0 = e.clientY;
-      if (calme) dessine(0);
-    });
-    function lache() { tire = false; }
-    toile.addEventListener("pointerup", lache);
-    toile.addEventListener("pointercancel", lache);
-    toile.addEventListener("webglcontextlost", function () { toile.hidden = true; repli.hidden = false; });
+    /* Drag to turn; let go and it keeps the throw, then slows to its own pace. */
+    function ecoute() {
+      var x0 = 0, y0 = 0;
+      toile.addEventListener("pointerdown", function (e) {
+        tire = true; x0 = e.clientX; y0 = e.clientY;
+        toile.setPointerCapture(e.pointerId);
+      });
+      toile.addEventListener("pointermove", function (e) {
+        if (!tire) return;
+        var dx = (e.clientX - x0) * 0.01;
+        lacet += dx;
+        tangage = Math.max(-0.9, Math.min(0.9, tangage + (e.clientY - y0) * 0.006));
+        inertie = dx * 40;
+        x0 = e.clientX; y0 = e.clientY;
+        if (calme) dessine(0);
+      });
+      function lache() { tire = false; }
+      toile.addEventListener("pointerup", lache);
+      toile.addEventListener("pointercancel", lache);
+      toile.addEventListener("webglcontextlost", function () { toile.hidden = true; repli.hidden = false; });
+    }
 
-    toile.hidden = false;
-    repli.hidden = true;
-    var astuce = document.querySelector(".astuce");
-    if (astuce) astuce.hidden = false;
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(function (v) { vu = v[0].isIntersecting; }).observe(toile);
+    /* The canvas replaces the picture, and draws only while on screen. */
+    function montre() {
+      toile.hidden = false;
+      repli.hidden = true;
+      var astuce = document.querySelector(".astuce");
+      if (astuce) astuce.hidden = false;
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (v) { vu = v[0].isIntersecting; }).observe(toile);
+      }
+      if ("ResizeObserver" in window && calme) {
+        new ResizeObserver(function () { dessine(0); }).observe(toile);
+      }
+      if (calme) dessine(0);
+      else window.requestAnimationFrame(image);
     }
-    if ("ResizeObserver" in window && calme) {
-      new ResizeObserver(function () { dessine(0); }).observe(toile);
-    }
-    if (calme) dessine(0);
-    else window.requestAnimationFrame(image);
+
+    ecoute();
+    montre();
   }
 
   var toile = document.getElementById("trombone");

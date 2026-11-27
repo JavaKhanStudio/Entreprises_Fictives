@@ -1,0 +1,5 @@
+r124: render_pages.py merlin/index.html before (avant/) and after (apres/) the split of trombone(),
+compared with `compare -metric AE`: 0 pixels differ at 1280 and at 390. The pictures are not
+committed (2.4 MB of identical PNGs); the two trombone checks are summed up below.
+
+check_trombone.py: ALL OK (exit 0). check_trombone_browsers.py: ALL OK (exit 0), Firefox and headed Chrome.
