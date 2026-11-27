@@ -205,9 +205,8 @@ def run_states(d, emit, failed):
             d.frame(f"{key}-vide", state)
 
 
-def run_turn(d, failed):
-    """The sway, a real pointer on the strips, a click that stays."""
-    d.open(False)
+def sway_moves(d, failed):
+    """The coffin sways by itself, even on a Mac that asks for reduced motion."""
     if d.script(STATE)["reduced"]:
         print("this Mac asks for reduced motion: the sway is forced on, for this read", flush=True)
         d.script(ADD_STYLE, MOVE)
@@ -219,11 +218,17 @@ def run_turn(d, failed):
     print(f"sway: {a:.2f}, {b:.2f}", flush=True)
     if abs(a - b) < 0.1:
         failed.append(f"it does not sway ({a:.2f}, {b:.2f})")
-    d.away()
+
+
+def flash_before_use(d, failed):
     running = d.script(ECLAT)
     print(f"flash, before use: {running}", flush=True)
     if running[0] != 1 or running[1] != "1":
         failed.append(f"the lid's checkbox does not flash before use ({running})")
+
+
+def pointer_turns(d, failed):
+    """A real pointer on the strips: hovering does nothing, a drag turns, a click without one keeps the angle."""
     scene = d.script(STATE)["scene"]
     middle = round(scene["y"] + scene["h"] / 2)
     at = lambda share: round(scene["x"] + scene["w"] * share)
@@ -247,20 +252,41 @@ def run_turn(d, failed):
     d.lift()
     time.sleep(0.8)
     failed.extend(as_expected("a click without a drag", d.script(STATE), 90))
+
+
+def press_stops_sway(d, failed):
     a = d.script(SWAY)
     time.sleep(0.7)
     if abs(a - d.script(SWAY)) > 0.001:
         failed.append("the first press did not stop the sway")
+
+
+def view_after_drag(d, failed):
     d.click("label[for=v5]")
     d.away()
     time.sleep(0.8)
     failed.extend(as_expected("the view already chosen, after a drag", d.script(STATE), -30))
+
+
+def flash_after_use(d, failed):
     d.click("label.ouvrir")
     time.sleep(0.2)
     running = d.script(ECLAT)
     print(f"flash, after use: {running}", flush=True)
     if running[1] != "0":
         failed.append(f"using the lid's checkbox does not stop its flash ({running})")
+
+
+def run_turn(d, failed):
+    """The sway, a real pointer on the strips, a click that stays."""
+    d.open(False)
+    sway_moves(d, failed)
+    d.away()
+    flash_before_use(d, failed)
+    pointer_turns(d, failed)
+    press_stops_sway(d, failed)
+    view_after_drag(d, failed)
+    flash_after_use(d, failed)
 
 
 def run_fit(d, failed):
@@ -464,64 +490,83 @@ def on_the_mac():
     return 1 if failed else 0
 
 
-def extract(log, out):
-    """Write the frames, draw the same states in Chrome, read the pixels."""
-    from PIL import Image, ImageChops, ImageFilter
-    from playwright.sync_api import sync_playwright
+def is_magenta(r, g, b):
+    return r > 200 and g < 70 and b > 200
 
+
+def is_cyan(r, g, b):
+    return r < 70 and g > 200 and b > 200
+
+
+MARKER = {"repere-dessus": is_magenta, "repere-doublure": is_cyan, "plat-repere-dessus": is_magenta, "creux-repere-dessus": is_magenta}
+
+
+def count(path, kind):
+    """The pixels of one marker colour in a picture."""
+    from PIL import Image
+    rgb = Image.open(path).convert("RGB").tobytes()
+    return sum(1 for i in range(0, len(rgb), 3) if kind(rgb[i], rgb[i + 1], rgb[i + 2]))
+
+
+def far_from_chrome(out, client, state, box, other):
+    """check_configurateur_browsers.apart for a frame that came through a JPEG and a crop: softened,
+    and at its best alignment within a pixel, or wood grain alone reads as far apart (5 to 7 % on
+    Chrome against itself)."""
+    from PIL import Image, ImageChops, ImageFilter
+    if box[2] <= box[0] or box[3] <= box[1]:
+        return 1.0
+    soft = ImageFilter.GaussianBlur(1.5)
+    a = Image.open(out / f"chrome-{client}-{state}.png").convert("RGB").filter(soft).crop(box)
+    b = Image.open(out / f"{other}-{client}-{state}.png").convert("RGB").filter(soft)
+    best = 1.0
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            moved = b.crop((box[0] + dx, box[1] + dy, box[2] + dx, box[3] + dy))
+            d = ImageChops.difference(a, moved).convert("L")
+            best = min(best, sum(d.histogram()[25:]) / (d.width * d.height))
+    return best
+
+
+def mac_scene(metas, out, asked, name):
+    """The scene cut out of the Mac's frames, with and without the coffin, on Chrome's pixel grid.
+    By the height: a window's shot may or may not count its classic scrollbar in its width."""
+    from PIL import Image
+    state = metas[f"{asked}-{name}"]
+    scene, cut = state["scene"], []
+    for suffix in ("", "-vide"):
+        picture = Image.open(out / f"mac-{asked}-{name}{suffix}.jpg").convert("RGB")
+        scale = picture.height / state["top"][1]
+        box = [round(v * scale) for v in (scene["x"], scene["y"], scene["x"] + scene["w"], scene["y"] + scene["h"])]
+        cut.append(picture.crop(box).resize((round(scene["w"]), round(scene["h"]))))
+    return cut
+
+
+def chrome_marker(chrome, client, name, out):
+    """One marker frame drawn in Chrome, as the Mac drew it."""
     import check_configurateur as cc
     import check_configurateur_browsers as ccb
+    state, css = MARKED[name]
+    combo, view, lid = STATES[state]
+    context, page = cc.opened(chrome, [], client)
+    page.add_style_tag(content=css)
+    page.locator(".scene").scroll_into_view_if_needed()
+    cc.choose(page, *combo)
+    page.locator(".vues label", has_text=view).click()
+    if lid:
+        page.locator("label.ouvrir").click()
+    page.mouse.move(0, 0)
+    page.evaluate(cc.FREEZE, FREEZE_AT)
+    page.wait_for_timeout(cc.SETTLE)
+    page.evaluate(ccb.SETTLE)
+    page.locator(".scene").screenshot(path=out / f"chrome-{client}-{name}.png")
+    context.close()
 
-    magenta = lambda r, g, b: r > 200 and g < 70 and b > 200
-    cyan = lambda r, g, b: r < 70 and g > 200 and b > 200
-    colour = {"repere-dessus": magenta, "repere-doublure": cyan, "plat-repere-dessus": magenta, "creux-repere-dessus": magenta}
 
-    def count(path, kind):
-        rgb = Image.open(path).convert("RGB").tobytes()
-        return sum(1 for i in range(0, len(rgb), 3) if kind(rgb[i], rgb[i + 1], rgb[i + 2]))
+def chrome_references(metas, widths, out):
+    """Chrome's states and markers at each width Safari laid out; the step of each width's views."""
+    from playwright.sync_api import sync_playwright
 
-    metas = read_frames(log, out, "mac")[0]
-    problems = []
-    widths = sorted({key.split("-", 1)[0] for key in metas}, key=int, reverse=True)
-    if not widths:
-        print("NOT OK: no state in this log")
-        return 1
-
-    def far_from_chrome(client, state, box, other):
-        """check_configurateur_browsers.apart for a frame that came through a JPEG and a crop: softened,
-        and at its best alignment within a pixel, or wood grain alone reads as far apart (5 to 7 % on
-        Chrome against itself)."""
-        if box[2] <= box[0] or box[3] <= box[1]:
-            return 1.0
-        soft = ImageFilter.GaussianBlur(1.5)
-        a = Image.open(out / f"chrome-{client}-{state}.png").convert("RGB").filter(soft).crop(box)
-        b = Image.open(out / f"{other}-{client}-{state}.png").convert("RGB").filter(soft)
-        best = 1.0
-        for dx in (-1, 0, 1):
-            for dy in (-1, 0, 1):
-                moved = b.crop((box[0] + dx, box[1] + dy, box[2] + dx, box[3] + dy))
-                d = ImageChops.difference(a, moved).convert("L")
-                best = min(best, sum(d.histogram()[25:]) / (d.width * d.height))
-        return best
-
-    def load(asked, name):
-        """The scene cut out of the Mac's frames, on Chrome's pixel grid. By the height: a window's shot
-        may or may not count its classic scrollbar in its width."""
-        state = metas[f"{asked}-{name}"]
-        scene, cut = state["scene"], []
-        for suffix in ("", "-vide"):
-            picture = Image.open(out / f"mac-{asked}-{name}{suffix}.jpg").convert("RGB")
-            scale = picture.height / state["top"][1]
-            box = [round(v * scale) for v in (scene["x"], scene["y"], scene["x"] + scene["w"], scene["y"] + scene["h"])]
-            cut.append(picture.crop(box).resize((round(scene["w"]), round(scene["h"]))))
-        return cut
-
-    missing = [f"{asked}-{name}" for asked in widths for name in STATES if f"{asked}-{name}" not in metas]
-    if missing:
-        print(f"FAILED: the run left no frame of {missing}")
-        print("NOT OK")
-        return 1
-
+    import check_configurateur_browsers as ccb
     steps = {}
     with sync_playwright() as playwright:
         chrome = playwright.chromium.launch(channel="chrome", args=["--hide-scrollbars"])
@@ -529,62 +574,94 @@ def extract(log, out):
         for asked in widths:
             client = metas[f"{asked}-ferme"]["client"]
             steps[client] = ccb.frames(chrome, "chrome", client, out, "")["step"]
-            for name, (state, css) in MARKED.items():
-                combo, view, lid = STATES[state]
-                context, page = cc.opened(chrome, [], client)
-                page.add_style_tag(content=css)
-                page.locator(".scene").scroll_into_view_if_needed()
-                cc.choose(page, *combo)
-                page.locator(".vues label", has_text=view).click()
-                if lid:
-                    page.locator("label.ouvrir").click()
-                page.mouse.move(0, 0)
-                page.evaluate(cc.FREEZE, FREEZE_AT)
-                page.wait_for_timeout(cc.SETTLE)
-                page.evaluate(ccb.SETTLE)
-                page.locator(".scene").screenshot(path=out / f"chrome-{client}-{name}.png")
-                context.close()
+            for name in MARKED:
+                chrome_marker(chrome, client, name, out)
         chrome.close()
+    return steps
 
-    for asked in widths:
-        client = metas[f"{asked}-ferme"]["client"]
-        r = {"browser": "safari", "width": client, "errors": [], "step": steps[client],
-             "total_right": metas[f"{asked}-chene"].get("total_right", False)}
-        for state in STATES:
-            picture, empty = load(asked, state)
-            picture.save(out / f"safari-{client}-{state}.png")
-            mask = ccb.silhouette(picture, empty)
-            r[state] = {"box": ccb.box_of(mask), "oak": ccb.share(picture, mask, ccb.OAK), "gold": ccb.share(picture, mask, ccb.GOLD)}
-        checks = ccb.judge(r, out)
-        for state in STATES:
-            far = far_from_chrome(client, state, r[state]["box"], "safari")
-            checks.append((f"{state} is drawn as in Chrome ({far:.1%} of its box far apart)", far < ccb.LIMIT))
-        for name in MARKED:
-            picture, _ = load(asked, name)
-            picture.save(out / f"safari-{client}-{name}.png")
-            ours, theirs = count(out / f"safari-{client}-{name}.png", colour[name]), count(out / f"chrome-{client}-{name}.png", colour[name])
-            checks.append((f"{name}: {ours} px of the marker against Chrome's {theirs}", theirs > 500 and 0.93 < ours / theirs < 1.07))
-        for what, ok in checks:
-            print(f"{'OK  ' if ok else 'FAIL'} safari at {client}: {what}")
-            if not ok:
-                problems.append(f"safari at {client}: {what}")
-        if asked == "1280":
-            for name, (state, _css) in CONTROLS.items():
-                picture, _ = load(asked, name)
-                if "repere" in name:
-                    path = out / f"safari-{client}-{name}.png"
-                    picture.save(path)
-                    ours = count(path, colour[name])
-                    ratio = ours / max(1, count(out / f"chrome-{client}-repere-dessus.png", colour[name]))
-                    print(f"CONTROL {name}: {ours} px of the marker, {ratio:.0%} of Chrome's")
-                    wrong = not 0.93 < ratio < 1.07
-                else:
-                    picture.save(out / f"{name}-{client}-{state}.png")
-                    far = far_from_chrome(client, state, r[state]["box"], name)
-                    print(f"CONTROL {name}: {far:.1%} of the coffin's box far from Chrome")
-                    wrong = far >= ccb.LIMIT
-                if name.startswith("plat-") and not wrong:
-                    problems.append(f"{name}: the flat control still reads as right: this read proves nothing")
+
+def state_checks(metas, out, asked, client, step):
+    """Each state's silhouette, judged as Chrome's and Firefox's are, then against Chrome in its own box."""
+    import check_configurateur_browsers as ccb
+    r = {"browser": "safari", "width": client, "errors": [], "step": step,
+         "total_right": metas[f"{asked}-chene"].get("total_right", False)}
+    for state in STATES:
+        picture, empty = mac_scene(metas, out, asked, state)
+        picture.save(out / f"safari-{client}-{state}.png")
+        mask = ccb.silhouette(picture, empty)
+        r[state] = {"box": ccb.box_of(mask), "oak": ccb.share(picture, mask, ccb.OAK), "gold": ccb.share(picture, mask, ccb.GOLD)}
+    checks = ccb.judge(r, out)
+    for state in STATES:
+        far = far_from_chrome(out, client, state, r[state]["box"], "safari")
+        checks.append((f"{state} is drawn as in Chrome ({far:.1%} of its box far apart)", far < ccb.LIMIT))
+    return checks, r
+
+
+def marker_checks(metas, out, asked, client):
+    """The lid's top and the lining in a solid colour, counted against Chrome's."""
+    checks = []
+    for name in MARKED:
+        picture, _ = mac_scene(metas, out, asked, name)
+        picture.save(out / f"safari-{client}-{name}.png")
+        ours, theirs = count(out / f"safari-{client}-{name}.png", MARKER[name]), count(out / f"chrome-{client}-{name}.png", MARKER[name])
+        checks.append((f"{name}: {ours} px of the marker against Chrome's {theirs}", theirs > 500 and 0.93 < ours / theirs < 1.07))
+    return checks
+
+
+def control_reads_wrong(metas, out, asked, client, name, boxes):
+    """Prints one control's read; True when it reads as wrong."""
+    import check_configurateur_browsers as ccb
+    state = CONTROLS[name][0]
+    picture, _ = mac_scene(metas, out, asked, name)
+    if "repere" in name:
+        path = out / f"safari-{client}-{name}.png"
+        picture.save(path)
+        ours = count(path, MARKER[name])
+        ratio = ours / max(1, count(out / f"chrome-{client}-repere-dessus.png", MARKER[name]))
+        print(f"CONTROL {name}: {ours} px of the marker, {ratio:.0%} of Chrome's")
+        return not 0.93 < ratio < 1.07
+    picture.save(out / f"{name}-{client}-{state}.png")
+    far = far_from_chrome(out, client, state, boxes[state]["box"], name)
+    print(f"CONTROL {name}: {far:.1%} of the coffin's box far from Chrome")
+    return far >= ccb.LIMIT
+
+
+def control_problems(metas, out, asked, client, boxes):
+    """The flattened 3D must read as wrong; the hollow one is printed only."""
+    return [f"{name}: the flat control still reads as right: this read proves nothing"
+            for name in CONTROLS
+            if not control_reads_wrong(metas, out, asked, client, name, boxes) and name.startswith("plat-")]
+
+
+def width_problems(metas, out, asked, steps):
+    """Every read at one width Safari laid out, printed; what failed."""
+    client = metas[f"{asked}-ferme"]["client"]
+    checks, r = state_checks(metas, out, asked, client, steps[client])
+    checks += marker_checks(metas, out, asked, client)
+    problems = []
+    for what, ok in checks:
+        print(f"{'OK  ' if ok else 'FAIL'} safari at {client}: {what}")
+        if not ok:
+            problems.append(f"safari at {client}: {what}")
+    if asked == "1280":
+        problems += control_problems(metas, out, asked, client, r)
+    return problems
+
+
+def extract(log, out):
+    """Write the frames, draw the same states in Chrome, read the pixels."""
+    metas = read_frames(log, out, "mac")[0]
+    widths = sorted({key.split("-", 1)[0] for key in metas}, key=int, reverse=True)
+    if not widths:
+        print("NOT OK: no state in this log")
+        return 1
+    missing = [f"{asked}-{name}" for asked in widths for name in STATES if f"{asked}-{name}" not in metas]
+    if missing:
+        print(f"FAILED: the run left no frame of {missing}")
+        print("NOT OK")
+        return 1
+    steps = chrome_references(metas, widths, out)
+    problems = [p for asked in widths for p in width_problems(metas, out, asked, steps)]
     for problem in problems:
         print(f"FAILED: {problem}")
     print("OK" if not problems else "NOT OK")
