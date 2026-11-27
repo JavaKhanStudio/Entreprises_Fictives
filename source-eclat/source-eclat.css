@@ -41,7 +41,6 @@ h3 { margin: 0 0 6px; font-size: 24px; line-height: 1.2; }
 .chapo { max-width: 640px; margin: 0 auto 30px; color: var(--doux); text-align: center; }
 .blanc { background: #fff; }
 .rose { background: var(--rose); }
-.etroit { max-width: 780px; margin: 0 auto; padding-left: 0; padding-right: 0; }
 
 .rang { display: grid; grid-template-columns: 1fr minmax(0, 760px) 1fr; align-items: center; margin: 3px 0; }
 .rang > span { color: var(--doux); font-size: 14px; font-variant-numeric: tabular-nums; }
@@ -76,9 +75,6 @@ h3 { margin: 0 0 6px; font-size: 24px; line-height: 1.2; }
 .frise { display: grid; grid-template-columns: 90px 1fr; gap: 10px 24px; max-width: 780px; margin: 0 auto; }
 .frise b { color: var(--cuivre); font: italic 400 26px/1.2 "Liberation Serif", Georgia, serif; }
 .frise p { margin: 0 0 12px; }
-.dits { max-width: 780px; margin: 0 auto; }
-.dits h3 { margin-top: 26px; }
-.dits p { margin: 0; }
 
 .sommaire { padding: 18px 64px; background: #fff; text-align: center; font-size: 14px; }
 .fiche { display: grid; grid-template-columns: 240px 1fr; gap: 40px; border-top: 1px solid #ecdfd4; }
@@ -123,7 +119,6 @@ h3 { margin: 0 0 6px; font-size: 24px; line-height: 1.2; }
   .tete { flex-wrap: wrap; padding: 14px 24px; }
   .tete nav { order: 3; width: 100%; }
   section, .plein, .pied, .sommaire { padding-left: 24px; padding-right: 24px; }
-  .etroit { padding-left: 0; padding-right: 0; }
   .hero .txt { padding-left: 24px; }
   .prod { grid-template-columns: 1fr 1fr; gap: 30px; }
 }
